@@ -40,24 +40,24 @@
       </template>
       <rect
           v-if="lastMove !== null"
-          :x="(lastMove.fromCell.x) * tileAbsoluteWidth"
-          :y="(8- lastMove.fromCell.y -1) * tileAbsoluteHeight"
+          :x="(reverse ? 7 - lastMove.fromCell.x : lastMove.fromCell.x) * tileAbsoluteWidth"
+          :y="(reverse ? lastMove.fromCell.y : 8 - lastMove.fromCell.y - 1) * tileAbsoluteHeight"
           :width="tileAbsoluteWidth"
           :height="tileAbsoluteHeight"
           class="fill-yellow-300/75"
       />
       <rect
           v-if="lastMove !== null"
-          :x="(lastMove.toCell.x) * tileAbsoluteWidth"
-          :y="(8- lastMove.toCell.y -1) * tileAbsoluteHeight"
+          :x="(reverse ? 7 - lastMove.toCell.x : lastMove.toCell.x) * tileAbsoluteWidth"
+          :y="(reverse ? lastMove.toCell.y : 8 - lastMove.toCell.y - 1) * tileAbsoluteHeight"
           :width="tileAbsoluteWidth"
           :height="tileAbsoluteHeight"
           class="fill-yellow-300/75"
       />
       <rect
           v-if="currentMove !== null"
-          :x="(currentMove.fromCell.x) * tileAbsoluteWidth"
-          :y="(8- currentMove.fromCell.y -1) * tileAbsoluteHeight"
+          :x="(reverse ? 7 - currentMove.fromCell.x : currentMove.fromCell.x) * tileAbsoluteWidth"
+          :y="(reverse ? currentMove.fromCell.y : 8 - currentMove.fromCell.y - 1) * tileAbsoluteHeight"
           :width="tileAbsoluteWidth"
           :height="tileAbsoluteHeight"
           class="fill-red-300/75"
