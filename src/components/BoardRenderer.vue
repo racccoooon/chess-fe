@@ -10,7 +10,7 @@
         font-weight="500"
         text-anchor="middle"
         dominant-baseline="middle"
-        v-text="8 - i + 1"
+        v-text="reverse ? i : 8 - i + 1"
       />
     </template>
     <template v-for="i in 8" :key="i">
@@ -22,7 +22,7 @@
         font-weight="500"
         text-anchor="middle"
         dominant-baseline="middle"
-        v-text="String.fromCharCode(96 + i)"
+        v-text="String.fromCharCode(96 + (reverse ? 9 - i : i))"
       />
     </template>
     <svg :x="borderAbsoluteSize" :y="borderAbsoluteSize" :width="tileAbsoluteWidth * 8" :height="tileAbsoluteHeight * 8">
@@ -33,15 +33,15 @@
             :y="(y - 1) * tileAbsoluteHeight"
             :width="tileAbsoluteWidth"
             :height="tileAbsoluteHeight"
-            :class="['fill-green-100','fill-green-500'][(x + y) % 2]"
+            :class="['fill-green-100','fill-green-500'][reverse ? (x + y + 1) % 2 : (x + y) % 2]"
           />
         </template>
       </template>
       <TransitionGroup>
         <Piece
           v-for="piece in board.pieces"
-          :x="piece.x"
-          :y="piece.y"
+          :x="reverse ? 7 - piece.x : piece.x"
+          :y="reverse ? 7 - piece.y : piece.y"
           :type="piece.type"
           :color="piece.color"
           :key="piece.id"
@@ -57,6 +57,7 @@ import type { Board } from "@/lib/types";
 
 defineProps<{
   board: Board;
+  reverse: boolean;
 }>();
 
 const tileAbsoluteWidth = 100;

@@ -1,7 +1,7 @@
 <template>
   <div class="mx-3 sm:mx-auto sm:w-3/4 lg:w-2/3 2xl:w-11/12 max-w-7xl py-12">
     <div class="flex justify-center">
-      <BoardRenderer :board="board"/>
+      <BoardRenderer :board="board" :reverse="reverseBoard" />
     </div>
   </div>
 </template>
@@ -20,6 +20,8 @@ const gameId = useRoute().params.id as string;
 const board = ref<Board>({
   pieces: [],
 });
+
+const reverseBoard = ref(false);
 
 getGame(gameId).then((res) => {
   res.pieces?.forEach((piece) => {
