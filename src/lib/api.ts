@@ -19,6 +19,11 @@ export const getGame = async (gameId: string, token: string): Promise<Partial<Bo
   return response.data as Partial<Board>;
 }
 
+export const joinGame = async (gameId: string): Promise<{token: string; playerName: string; opponentName: string }> => {
+  const response = await api.post(`/games/${gameId}/join/`);
+  return response.data;
+}
+
 export const movePiece = async (gameId: string, token: string, move: Move): Promise<void> => {
   await api.post(
     `/games/${gameId}/moves/`,
