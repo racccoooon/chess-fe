@@ -34,6 +34,7 @@
             :width="tileAbsoluteWidth"
             :height="tileAbsoluteHeight"
             :class="['fill-green-100','fill-green-500'][reverse ? (x + y + 1) % 2 : (x + y) % 2]"
+            @click="handleClick(reverse ? 8 - x : x - 1, reverse ? y - 1 : 8 - y)"
           />
         </template>
       </template>
@@ -45,6 +46,7 @@
           :type="piece.type"
           :color="piece.color"
           :key="piece.id"
+          @click="handleClick(piece.x, piece.y)"
         />
       </TransitionGroup>
     </svg>
@@ -60,7 +62,16 @@ defineProps<{
   reverse: boolean;
 }>();
 
+const emit = defineEmits<{
+  (event: "click", ...args: [number, number]): void;
+}>();
+
 const tileAbsoluteWidth = 100;
 const tileAbsoluteHeight = 100;
 const borderAbsoluteSize = 33;
+
+const handleClick = (x: number, y: number) => {
+  console.log("clicked on board:", x, y);
+  emit("click", x, y);
+};
 </script>

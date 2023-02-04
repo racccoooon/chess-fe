@@ -34,3 +34,18 @@ export class Piece {
 export interface Board {
   pieces: Piece[];
 }
+
+export interface Cell {
+  x: number;
+  y: number;
+}
+
+export interface Move {
+  fromCell: Cell;
+  toCell: Cell;
+}
+
+export interface PartialMove {
+  fromCell: Cell | null;
+  toCell: Cell | null;
+}
