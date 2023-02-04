@@ -49,3 +49,8 @@ export interface PartialMove {
   fromCell: Cell | null;
   toCell: Cell | null;
 }
+
+export interface Player {
+  name: string;
+  color: PieceColor;
+}
