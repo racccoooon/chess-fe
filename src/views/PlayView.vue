@@ -19,11 +19,13 @@
 <script setup lang="ts">
 import BoardRenderer from "@/components/BoardRenderer.vue";
 import { getGame, joinGame, movePiece } from "@/lib/api";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import type { Board, Move, PartialMove, Player } from "@/lib/types";
 import { computed, onBeforeMount, onMounted, ref } from "vue";
 import { get, set, useEventListener } from "@vueuse/core";
 import { Piece, PieceColor, PieceType } from "@/lib/types";
+
+const router = useRouter();
 
 const gameId = ref(useRoute().params.gameId as string);
 const token = ref(window.history.state.token as string);
@@ -59,7 +61,14 @@ const initialize = async () => {
     delete window.history.state.token;
   } else {
     // if we don't have a token, we're joining the game
-    let res = await joinGame(get(gameId));
+    let res = await joinGame(get(gameId)).catch(() => {
+      // if we can't join the game, redirect to start playing page
+      router.push({ name: "start-playing" });
+    });
+
+    if (!res) {
+      return;
+    }
 
     set(token, res.token);
 
