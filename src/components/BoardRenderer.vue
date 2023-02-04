@@ -37,18 +37,27 @@
           />
         </template>
       </template>
-      <template v-for="x in 8" :key="x">
-        <template v-for="y in 2" :key="y">
-          <Piece :x="x - 1" :y="y - 1" :color="'white'" :type="'pawn'"/>
-          <Piece :x="x - 1" :y="y + 5" :color="'black'" :type="'pawn'" />
-        </template>
-      </template>
+      <TransitionGroup>
+        <Piece
+          v-for="piece in board.pieces"
+          :x="piece.x"
+          :y="piece.y"
+          :type="piece.type"
+          :color="piece.color"
+          :key="piece.id"
+        />
+      </TransitionGroup>
     </svg>
   </svg>
 </template>
 
 <script setup lang="ts">
 import Piece from "@/components/Piece.vue";
+import type { Board } from "@/lib/types";
+
+defineProps<{
+  board: Board;
+}>();
 
 const tileAbsoluteWidth = 100;
 const tileAbsoluteHeight = 100;
