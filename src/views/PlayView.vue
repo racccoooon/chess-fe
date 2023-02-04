@@ -1,6 +1,9 @@
 <template>
   <div class="mx-3 sm:mx-auto sm:w-3/4 lg:w-2/3 2xl:w-11/12 max-w-7xl py-12">
-    <div class="flex flex-col gap-12">
+    <div class="flex flex-col gap-8">
+      <div class="flex justify-center">
+        <h2 class="dark:text-gray-50 text-gray-900 text-xl font-bold">{{opponent?.name || "Opponent hasn't joined yet..."}}</h2>
+      </div>
       <div class="flex justify-center">
         <BoardRenderer
           :board="board"
@@ -8,6 +11,9 @@
           :currentMove="currentMove"
           :lastMove="lastMove"
           @click="handleClick" />
+      </div>
+      <div class="flex justify-center">
+        <h2 class="dark:text-gray-50 text-gray-900 text-xl font-bold">{{player?.name}} (You)</h2>
       </div>
       <div>
         <button @click="loadBoard" class="px-6 py-3 rounded-2xl bg-gray-700 border-b-4 border-gray-800 text-gray-50 font-medium text-lg">loadBoard</button>
@@ -34,7 +40,11 @@ const board = ref<Board>({
   pieces: [],
 });
 
-const player = ref<Player | null>(null);
+// set up the default players
+const player = ref<Player>({
+  color: PieceColor.White,
+  name: window.history.state!.playerName as string || "Player 1",
+});
 const opponent = ref<Player | null>(null);
 
 const reverseBoard = computed(() => {
@@ -47,18 +57,12 @@ const currentMove = ref<PartialMove | null>(null);
 const initialize = async () => {
   if (get(token)) {
     // if we have a token, we're the creator of the game
-    set(player, {
-      name: "",
-      color: PieceColor.White
-    });
 
-    set(opponent, {
-      name: "",
-      color: PieceColor.Black
-    });
+    // all values are already set, so we can just load the board
 
-    // remove token from history state
+    // remove token and playerName from history state because they are already saved
     delete window.history.state.token;
+    delete window.history.state.playerName;
   } else {
     // if we don't have a token, we're joining the game
     let res = await joinGame(get(gameId)).catch(() => {

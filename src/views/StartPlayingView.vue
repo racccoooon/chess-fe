@@ -26,7 +26,7 @@ const gameId = ref("");
 const createGame = async () => {
   let game = await createGameApi();
 
-  await router.push({ name: "play", params: { gameId: game.gameId }, state: { token: game.token } });
+  await router.push({ name: "play", params: { gameId: game.gameId }, state: { token: game.token, playerName: game.playerName } });
 };
 
 const join = async () => {
