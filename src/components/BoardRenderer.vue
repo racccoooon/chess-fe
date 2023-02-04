@@ -38,6 +38,30 @@
           />
         </template>
       </template>
+      <rect
+          v-if="lastMove !== null"
+          :x="(lastMove.fromCell.x) * tileAbsoluteWidth"
+          :y="(8- lastMove.fromCell.y -1) * tileAbsoluteHeight"
+          :width="tileAbsoluteWidth"
+          :height="tileAbsoluteHeight"
+          class="fill-yellow-300/75"
+      />
+      <rect
+          v-if="lastMove !== null"
+          :x="(lastMove.toCell.x) * tileAbsoluteWidth"
+          :y="(8- lastMove.toCell.y -1) * tileAbsoluteHeight"
+          :width="tileAbsoluteWidth"
+          :height="tileAbsoluteHeight"
+          class="fill-yellow-300/75"
+      />
+      <rect
+          v-if="currentMove !== null"
+          :x="(currentMove.fromCell.x) * tileAbsoluteWidth"
+          :y="(8- currentMove.fromCell.y -1) * tileAbsoluteHeight"
+          :width="tileAbsoluteWidth"
+          :height="tileAbsoluteHeight"
+          class="fill-red-300/75"
+      />
       <TransitionGroup>
         <Piece
           v-for="piece in board.pieces"
@@ -55,11 +79,13 @@
 
 <script setup lang="ts">
 import Piece from "@/components/Piece.vue";
-import type { Board } from "@/lib/types";
+import type {Board, Move, PartialMove} from "@/lib/types";
 
 defineProps<{
   board: Board;
   reverse: boolean;
+  currentMove: PartialMove | null;
+  lastMove: Move | null;
 }>();
 
 const emit = defineEmits<{

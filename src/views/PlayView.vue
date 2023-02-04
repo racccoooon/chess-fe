@@ -1,7 +1,12 @@
 <template>
   <div class="mx-3 sm:mx-auto sm:w-3/4 lg:w-2/3 2xl:w-11/12 max-w-7xl py-12">
     <div class="flex justify-center">
-      <BoardRenderer :board="board" :reverse="reverseBoard" @click="handleClick" />
+      <BoardRenderer
+          :board="board"
+          :reverse="reverseBoard"
+          :currentMove="currentMove"
+          :lastMove="lastMove"
+          @click="handleClick" />
     </div>
   </div>
 </template>
@@ -24,6 +29,7 @@ const board = ref<Board>({
 
 const reverseBoard = ref(false);
 
+const lastMove = ref<Move | null>(null);
 const currentMove = ref<PartialMove | null>(null);
 
 const loadBoard = async () => {
@@ -75,6 +81,7 @@ const handleClick = async (x: number, y: number) => {
     });
     await loadBoard();
 
+    set(lastMove, get(currentMove) as Move)
     set(currentMove, null);
   }
 };
