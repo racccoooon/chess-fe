@@ -21,6 +21,7 @@ export const getGame = async (gameId: string, token: string): Promise<Partial<Bo
 
 export const joinGame = async (gameId: string): Promise<{token: string; playerName: string; opponentName: string }> => {
   const response = await api.post(`/games/${gameId}/join/`);
+  console.log(response.data);
   return response.data;
 }
 

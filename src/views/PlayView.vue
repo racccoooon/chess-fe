@@ -30,8 +30,10 @@ import type { Board, Move, PartialMove, Player } from "@/lib/types";
 import { computed, onBeforeMount, onMounted, ref } from "vue";
 import { get, set, useEventListener } from "@vueuse/core";
 import { Piece, PieceColor, PieceType } from "@/lib/types";
+import {SignalrConnection} from "@/lib/signalr";
 
 const router = useRouter();
+const hubConnection = new SignalrConnection();
 
 const gameId = ref(useRoute().params.gameId as string);
 const token = ref(window.history.state.token as string);
@@ -67,7 +69,7 @@ const initialize = async () => {
     // if we don't have a token, we're joining the game
     let res = await joinGame(get(gameId)).catch(() => {
       // if we can't join the game, redirect to start playing page
-      router.push({ name: "start-playing" });
+      //router.push({ name: "start-playing" });
     });
 
     if (!res) {
@@ -86,6 +88,22 @@ const initialize = async () => {
       color: PieceColor.White
     });
   }
+
+  await hubConnection.start();
+  await hubConnection.joinGame(get(gameId), get(token));
+
+  hubConnection.onMoveMade(async (fromX, fromY, toX, toY) => {
+    set(lastMove, {
+      fromCell: { x: fromX, y: fromY },
+      toCell: { x: toX, y: toY },
+    });
+
+    await loadBoard();
+  });
+
+  hubConnection.onOpponentJoined((opponentName) => {
+    get(opponent)!.name = opponentName;
+  });
 
   await loadBoard();
 };
