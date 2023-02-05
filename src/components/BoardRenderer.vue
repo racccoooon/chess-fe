@@ -1,6 +1,6 @@
 <template>
   <svg
-    class="w-[800px] aspect-square select-none"
+    class="w-[800px] aspect-square select-none rounded-2xl overflow-hidden"
     :viewBox="`0 0 ${tileAbsoluteWidth * 8 + borderAbsoluteSize * 2} ${
       tileAbsoluteHeight * 8 + borderAbsoluteSize * 2
     }`"
