@@ -56,8 +56,8 @@
       />
       <rect
           v-if="currentMove !== null"
-          :x="(reverse ? 7 - currentMove.fromCell.x : currentMove.fromCell.x) * tileAbsoluteWidth"
-          :y="(reverse ? currentMove.fromCell.y : 8 - currentMove.fromCell.y - 1) * tileAbsoluteHeight"
+          :x="(reverse ? 7 - currentMove?.fromCell.x : currentMove?.fromCell.x) * tileAbsoluteWidth"
+          :y="(reverse ? currentMove?.fromCell.y : 8 - currentMove?.fromCell.y - 1) * tileAbsoluteHeight"
           :width="tileAbsoluteWidth"
           :height="tileAbsoluteHeight"
           class="fill-red-300/75"
