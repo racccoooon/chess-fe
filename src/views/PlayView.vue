@@ -69,7 +69,9 @@ const initialize = async () => {
     // if we don't have a token, we're joining the game
     let res = await joinGame(get(gameId)).catch(() => {
       // if we can't join the game, redirect to start playing page
-      //router.push({ name: "start-playing" });
+      if (import.meta.env.PROD) {
+        router.push({ name: "start-playing" });
+      }
     });
 
     if (!res) {
