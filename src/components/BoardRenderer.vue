@@ -93,7 +93,7 @@
         class="fill-red-300/75"
       />
       <TransitionGroup>
-        <Piece
+        <PieceRenderer
           v-for="piece in board.pieces"
           :x="reverse ? 7 - piece.x : piece.x"
           :y="reverse ? 7 - piece.y : piece.y"
@@ -108,7 +108,7 @@
 </template>
 
 <script setup lang="ts">
-import Piece from "@/components/Piece.vue";
+import PieceRenderer from "@/components/PieceRenderer.vue";
 import type { Board, Cell, Move, PartialMove } from "@/lib/types";
 import { computed } from "vue";
 

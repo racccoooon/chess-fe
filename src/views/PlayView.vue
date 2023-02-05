@@ -2,7 +2,9 @@
   <div class="mx-3 sm:mx-auto sm:w-3/4 lg:w-2/3 2xl:w-11/12 max-w-7xl py-12">
     <div class="flex flex-col gap-8">
       <div class="flex justify-center">
-        <h2 class="dark:text-gray-50 text-gray-900 text-xl font-bold">{{opponent?.name || "Opponent hasn't joined yet..."}}</h2>
+        <h2 class="dark:text-gray-50 text-gray-900 text-xl font-bold">
+          {{ opponent?.name || "Opponent hasn't joined yet..." }}
+        </h2>
       </div>
       <div class="flex justify-center">
         <BoardRenderer
@@ -10,13 +12,21 @@
           :reverse="reverseBoard"
           :currentMove="currentMove"
           :lastMove="lastMove"
-          @click="handleClick" />
+          @click="handleClick"
+        />
       </div>
       <div class="flex justify-center">
-        <h2 class="dark:text-gray-50 text-gray-900 text-xl font-bold">{{player?.name}} (You)</h2>
+        <h2 class="dark:text-gray-50 text-gray-900 text-xl font-bold">
+          {{ player?.name }} (You)
+        </h2>
       </div>
       <div>
-        <button @click="loadBoard" class="px-6 py-3 rounded-2xl bg-gray-700 border-b-4 border-gray-800 text-gray-50 font-medium text-lg">loadBoard</button>
+        <button
+          @click="loadBoard"
+          class="px-6 py-3 rounded-2xl bg-gray-700 border-b-4 border-gray-800 text-gray-50 font-medium text-lg"
+        >
+          loadBoard
+        </button>
       </div>
     </div>
   </div>
@@ -24,13 +34,13 @@
 
 <script setup lang="ts">
 import BoardRenderer from "@/components/BoardRenderer.vue";
-import { getGame, joinGame, movePiece } from "@/lib/api";
+import { getGame, joinGame } from "@/lib/api";
 import { useRoute, useRouter } from "vue-router";
 import type { Board, Move, PartialMove, Player } from "@/lib/types";
 import { computed, onBeforeMount, onMounted, ref } from "vue";
 import { get, set, useEventListener } from "@vueuse/core";
 import { Piece, PieceColor, PieceType } from "@/lib/types";
-import {SignalrConnection} from "@/lib/signalr";
+import { SignalrConnection } from "@/lib/signalr";
 
 const router = useRouter();
 const hubConnection = new SignalrConnection();
@@ -45,7 +55,7 @@ const board = ref<Board>({
 // set up the default players
 const player = ref<Player>({
   color: PieceColor.White,
-  name: window.history.state!.playerName as string || "Player 1",
+  name: (window.history.state!.playerName as string) || "Player 1",
 });
 const opponent = ref<Player | null>(null);
 
@@ -82,12 +92,12 @@ const initialize = async () => {
 
     set(player, {
       name: res.playerName,
-      color: PieceColor.Black
+      color: PieceColor.Black,
     });
 
     set(opponent, {
       name: res.opponentName,
-      color: PieceColor.White
+      color: PieceColor.White,
     });
   }
 
@@ -105,7 +115,7 @@ const initialize = async () => {
   hubConnection.onOpponentJoined((opponentName) => {
     set(opponent, {
       name: opponentName,
-      color: PieceColor.White
+      color: PieceColor.White,
     });
   });
 
@@ -115,13 +125,18 @@ const initialize = async () => {
 };
 
 const loadBoard = async () => {
-  let game = await getGame(get(gameId), get(token))
+  let game = await getGame(get(gameId), get(token));
 
   get(board).pieces = [];
 
   game.pieces?.forEach((piece) => {
     get(board).pieces.push(
-      new Piece(piece.type as PieceType, piece.color as PieceColor, piece.x, piece.y)
+      new Piece(
+        piece.type as PieceType,
+        piece.color as PieceColor,
+        piece.x,
+        piece.y
+      )
     );
   });
 };
@@ -131,12 +146,12 @@ onMounted(async () => {
 });
 
 onBeforeMount(() => {
-  useEventListener(window,"beforeunload", event => {
+  useEventListener(window, "beforeunload", (event) => {
     if (import.meta.env.PROD) {
       event.preventDefault();
       event.returnValue = "Are you sure you want to leave?";
     }
-  })
+  });
 });
 
 const handleClick = async (x: number, y: number) => {
@@ -158,9 +173,13 @@ const handleClick = async (x: number, y: number) => {
 
     console.log("completing move...", get(currentMove));
 
-    await hubConnection.makeMove(get(gameId), get(token), get(currentMove) as Move);
+    await hubConnection.makeMove(
+      get(gameId),
+      get(token),
+      get(currentMove) as Move
+    );
 
-    set(lastMove, get(currentMove) as Move)
+    set(lastMove, get(currentMove) as Move);
     set(currentMove, null);
   }
 };
