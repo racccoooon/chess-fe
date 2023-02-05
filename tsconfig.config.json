@@ -8,6 +8,9 @@
   ],
   "compilerOptions": {
     "composite": true,
-    "types": ["node"]
+    "types": ["node"],
+    // https://stackoverflow.com/a/64294112
+    "importsNotUsedAsValues": "remove",
+    "isolatedModules": false
   }
 }
