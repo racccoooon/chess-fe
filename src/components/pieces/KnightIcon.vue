@@ -22,7 +22,7 @@
 </template>
 
 <script setup lang="ts">
-import { PieceColor } from "@/lib/types";
+import type { PieceColor } from "@/lib/types";
 
 defineProps<{
   color: PieceColor;
