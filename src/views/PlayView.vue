@@ -90,7 +90,6 @@ const initialize = async () => {
   }
 
   await hubConnection.start();
-  await hubConnection.joinGame(get(gameId), get(token));
 
   hubConnection.onMoveMade(async (fromX, fromY, toX, toY) => {
     set(lastMove, {
@@ -102,8 +101,13 @@ const initialize = async () => {
   });
 
   hubConnection.onOpponentJoined((opponentName) => {
-    get(opponent)!.name = opponentName;
+    set(opponent, {
+      name: opponentName,
+      color: PieceColor.White
+    });
   });
+
+  await hubConnection.joinGame(get(gameId), get(token));
 
   await loadBoard();
 };
@@ -152,10 +156,7 @@ const handleClick = async (x: number, y: number) => {
 
     console.log("completing move...", get(currentMove));
 
-    await movePiece(get(gameId), get(token), get(currentMove) as Move).catch((error) => {
-      console.log(error);
-    });
-    await loadBoard();
+    await hubConnection.makeMove(get(gameId), get(token), get(currentMove) as Move);
 
     set(lastMove, get(currentMove) as Move)
     set(currentMove, null);

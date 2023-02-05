@@ -1,4 +1,5 @@
 import {HttpTransportType, HubConnection, HubConnectionBuilder, LogLevel} from "@aspnet/signalr";
+import type {Move} from "@/lib/types";
 
 export class SignalrConnection {
     private connection: HubConnection;
@@ -29,6 +30,13 @@ export class SignalrConnection {
 
     async leaveGame(gameId: string, token: string) {
         await this.connection.invoke("Leave", gameId, token);
+    }
+
+    async makeMove(gameId: string, token: string, move: Move) {
+        await this.connection.invoke("MakeMove", gameId, token, {
+            fromCell: move.fromCell,
+            toCell: move.toCell,
+        });
     }
 
     onMoveMade(callback: (fromX: number, fromY: number, toX: number, toY: number) => Promise<void>) {
