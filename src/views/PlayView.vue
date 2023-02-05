@@ -103,13 +103,21 @@ const initialize = async () => {
 
   await hubConnection.start();
 
-  hubConnection.onMoveMade(async (fromX, fromY, toX, toY) => {
-    set(lastMove, {
-      fromCell: { x: fromX, y: fromY },
-      toCell: { x: toX, y: toY },
-    });
+  hubConnection.onMoveMade(async (e) => {
+    let move: Move = {
+      fromCell: {
+        x: e.fromCell.x,
+        y: e.fromCell.y,
+      },
+      toCell: {
+        x: e.toCell!.x,
+        y: e.toCell!.y,
+      },
+    };
 
-    await loadBoard();
+    set(lastMove, move);
+
+    makeMove(move);
   });
 
   hubConnection.onOpponentJoined((opponentName) => {
@@ -141,6 +149,21 @@ const loadBoard = async () => {
   });
 };
 
+const getPieceAtCell = (x: number, y: number) => {
+  return get(board).pieces.find((piece) => piece.x === x && piece.y === y);
+};
+
+const makeMove = async (move: Move) => {
+  let piece = getPieceAtCell(move.fromCell.x, move.fromCell.y);
+
+  if (!piece) {
+    return;
+  }
+
+  piece.x = move.toCell.x;
+  piece.y = move.toCell.y;
+};
+
 onMounted(async () => {
   await initialize();
 });
@@ -155,23 +178,31 @@ onBeforeMount(() => {
 });
 
 const handleClick = async (x: number, y: number) => {
-  let move = get(currentMove);
+  let selectedPiece = getPieceAtCell(x, y);
 
-  if (move === null) {
-    move = {
+  if (get(currentMove) === null) {
+    // if there is no piece at the selected cell, or the piece is not the player's color, do nothing
+    if (
+      selectedPiece === undefined ||
+      selectedPiece.color !== get(player).color
+    ) {
+      return;
+    }
+
+    set(currentMove, {
       fromCell: { x, y },
       toCell: null,
-    } as PartialMove;
-
-    set(currentMove, move);
-
-    console.log("starting move...", get(currentMove));
+    } as PartialMove);
   } else {
-    move.toCell = { x, y };
+    // if the player selects a cell with a piece of their color as the target position, cancel the move
+    if (selectedPiece?.color === get(player).color) {
+      set(currentMove, null);
+      return;
+    }
 
-    set(currentMove, move);
+    // TODO: check if the move is valid
 
-    console.log("completing move...", get(currentMove));
+    get(currentMove)!.toCell = { x, y };
 
     await hubConnection.makeMove(
       get(gameId),

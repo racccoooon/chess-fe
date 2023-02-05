@@ -128,7 +128,6 @@ const tileAbsoluteHeight = 100;
 const borderAbsoluteSize = 33;
 
 const handleClick = (x: number, y: number) => {
-  console.log("clicked on board:", x, y);
   emit("click", x, y);
 };
 

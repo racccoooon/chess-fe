@@ -40,14 +40,7 @@ export class SignalrConnection {
     });
   }
 
-  onMoveMade(
-    callback: (
-      fromX: number,
-      fromY: number,
-      toX: number,
-      toY: number
-    ) => Promise<void>
-  ) {
+  onMoveMade(callback: (e: any) => Promise<void>) {
     this.connection.on("moveMade", callback);
   }
 
