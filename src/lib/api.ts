@@ -1,54 +1,17 @@
 import axios from "axios";
-import type { Board, Move } from "@/lib/types";
+import type { GameStartColor } from "@/lib/types";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
 });
 
-export const createGame = async (): Promise<{
+export const createGame = async (
+  color: GameStartColor
+): Promise<{
   gameId: string;
-  token: string;
-  playerName: string;
 }> => {
-  const response = await api.post("/games/");
-  return response.data;
-};
-
-export const getGame = async (
-  gameId: string,
-  token: string
-): Promise<Partial<Board>> => {
-  const response = await api.get(`/games/${gameId}/`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
+  const response = await api.post("/games/", {
+    color,
   });
-  return response.data as Partial<Board>;
-};
-
-export const joinGame = async (
-  gameId: string
-): Promise<{ token: string; playerName: string; opponentName: string }> => {
-  const response = await api.post(`/games/${gameId}/join/`);
-  console.log(response.data);
   return response.data;
-};
-
-export const movePiece = async (
-  gameId: string,
-  token: string,
-  move: Move
-): Promise<void> => {
-  await api.post(
-    `/games/${gameId}/moves/`,
-    {
-      fromCell: move.fromCell,
-      toCell: move.toCell,
-    },
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
 };

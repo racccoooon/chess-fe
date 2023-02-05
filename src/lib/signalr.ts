@@ -1,12 +1,12 @@
 // @ts-ignore
 import { HubConnection, HubConnectionBuilder, LogLevel } from "@aspnet/signalr";
-import type { Move } from "@/lib/types";
+import type { GameStartedResponse, JoinGameResponse } from "@/lib/types";
 
 export class SignalrConnection {
   private connection: HubConnection;
   constructor() {
     this.connection = new HubConnectionBuilder()
-      .withUrl(`${import.meta.env.VITE_HUB_URL}`)
+      .withUrl(`${import.meta.env.VITE_GAME_HUB_URL}`)
       .configureLogging(LogLevel.Debug)
       .build();
   }
@@ -25,26 +25,36 @@ export class SignalrConnection {
     await this.connection.stop();
   }
 
-  async joinGame(gameId: string, token: string) {
-    await this.connection.invoke("Join", gameId, token);
+  async joinGame(gameId: string, token: string, playerName: string) {
+    await this.connection.invoke("JoinGame", {
+      gameId,
+      token,
+      playerName,
+    });
   }
 
-  async leaveGame(gameId: string, token: string) {
-    await this.connection.invoke("Leave", gameId, token);
-  }
-
+  /*
   async makeMove(gameId: string, token: string, move: Move) {
     await this.connection.invoke("MakeMove", gameId, token, {
       fromCell: move.fromCell,
       toCell: move.toCell,
     });
   }
+   */
 
   onMoveMade(callback: (e: any) => Promise<void>) {
     this.connection.on("moveMade", callback);
   }
 
-  onOpponentJoined(callback: (opponentName: string) => void) {
+  onGameFull(callback: () => void) {
+    this.connection.on("gameFull", callback);
+  }
+
+  onGameJoined(callback: (e: JoinGameResponse) => void) {
     this.connection.on("gameJoined", callback);
+  }
+
+  onGameStarted(callback: (e: GameStartedResponse) => void) {
+    this.connection.on("gameStarted", callback);
   }
 }

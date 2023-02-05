@@ -15,6 +15,12 @@ export enum PieceColor {
   Black = "black",
 }
 
+export enum GameStartColor {
+  White = "white",
+  Black = "black",
+  Random = "randomColor",
+}
+
 export class Piece {
   type: PieceType;
   color: PieceColor;
@@ -50,7 +56,31 @@ export interface PartialMove {
   toCell: Cell | null;
 }
 
+export interface MoveItem {
+  fromCell: Cell;
+  toCell: Cell;
+  color: PieceColor;
+  type: PieceType;
+}
+
 export interface Player {
   name: string;
   color: PieceColor;
+}
+
+export interface JoinGameResponse {
+  moves: MoveItem[];
+  board: {
+    color: PieceColor;
+    type: PieceType;
+    position: Cell;
+  }[];
+  activeColor: PieceColor;
+  playerColor: PieceColor;
+  opponentName: string;
+}
+
+export interface GameStartedResponse {
+  whitePlayerName: string;
+  blackPlayerName: string;
 }

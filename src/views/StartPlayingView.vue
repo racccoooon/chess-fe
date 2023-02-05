@@ -22,22 +22,22 @@
         <div class="flex flex-row gap-4 items-center">
           <h2 class="font-medium text-lg">You Play As</h2>
           <button
-            @click="selectedColor = ColorOptions.White"
-            :aria-selected="selectedColor === ColorOptions.White"
+            @click="selectedColor = GameStartColor.White"
+            :aria-selected="selectedColor === GameStartColor.White"
             class="w-24 h-16 rounded-2xl bg-gray-200 border-b-4 active:border-b-0 active:border-t-4 border-gray-300 text-gray-900 font-medium text-md aria-selected:outline outline-3 outline-pink-500 outline-offset-4 transition-all ease-in-out"
           >
             White
           </button>
           <button
-            @click="selectedColor = ColorOptions.Black"
-            :aria-selected="selectedColor === ColorOptions.Black"
+            @click="selectedColor = GameStartColor.Black"
+            :aria-selected="selectedColor === GameStartColor.Black"
             class="w-24 h-16 rounded-2xl bg-gray-700 border-b-4 active:border-b-0 active:border-t-4 border-gray-900 text-gray-50 font-medium text-md aria-selected:outline outline-3 outline-pink-500 outline-offset-4 transition-all ease-in-out"
           >
             Black
           </button>
           <button
-            @click="selectedColor = ColorOptions.Random"
-            :aria-selected="selectedColor === ColorOptions.Random"
+            @click="selectedColor = GameStartColor.Random"
+            :aria-selected="selectedColor === GameStartColor.Random"
             class="w-24 h-16 rounded-2xl bg-gray-700 border-b-4 active:border-b-0 active:border-t-4 border-gray-900 text-gray-50 font-medium text-md aria-selected:outline outline-3 outline-pink-500 outline-offset-4 transition-all ease-in-out"
           >
             Random
@@ -85,25 +85,20 @@
 import { createGame as createGameApi } from "@/lib/api";
 import { useRouter } from "vue-router";
 import { ref } from "vue";
-
-enum ColorOptions {
-  White = "white",
-  Black = "black",
-  Random = "random",
-}
+import { GameStartColor } from "@/lib/types";
+import { get } from "@vueuse/core";
 
 const router = useRouter();
 const playerName = ref("");
-const selectedColor = ref(ColorOptions.White);
+const selectedColor = ref(GameStartColor.White);
 const gameId = ref("");
 
 const createGame = async () => {
-  let game = await createGameApi();
+  let game = await createGameApi(get(selectedColor));
 
   await router.push({
     name: "play",
     params: { gameId: game.gameId },
-    state: { token: game.token, playerName: game.playerName },
   });
 };
 

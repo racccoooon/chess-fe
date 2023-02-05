@@ -20,33 +20,32 @@
           {{ player?.name }} (You)
         </h2>
       </div>
-      <div>
-        <button
-          @click="loadBoard"
-          class="px-6 py-3 rounded-2xl bg-gray-700 border-b-4 border-gray-800 text-gray-50 font-medium text-lg"
-        >
-          loadBoard
-        </button>
-      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import BoardRenderer from "@/components/BoardRenderer.vue";
-import { getGame, joinGame } from "@/lib/api";
 import { useRoute, useRouter } from "vue-router";
-import type { Board, Move, PartialMove, Player } from "@/lib/types";
+import type {
+  Board,
+  GameStartedResponse,
+  JoinGameResponse,
+  Move,
+  PartialMove,
+  Player,
+} from "@/lib/types";
 import { computed, onBeforeMount, onMounted, ref } from "vue";
 import { get, set, useEventListener } from "@vueuse/core";
 import { Piece, PieceColor, PieceType } from "@/lib/types";
 import { SignalrConnection } from "@/lib/signalr";
+import { v4 as uuid } from "uuid";
 
 const router = useRouter();
 const hubConnection = new SignalrConnection();
 
 const gameId = ref(useRoute().params.gameId as string);
-const token = ref(window.history.state.token as string);
+const token = ref<string | null>(null);
 
 const board = ref<Board>({
   pieces: [],
@@ -66,39 +65,19 @@ const reverseBoard = computed(() => {
 const lastMove = ref<Move | null>(null);
 const currentMove = ref<PartialMove | null>(null);
 
+const activeColor = ref<PieceColor>(PieceColor.White);
+
+const canMove = computed(() => {
+  if (get(opponent) === null) {
+    return false;
+  }
+  return get(activeColor) === get(player).color;
+});
+
 const initialize = async () => {
-  if (get(token)) {
-    // if we have a token, we're the creator of the game
-
-    // all values are already set, so we can just load the board
-
-    // remove token and playerName from history state because they are already saved
-    delete window.history.state.token;
-    delete window.history.state.playerName;
-  } else {
-    // if we don't have a token, we're joining the game
-    let res = await joinGame(get(gameId)).catch(() => {
-      // if we can't join the game, redirect to start playing page
-      if (import.meta.env.PROD) {
-        router.push({ name: "start-playing" });
-      }
-    });
-
-    if (!res) {
-      return;
-    }
-
-    set(token, res.token);
-
-    set(player, {
-      name: res.playerName,
-      color: PieceColor.Black,
-    });
-
-    set(opponent, {
-      name: res.opponentName,
-      color: PieceColor.White,
-    });
+  if (get(token) === null) {
+    // create a new token if we don't have one already
+    set(token, uuid());
   }
 
   await hubConnection.start();
@@ -120,33 +99,58 @@ const initialize = async () => {
     makeMove(move);
   });
 
-  hubConnection.onOpponentJoined((opponentName) => {
+  hubConnection.onGameFull(() => {
+    alert("Game is full!");
+    router.push({ name: "start-playing" });
+  });
+
+  hubConnection.onGameJoined((e: JoinGameResponse) => {
+    // set board
+    e.board.forEach((piece) => {
+      get(board).pieces.push(
+        new Piece(
+          piece.type as PieceType,
+          piece.color as PieceColor,
+          piece.position.x,
+          piece.position.y
+        )
+      );
+    });
+
+    // set player color
+    get(player).color = e.playerColor as PieceColor;
+
+    // set opponent if they joined
+    if (e.opponentName) {
+      set(opponent, {
+        name: e.opponentName,
+        color:
+          e.playerColor === PieceColor.White
+            ? PieceColor.Black
+            : PieceColor.White,
+      });
+    }
+
+    // set active color
+    set(activeColor, e.activeColor as PieceColor);
+  });
+
+  hubConnection.onGameStarted((e: GameStartedResponse) => {
+    let opponentColor =
+      get(player).color === PieceColor.White
+        ? PieceColor.Black
+        : PieceColor.White;
+
     set(opponent, {
-      name: opponentName,
-      color: PieceColor.White,
+      name:
+        opponentColor === PieceColor.White
+          ? e.whitePlayerName
+          : e.blackPlayerName,
+      color: opponentColor,
     });
   });
 
-  await hubConnection.joinGame(get(gameId), get(token));
-
-  await loadBoard();
-};
-
-const loadBoard = async () => {
-  let game = await getGame(get(gameId), get(token));
-
-  get(board).pieces = [];
-
-  game.pieces?.forEach((piece) => {
-    get(board).pieces.push(
-      new Piece(
-        piece.type as PieceType,
-        piece.color as PieceColor,
-        piece.x,
-        piece.y
-      )
-    );
-  });
+  await hubConnection.joinGame(get(gameId), get(token)!, get(player).name);
 };
 
 const getPieceAtCell = (x: number, y: number) => {
@@ -178,6 +182,11 @@ onBeforeMount(() => {
 });
 
 const handleClick = async (x: number, y: number) => {
+  if (!get(canMove)) {
+    set(currentMove, null);
+    return;
+  }
+
   let selectedPiece = getPieceAtCell(x, y);
 
   if (get(currentMove) === null) {
@@ -204,11 +213,13 @@ const handleClick = async (x: number, y: number) => {
 
     get(currentMove)!.toCell = { x, y };
 
+    /*
     await hubConnection.makeMove(
       get(gameId),
-      get(token),
+      get(token)!,
       get(currentMove) as Move
     );
+     */
 
     set(lastMove, get(currentMove) as Move);
     set(currentMove, null);
