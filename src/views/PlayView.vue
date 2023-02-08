@@ -102,7 +102,7 @@ const initialize = async () => {
 
     set(lastMove, move);
 
-    makeMove(move);
+    resolveMove(move);
   });
 
   hubConnection.onGameFull(() => {
@@ -163,7 +163,7 @@ const getPieceAtCell = (x: number, y: number) => {
   return get(board).pieces.find((piece) => piece.x === x && piece.y === y);
 };
 
-const makeMove = async (move: Move) => {
+const resolveMove = async (move: Move) => {
   let piece = getPieceAtCell(move.fromCell.x, move.fromCell.y);
 
   if (!piece) {
@@ -217,15 +217,11 @@ const handleClick = async (x: number, y: number) => {
 
     // TODO: check if the move is valid
 
+    // complete current move
     get(currentMove)!.toCell = { x, y };
 
-    /*
-    await hubConnection.makeMove(
-      get(gameId),
-      get(token)!,
-      get(currentMove) as Move
-    );
-     */
+    // send move to server
+    await hubConnection.makeMove(get(gameId), get(currentMove) as Move);
 
     set(lastMove, get(currentMove) as Move);
     set(currentMove, null);
