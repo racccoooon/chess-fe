@@ -87,14 +87,21 @@ import { useRouter } from "vue-router";
 import { ref } from "vue";
 import { GameStartColor } from "@/lib/types";
 import { get } from "@vueuse/core";
+import { usePlayerStore } from "@/stores/player";
+
+const store = usePlayerStore();
 
 const router = useRouter();
-const playerName = ref("");
+const playerName = ref(store.name);
 const selectedColor = ref(GameStartColor.White);
 const gameId = ref("");
 
 const createGame = async () => {
   let game = await createGameApi(get(selectedColor));
+
+  store.$patch({
+    name: get(playerName),
+  });
 
   await router.push({
     name: "play",

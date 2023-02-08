@@ -1,5 +1,6 @@
 // @ts-ignore
 import { v4 as uuidv4 } from "uuid";
+import type { Ref } from "vue";
 
 export enum PieceType {
   Pawn = "pawn",
@@ -64,7 +65,7 @@ export interface MoveItem {
 }
 
 export interface Player {
-  name: string;
+  name: string | Ref<string>;
   color: PieceColor;
 }
 

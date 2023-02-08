@@ -17,7 +17,8 @@
       </div>
       <div class="flex justify-center">
         <h2 class="dark:text-gray-50 text-gray-900 text-xl font-bold">
-          {{ player?.name }} (You)
+          <input class="bg-gray-100 dark:bg-gray-800" v-model="player.name" />
+          (You)
         </h2>
       </div>
     </div>
@@ -35,17 +36,19 @@ import type {
   PartialMove,
   Player,
 } from "@/lib/types";
-import { computed, onBeforeMount, onMounted, ref } from "vue";
+import { computed, onBeforeMount, onMounted, ref, watch } from "vue";
 import { get, set, useEventListener } from "@vueuse/core";
 import { Piece, PieceColor, PieceType } from "@/lib/types";
 import { SignalrConnection } from "@/lib/signalr";
-import { v4 as uuid } from "uuid";
+import { usePlayerStore } from "@/stores/player";
 
 const router = useRouter();
 const hubConnection = new SignalrConnection();
 
+const store = usePlayerStore();
+
 const gameId = ref(useRoute().params.gameId as string);
-const token = ref<string | null>(null);
+const token = store.token;
 
 const board = ref<Board>({
   pieces: [],
@@ -54,9 +57,17 @@ const board = ref<Board>({
 // set up the default players
 const player = ref<Player>({
   color: PieceColor.White,
-  name: (window.history.state!.playerName as string) || "Player 1",
+  name: ref(store.name),
 });
 const opponent = ref<Player | null>(null);
+
+// update the store when the player name changes
+watch(
+  () => get(player).name,
+  (newName) => {
+    store.$patch({ name: newName });
+  }
+);
 
 const reverseBoard = computed(() => {
   return get(player)?.color === PieceColor.Black;
@@ -75,11 +86,6 @@ const canMove = computed(() => {
 });
 
 const initialize = async () => {
-  if (get(token) === null) {
-    // create a new token if we don't have one already
-    set(token, uuid());
-  }
-
   await hubConnection.start();
 
   hubConnection.onMoveMade(async (e) => {
