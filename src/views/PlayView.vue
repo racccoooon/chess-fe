@@ -33,6 +33,7 @@ import type {
   GameStartedResponse,
   JoinGameResponse,
   Move,
+  MoveItem,
   PartialMove,
   Player,
 } from "@/lib/types";
@@ -162,21 +163,13 @@ const initialize = async () => {
     });
   });
 
-  hubConnection.onMoveMade(async (e) => {
-    let move: Move = {
-      fromCell: {
-        x: e.fromCell.x,
-        y: e.fromCell.y,
-      },
-      toCell: {
-        x: e.toCell!.x,
-        y: e.toCell!.y,
-      },
-    };
+  hubConnection.onMove(async (e: MoveItem) => {
+    set(lastMove, {
+      from: e.from,
+      to: e.to,
+    });
 
-    set(lastMove, move);
-
-    resolveMove(move);
+    resolveMove(e);
   });
 
   // join the game
@@ -187,15 +180,33 @@ const getPieceAtCell = (x: number, y: number) => {
   return get(board).pieces.find((piece) => piece.x === x && piece.y === y);
 };
 
-const resolveMove = async (move: Move) => {
-  let piece = getPieceAtCell(move.fromCell.x, move.fromCell.y);
+const resolveMove = async (move: MoveItem) => {
+  console.log("resolving move", move);
 
-  if (!piece) {
+  // get the piece at the form cell
+  let pieceToMove = getPieceAtCell(move.from.x, move.from.y);
+
+  // get the piece at the to cell
+  let takesToTake = getPieceAtCell(move.to.x, move.to.y);
+
+  if (!pieceToMove) {
     return;
   }
 
-  piece.x = move.toCell.x;
-  piece.y = move.toCell.y;
+  // if there is a piece to take, remove it from the board
+  if (takesToTake) {
+    get(board).pieces = get(board).pieces.filter((p) => p !== takesToTake);
+  }
+
+  // move the piece to its new position
+  pieceToMove.x = move.to.x;
+  pieceToMove.y = move.to.y;
+
+  // change the active color
+  set(
+    activeColor,
+    move.color === PieceColor.White ? PieceColor.Black : PieceColor.White
+  );
 };
 
 const handleClick = async (x: number, y: number) => {
@@ -216,8 +227,8 @@ const handleClick = async (x: number, y: number) => {
     }
 
     set(currentMove, {
-      fromCell: { x, y },
-      toCell: null,
+      from: { x, y },
+      to: null,
     } as PartialMove);
   } else {
     // if the player selects a cell with a piece of their color as the target position, cancel the move
@@ -229,7 +240,9 @@ const handleClick = async (x: number, y: number) => {
     // TODO: check if the move is valid
 
     // complete current move
-    get(currentMove)!.toCell = { x, y };
+    get(currentMove)!.to = { x, y };
+
+    console.log("sending move", get(currentMove));
 
     // send move to server
     await hubConnection.makeMove(get(gameId), get(currentMove) as Move);

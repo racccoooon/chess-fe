@@ -47,21 +47,29 @@ export interface Cell {
   y: number;
 }
 
+export enum MoveType {
+  NonSpecial = "nonSpecialMove",
+  EnPassant = "enPassant",
+  Castling = "castling",
+  Promotion = "promotion",
+}
+
 export interface Move {
-  fromCell: Cell;
-  toCell: Cell;
+  from: Cell;
+  to: Cell;
 }
 
 export interface PartialMove {
-  fromCell: Cell | null;
-  toCell: Cell | null;
+  from: Cell | null;
+  to: Cell | null;
 }
 
 export interface MoveItem {
-  fromCell: Cell;
-  toCell: Cell;
+  from: Cell;
+  to: Cell;
   color: PieceColor;
   type: PieceType;
+  kind: MoveType;
 }
 
 export interface Player {

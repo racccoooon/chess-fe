@@ -59,11 +59,10 @@
       <rect
         v-if="lastMove !== null"
         :x="
-          (reverse ? 7 - lastMove.fromCell.x : lastMove.fromCell.x) *
-          tileAbsoluteWidth
+          (reverse ? 7 - lastMove.from.x : lastMove.from.x) * tileAbsoluteWidth
         "
         :y="
-          (reverse ? lastMove.fromCell.y : 8 - lastMove.fromCell.y - 1) *
+          (reverse ? lastMove.from.y : 8 - lastMove.from.y - 1) *
           tileAbsoluteHeight
         "
         :width="tileAbsoluteWidth"
@@ -72,13 +71,9 @@
       />
       <rect
         v-if="lastMove !== null"
-        :x="
-          (reverse ? 7 - lastMove.toCell.x : lastMove.toCell.x) *
-          tileAbsoluteWidth
-        "
+        :x="(reverse ? 7 - lastMove.to.x : lastMove.to.x) * tileAbsoluteWidth"
         :y="
-          (reverse ? lastMove.toCell.y : 8 - lastMove.toCell.y - 1) *
-          tileAbsoluteHeight
+          (reverse ? lastMove.to.y : 8 - lastMove.to.y - 1) * tileAbsoluteHeight
         "
         :width="tileAbsoluteWidth"
         :height="tileAbsoluteHeight"
@@ -135,8 +130,8 @@ const handleClick = (x: number, y: number) => {
  * the cell that is currently selected, with reversed board.
  */
 const selectedCell = computed((): Cell => {
-  let x = props.currentMove?.fromCell?.x || 0;
-  let y = props.currentMove?.fromCell?.y || 0;
+  let x = props.currentMove?.from?.x || 0;
+  let y = props.currentMove?.from?.y || 0;
 
   return {
     x: props.reverse ? 7 - x : x,

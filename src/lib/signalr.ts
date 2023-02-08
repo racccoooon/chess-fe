@@ -1,6 +1,11 @@
 // @ts-ignore
 import { HubConnection, HubConnectionBuilder, LogLevel } from "@aspnet/signalr";
-import type { GameStartedResponse, JoinGameResponse, Move } from "@/lib/types";
+import type {
+  GameStartedResponse,
+  JoinGameResponse,
+  Move,
+  MoveItem,
+} from "@/lib/types";
 
 export class SignalrConnection {
   private connection: HubConnection;
@@ -34,15 +39,11 @@ export class SignalrConnection {
   }
 
   async makeMove(gameId: string, move: Move) {
-    await this.connection.invoke("MoveRequest", {
+    await this.connection.invoke("Move", {
       gameId,
-      from: move.fromCell,
-      to: move.toCell,
+      from: move.from,
+      to: move.to,
     });
-  }
-
-  onMoveMade(callback: (e: any) => Promise<void>) {
-    this.connection.on("moveMade", callback);
   }
 
   onGameFull(callback: () => void) {
@@ -67,5 +68,17 @@ export class SignalrConnection {
 
   onGameStarted(callback: (e: GameStartedResponse) => void) {
     this.connection.on("gameStarted", callback);
+  }
+
+  onMove(callback: (e: MoveItem) => Promise<void>) {
+    this.connection.on("move", callback);
+  }
+
+  onCheck(callback: (e: MoveItem) => Promise<void>) {
+    this.connection.on("check", callback);
+  }
+
+  onCheckmate(callback: (e: MoveItem) => Promise<void>) {
+    this.connection.on("checkmate", callback);
   }
 }
