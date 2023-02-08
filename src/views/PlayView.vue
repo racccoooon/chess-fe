@@ -86,7 +86,81 @@ const canMove = computed(() => {
 });
 
 const initialize = async () => {
+  // initialize the signalr connection and register the event handlers
   await hubConnection.start();
+
+  hubConnection.onGameFull(() => {
+    alert("Game is full!");
+    router.push({ name: "start-playing" });
+  });
+
+  hubConnection.onGameNotFound(() => {
+    alert("Game not found!");
+    router.push({ name: "start-playing" });
+  });
+
+  hubConnection.onPlayerNotFound(() => {
+    alert("Player not found!");
+    router.push({ name: "start-playing" });
+  });
+
+  hubConnection.onInvalidMove(() => {
+    alert("Invalid move!");
+  });
+
+  hubConnection.onGameJoined((e: JoinGameResponse) => {
+    // the game joined event means we successfully joined the game as a player
+    // we need to set up the board and player color
+    // the opponent may or may not have joined yet
+
+    // setup board
+    e.board.forEach((piece) => {
+      get(board).pieces.push(
+        new Piece(
+          piece.type as PieceType,
+          piece.color as PieceColor,
+          piece.position.x,
+          piece.position.y
+        )
+      );
+    });
+
+    // set player color
+    get(player).color = e.playerColor as PieceColor;
+
+    // set opponent if they already joined before us
+    if (e.opponentName) {
+      set(opponent, {
+        name: e.opponentName,
+        color:
+          e.playerColor === PieceColor.White
+            ? PieceColor.Black
+            : PieceColor.White,
+      });
+    }
+
+    // set active color
+    set(activeColor, e.activeColor as PieceColor);
+  });
+
+  hubConnection.onGameStarted((e: GameStartedResponse) => {
+    // the game started event means the opponent joined
+
+    // get opponent color based on player color
+    let opponentColor =
+      get(player).color === PieceColor.White
+        ? PieceColor.Black
+        : PieceColor.White;
+
+    // set opponent
+    set(opponent, {
+      name:
+        opponentColor === PieceColor.White
+          ? e.whitePlayerName
+          : e.blackPlayerName,
+      color: opponentColor,
+    });
+  });
 
   hubConnection.onMoveMade(async (e) => {
     let move: Move = {
@@ -105,57 +179,7 @@ const initialize = async () => {
     resolveMove(move);
   });
 
-  hubConnection.onGameFull(() => {
-    alert("Game is full!");
-    router.push({ name: "start-playing" });
-  });
-
-  hubConnection.onGameJoined((e: JoinGameResponse) => {
-    // set board
-    e.board.forEach((piece) => {
-      get(board).pieces.push(
-        new Piece(
-          piece.type as PieceType,
-          piece.color as PieceColor,
-          piece.position.x,
-          piece.position.y
-        )
-      );
-    });
-
-    // set player color
-    get(player).color = e.playerColor as PieceColor;
-
-    // set opponent if they joined
-    if (e.opponentName) {
-      set(opponent, {
-        name: e.opponentName,
-        color:
-          e.playerColor === PieceColor.White
-            ? PieceColor.Black
-            : PieceColor.White,
-      });
-    }
-
-    // set active color
-    set(activeColor, e.activeColor as PieceColor);
-  });
-
-  hubConnection.onGameStarted((e: GameStartedResponse) => {
-    let opponentColor =
-      get(player).color === PieceColor.White
-        ? PieceColor.Black
-        : PieceColor.White;
-
-    set(opponent, {
-      name:
-        opponentColor === PieceColor.White
-          ? e.whitePlayerName
-          : e.blackPlayerName,
-      color: opponentColor,
-    });
-  });
-
+  // join the game
   await hubConnection.joinGame(get(gameId), get(token)!, get(player).name);
 };
 
@@ -173,10 +197,6 @@ const resolveMove = async (move: Move) => {
   piece.x = move.toCell.x;
   piece.y = move.toCell.y;
 };
-
-onMounted(async () => {
-  await initialize();
-});
 
 onBeforeMount(() => {
   useEventListener(window, "beforeunload", (event) => {
@@ -227,4 +247,8 @@ const handleClick = async (x: number, y: number) => {
     set(currentMove, null);
   }
 };
+
+onMounted(async () => {
+  await initialize();
+});
 </script>

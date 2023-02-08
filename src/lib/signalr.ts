@@ -49,6 +49,18 @@ export class SignalrConnection {
     this.connection.on("gameFull", callback);
   }
 
+  onGameNotFound(callback: () => void) {
+    this.connection.on("gameNotFound", callback);
+  }
+
+  onPlayerNotFound(callback: () => void) {
+    this.connection.on("playerNotFound", callback);
+  }
+
+  onInvalidMove(callback: () => void) {
+    this.connection.on("invalidMove", callback);
+  }
+
   onGameJoined(callback: (e: JoinGameResponse) => void) {
     this.connection.on("gameJoined", callback);
   }
