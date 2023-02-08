@@ -36,8 +36,8 @@ import type {
   PartialMove,
   Player,
 } from "@/lib/types";
-import { computed, onBeforeMount, onMounted, ref, watch } from "vue";
-import { get, set, useEventListener } from "@vueuse/core";
+import { computed, onMounted, ref, watch } from "vue";
+import { get, set } from "@vueuse/core";
 import { Piece, PieceColor, PieceType } from "@/lib/types";
 import { SignalrConnection } from "@/lib/signalr";
 import { usePlayerStore } from "@/stores/player";
@@ -197,15 +197,6 @@ const resolveMove = async (move: Move) => {
   piece.x = move.toCell.x;
   piece.y = move.toCell.y;
 };
-
-onBeforeMount(() => {
-  useEventListener(window, "beforeunload", (event) => {
-    if (import.meta.env.PROD) {
-      event.preventDefault();
-      event.returnValue = "Are you sure you want to leave?";
-    }
-  });
-});
 
 const handleClick = async (x: number, y: number) => {
   if (!get(canMove)) {
