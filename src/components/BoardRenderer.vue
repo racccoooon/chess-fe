@@ -68,6 +68,7 @@
         :width="tileAbsoluteWidth"
         :height="tileAbsoluteHeight"
         class="fill-yellow-300/75"
+        @click="handleClick(lastMove.from.x, lastMove.from.y)"
       />
       <rect
         v-if="lastMove !== null"
@@ -78,6 +79,7 @@
         :width="tileAbsoluteWidth"
         :height="tileAbsoluteHeight"
         class="fill-yellow-300/75"
+        @click="handleClick(lastMove.to.x, lastMove.to.y)"
       />
       <rect
         v-if="currentMove !== null"
@@ -86,6 +88,7 @@
         :width="tileAbsoluteWidth"
         :height="tileAbsoluteHeight"
         class="fill-red-300/75"
+        @click="handleClick(selectedCell.x, selectedCell.y)"
       />
       <TransitionGroup>
         <PieceRenderer
