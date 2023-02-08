@@ -37,9 +37,9 @@ import type {
   PartialMove,
   Player,
 } from "@/lib/types";
+import { MoveType, Piece, PieceColor, PieceType } from "@/lib/types";
 import { computed, onMounted, ref, watch } from "vue";
 import { get, set } from "@vueuse/core";
-import { Piece, PieceColor, PieceType } from "@/lib/types";
 import { SignalrConnection } from "@/lib/signalr";
 import { usePlayerStore } from "@/stores/player";
 
@@ -180,6 +180,10 @@ const getPieceAtCell = (x: number, y: number) => {
   return get(board).pieces.find((piece) => piece.x === x && piece.y === y);
 };
 
+const getCellNotation = (x: number, y: number) => {
+  return `${String.fromCharCode(97 + x)}${8 - y}`;
+};
+
 const resolveMove = async (move: MoveItem) => {
   console.log("resolving move", move);
 
@@ -187,15 +191,37 @@ const resolveMove = async (move: MoveItem) => {
   let pieceToMove = getPieceAtCell(move.from.x, move.from.y);
 
   // get the piece at the to cell
-  let takesToTake = getPieceAtCell(move.to.x, move.to.y);
+  let pieceToTake = getPieceAtCell(move.to.x, move.to.y);
+
+  if (move.kind === MoveType.EnPassant) {
+    // if the move is en passant, remove the piece that was taken
+    pieceToTake = getPieceAtCell(move.to.x, move.from.y);
+  }
 
   if (!pieceToMove) {
-    return;
+    throw new Error(
+      `Cannot move piece that does not exist! ${move.color} ${
+        move.type
+      } at ${getCellNotation(move.from.x, move.from.y)} to ${getCellNotation(
+        move.to.x,
+        move.to.y
+      )} (${move.kind})`
+    );
   }
 
   // if there is a piece to take, remove it from the board
-  if (takesToTake) {
-    get(board).pieces = get(board).pieces.filter((p) => p !== takesToTake);
+  if (pieceToTake) {
+    if (!pieceToTake) {
+      throw new Error(
+        `Cannot take piece that does not exist! ${move.color} ${
+          move.type
+        } at ${getCellNotation(move.from.x, move.from.y)} to ${getCellNotation(
+          move.to.x,
+          move.to.y
+        )} (${move.kind})`
+      );
+    }
+    get(board).pieces = get(board).pieces.filter((p) => p !== pieceToTake);
   }
 
   // move the piece to its new position
