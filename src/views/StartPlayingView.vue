@@ -1,9 +1,9 @@
 <template>
   <div
-    class="mx-3 sm:mx-auto sm:w-3/4 lg:w-2/3 2xl:w-11/12 max-w-7xl py-24 flex flex-col gap-12"
+    class="mx-3 sm:mx-auto sm:w-3/4 lg:w-1/2 max-w-7xl py-24 flex flex-col gap-12"
   >
     <div
-      class="p-24 flex flex-col gap-12 bg-gray-100 dark:bg-gray-800 rounded-2xl"
+      class="p-16 flex flex-col gap-12 bg-gray-100 dark:bg-gray-800 rounded-3xl"
     >
       <div class="flex flex-row gap-4 items-center">
         <h2 class="font-medium text-lg">Your Name</h2>
@@ -16,37 +16,39 @@
       </div>
     </div>
     <div
-      class="p-24 flex flex-col gap-12 bg-gray-100 dark:bg-gray-800 rounded-2xl"
+      class="p-16 flex flex-col gap-12 bg-gray-100 dark:bg-gray-800 rounded-3xl"
     >
-      <div class="flex flex-wrap justify-between gap-8">
-        <div class="flex flex-row gap-4 items-center">
-          <h2 class="font-medium text-lg">You Play As</h2>
-          <button
-            @click="selectedColor = GameStartColor.White"
-            :aria-selected="selectedColor === GameStartColor.White"
-            class="w-24 h-16 rounded-2xl bg-gray-200 border-b-4 active:border-b-0 active:border-t-4 border-gray-300 text-gray-900 font-medium text-md aria-selected:outline outline-3 outline-pink-500 outline-offset-4 transition-all ease-in-out"
-          >
-            White
-          </button>
-          <button
-            @click="selectedColor = GameStartColor.Black"
-            :aria-selected="selectedColor === GameStartColor.Black"
-            class="w-24 h-16 rounded-2xl bg-gray-700 border-b-4 active:border-b-0 active:border-t-4 border-gray-900 text-gray-50 font-medium text-md aria-selected:outline outline-3 outline-pink-500 outline-offset-4 transition-all ease-in-out"
-          >
-            Black
-          </button>
-          <button
-            @click="selectedColor = GameStartColor.Random"
-            :aria-selected="selectedColor === GameStartColor.Random"
-            class="w-24 h-16 rounded-2xl bg-gray-700 border-b-4 active:border-b-0 active:border-t-4 border-gray-900 text-gray-50 font-medium text-md aria-selected:outline outline-3 outline-pink-500 outline-offset-4 transition-all ease-in-out"
-          >
-            Random
-          </button>
+      <div class="flex flex-col justify-between gap-12">
+        <div class="flex flex-col gap-4">
+          <label class="font-medium text-lg">You Play As</label>
+          <div class="flex flex-row gap-4 items-center">
+            <button
+              @click="selectedColor = GameStartColor.White"
+              :aria-selected="selectedColor === GameStartColor.White"
+              class="w-24 h-16 rounded-2xl bg-gray-200 dark:bg-gray-700 border-b-4 active:border-b-0 active:border-t-4 border-gray-300 dark:border-gray-900 text-gray-800 dark:text-gray-50 shadow-xl aria-selected:shadow-pink-600/40 font-medium text-md aria-selected:outline outline-3 outline-pink-500 outline-offset-0 transition-all ease-in-out"
+            >
+              White
+            </button>
+            <button
+              @click="selectedColor = GameStartColor.Black"
+              :aria-selected="selectedColor === GameStartColor.Black"
+              class="w-24 h-16 rounded-2xl bg-gray-200 dark:bg-gray-700 border-b-4 active:border-b-0 active:border-t-4 border-gray-300 dark:border-gray-900 text-gray-800 dark:text-gray-50 shadow-xl aria-selected:shadow-pink-600/40 font-medium text-md aria-selected:outline outline-3 outline-pink-500 outline-offset-0 transition-all ease-in-out"
+            >
+              Black
+            </button>
+            <button
+              @click="selectedColor = GameStartColor.Random"
+              :aria-selected="selectedColor === GameStartColor.Random"
+              class="w-24 h-16 rounded-2xl bg-gray-200 dark:bg-gray-700 border-b-4 active:border-b-0 active:border-t-4 border-gray-300 dark:border-gray-900 text-gray-800 dark:text-gray-50 shadow-xl aria-selected:shadow-pink-600/40 font-medium text-md aria-selected:outline outline-3 outline-pink-500 outline-offset-0 transition-all ease-in-out"
+            >
+              Random
+            </button>
+          </div>
         </div>
-        <div class="flex">
+        <div class="w-full">
           <button
             @click="createGame"
-            class="px-6 py-3 rounded-2xl bg-green-300 border-b-4 active:border-b-0 active:border-t-4 border-green-600 text-green-900 font-medium text-lg transition-all ease-in-out"
+            class="flex items-center justify-center px-8 py-3 h-16 rounded-2xl bg-green-300 border-b-4 active:border-b-0 active:border-t-4 border-green-600 text-green-900 shadow-xl shadow-green-600/40 font-medium text-lg transition-all ease-in-out w-full"
           >
             Create A New Game
           </button>
