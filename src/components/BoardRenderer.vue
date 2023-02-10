@@ -45,11 +45,7 @@
             :y="(y - 1) * tileAbsoluteHeight"
             :width="tileAbsoluteWidth"
             :height="tileAbsoluteHeight"
-            :class="
-              ['fill-green-100', 'fill-green-500'][
-                reverse ? (x + y + 1) % 2 : (x + y) % 2
-              ]
-            "
+            :class="['fill-green-100', 'fill-green-500'][(x + y) % 2]"
             @click="
               handleClick(reverse ? 8 - x : x - 1, reverse ? y - 1 : 8 - y)
             "
