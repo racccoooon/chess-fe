@@ -1,25 +1,34 @@
 <template>
-  <div class="mx-3 sm:mx-auto sm:w-3/4 lg:w-2/3 2xl:w-11/12 max-w-7xl py-12">
-    <div class="flex flex-col gap-8">
-      <div class="flex justify-center">
+  <div
+    class="mx-6 md:m-12 lg:my-0 lg:h-screen flex flex-col lg:flex-row gap-6 lg:gap-16 justify-center items-center"
+  >
+    <div
+      class="flex flex-col justify-center lg:basis-5/12 xl:basis-1 w-full lg:w-auto lg:h-screen"
+    >
+      <div class="p-6">
         <h2 class="dark:text-gray-50 text-gray-900 text-xl font-bold">
           {{ opponent?.name || "Opponent hasn't joined yet..." }}
         </h2>
       </div>
-      <div class="flex justify-center">
+      <div class="w-full xl:h-3/4">
         <BoardRenderer
           :board="board"
           :reverse="reverseBoard"
           :currentMove="currentMove"
           :lastMove="lastMove"
           @click="handleClick"
+          class="h-full rounded-2xl"
         />
       </div>
-      <div class="flex justify-center">
+      <div class="p-6">
         <h2 class="dark:text-gray-50 text-gray-900 text-xl font-bold">
           <input class="bg-gray-100 dark:bg-gray-800" v-model="player.name" />
-          (You)
         </h2>
+      </div>
+    </div>
+    <div class="h-full flex flex-col basis-2/6 w-full lg:w-auto">
+      <div class="grow lg:my-16 p-16 bg-gray-100 dark:bg-gray-800 rounded-2xl">
+        <!--/-->
       </div>
     </div>
   </div>
