@@ -107,13 +107,11 @@ const lastMove = computed(() => {
 });
 const currentMove = ref<PartialMove | null>(null);
 
+const gameHasStarted = ref(false);
 const activeColor = ref<PieceColor>(PieceColor.White);
 
 const canMove = computed(() => {
-  if (get(opponent) === null) {
-    return false;
-  }
-  return get(activeColor) === get(player).color;
+  return get(activeColor) === get(player).color && get(gameHasStarted);
 });
 
 const isInCheck = (color: PieceColor) => {
@@ -138,11 +136,14 @@ const isBlackInCheck = computed(() => {
   return isInCheck(PieceColor.Black);
 });
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const isPlayerInCheck = computed(() => {
   return isInCheck(get(player).color);
 });
 
 const initialize = async () => {
+  set(gameHasStarted, false);
+
   // initialize the signalr connection and register the event handlers
   await hubConnection.start();
 
@@ -205,6 +206,8 @@ const initialize = async () => {
       get(opponent).color === PieceColor.White
         ? e.whitePlayerName
         : e.blackPlayerName;
+
+    set(gameHasStarted, true);
   });
 
   hubConnection.onMove(async (e: Partial<MoveItem>) => {
