@@ -16,13 +16,15 @@
           :reverse="reverseBoard"
           :currentMove="currentMove"
           :lastMove="lastMove"
+          :isWhiteInCheck="isWhiteInCheck"
+          :isBlackInCheck="isBlackInCheck"
           @click="handleClick"
           class="h-full rounded-2xl"
         />
       </div>
       <div class="p-6">
         <h2 class="dark:text-gray-50 text-gray-900 text-xl font-bold">
-          <input class="bg-gray-100 dark:bg-gray-800" v-model="player.name" />
+          <input class="bg-transparent" v-model="player.name" />
         </h2>
       </div>
     </div>
@@ -46,7 +48,13 @@ import type {
   PartialMove,
   Player,
 } from "@/lib/types";
-import { MoveType, Piece, PieceColor, PieceType } from "@/lib/types";
+import {
+  KingStatus,
+  MoveType,
+  Piece,
+  PieceColor,
+  PieceType,
+} from "@/lib/types";
 import { computed, onMounted, ref, watch } from "vue";
 import { get, set } from "@vueuse/core";
 import { SignalrConnection } from "@/lib/signalr";
@@ -66,12 +74,19 @@ const board = ref<Board>({
   pieces: [],
 });
 
-// set up the default players
+// set up players
 const player = ref<Player>({
-  color: PieceColor.White,
+  color: ref(PieceColor.White),
   name: ref(store.name),
 });
-const opponent = ref<Player | null>(null);
+const opponent = ref<Player>({
+  color: computed(() => {
+    return get(player).color === PieceColor.White
+      ? PieceColor.Black
+      : PieceColor.White;
+  }),
+  name: ref(""),
+});
 
 // update the store when the player name changes
 watch(
@@ -99,6 +114,32 @@ const canMove = computed(() => {
     return false;
   }
   return get(activeColor) === get(player).color;
+});
+
+const isInCheck = (color: PieceColor) => {
+  if (!get(lastMove)) {
+    return false;
+  }
+
+  let opponentColor =
+    color === PieceColor.White ? PieceColor.Black : PieceColor.White;
+
+  return (
+    get(lastMove).color === opponentColor &&
+    get(lastMove).status === KingStatus.IsCheck
+  );
+};
+
+const isWhiteInCheck = computed(() => {
+  return isInCheck(PieceColor.White);
+});
+
+const isBlackInCheck = computed(() => {
+  return isInCheck(PieceColor.Black);
+});
+
+const isPlayerInCheck = computed(() => {
+  return isInCheck(get(player).color);
 });
 
 const initialize = async () => {
@@ -146,13 +187,7 @@ const initialize = async () => {
 
     // set opponent if they already joined before us
     if (e.opponentName) {
-      set(opponent, {
-        name: e.opponentName,
-        color:
-          e.playerColor === PieceColor.White
-            ? PieceColor.Black
-            : PieceColor.White,
-      });
+      get(opponent).name = e.opponentName;
     }
 
     // set move history
@@ -165,20 +200,11 @@ const initialize = async () => {
   hubConnection.onGameStarted((e: GameStartedResponse) => {
     // the game started event means the opponent joined
 
-    // get opponent color based on player color
-    let opponentColor =
-      get(player).color === PieceColor.White
-        ? PieceColor.Black
-        : PieceColor.White;
-
-    // set opponent
-    set(opponent, {
-      name:
-        opponentColor === PieceColor.White
-          ? e.whitePlayerName
-          : e.blackPlayerName,
-      color: opponentColor,
-    });
+    // set opponent name
+    get(opponent).name =
+      get(opponent).color === PieceColor.White
+        ? e.whitePlayerName
+        : e.blackPlayerName;
   });
 
   hubConnection.onMove(async (e: Partial<MoveItem>) => {

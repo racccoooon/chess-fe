@@ -95,6 +95,17 @@
           :color="piece.color"
           :key="piece.id"
           @click="handleClick(piece.x, piece.y)"
+          :style="{
+            filter:
+              ((piece.color === PieceColor.White && isWhiteInCheck) ||
+                (piece.color === PieceColor.Black && isBlackInCheck)) &&
+              piece.type === PieceType.King
+                ? 'drop-shadow(-1px -1px 4px rgba(239, 68, 68, 0.7)) \n' +
+                  'drop-shadow(2px -1px 4px rgba(239, 68, 68, 0.7)) \n' +
+                  'drop-shadow(2px 2px 4px rgba(239, 68, 68, 0.7))\n' +
+                  'drop-shadow(-1px 2px 4px rgba(239, 68, 68, 0.7))'
+                : '',
+          }"
         />
       </TransitionGroup>
     </svg>
@@ -105,12 +116,15 @@
 import PieceRenderer from "@/components/PieceRenderer.vue";
 import type { Board, Cell, Move, PartialMove } from "@/lib/types";
 import { computed } from "vue";
+import { PieceColor, PieceType } from "@/lib/types";
 
 const props = defineProps<{
   board: Board;
   reverse: boolean;
   currentMove: PartialMove | null;
   lastMove: Move | null;
+  isWhiteInCheck: boolean;
+  isBlackInCheck: boolean;
 }>();
 
 const emit = defineEmits<{

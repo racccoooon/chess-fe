@@ -83,8 +83,8 @@ export interface MoveItem {
 }
 
 export interface Player {
-  name: string | Ref<string>;
-  color: PieceColor;
+  color: Ref<PieceColor> | PieceColor;
+  name: Ref<string> | string;
 }
 
 export interface JoinGameResponse {
