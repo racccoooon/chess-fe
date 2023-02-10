@@ -26,27 +26,9 @@
         </h2>
       </div>
     </div>
-    <div class="h-full flex flex-col basis-2/6 w-full lg:w-auto">
-      <div class="grow lg:my-16 p-16 bg-gray-100 dark:bg-gray-800 rounded-2xl">
-        <div class="flex flex-col gap-2 overflow-y-auto">
-          <div v-for="move in moveHistory" :key="hash(move)">
-            <div class="flex flex-wrap items-center gap-2">
-              <div
-                class="w-4 h-4 rounded-full border-2 border-gray-200"
-                :class="{
-                  'bg-white': move.color === PieceColor.White,
-                  'bg-black': move.color === PieceColor.Black,
-                }"
-              ></div>
-              <div>{{ move.type }}</div>
-              <div>{{ getCellNotation(move.from.x, move.from.y) }}</div>
-              <div>-></div>
-              <div>{{ getCellNotation(move.to.x, move.to.y) }}</div>
-              <div>{{ move.kind }}</div>
-              <div>{{ move.status }}</div>
-            </div>
-          </div>
-        </div>
+    <div class="h-full flex flex-col basis-1/4 w-full lg:w-auto">
+      <div class="grow lg:my-16 p-8 bg-gray-100 dark:bg-gray-800 rounded-2xl">
+        <GameHistory :moveHistory="moveHistory" />
       </div>
     </div>
   </div>
@@ -69,7 +51,8 @@ import { computed, onMounted, ref, watch } from "vue";
 import { get, set } from "@vueuse/core";
 import { SignalrConnection } from "@/lib/signalr";
 import { usePlayerStore } from "@/stores/player";
-import hash from "object-hash";
+import { getSquareName } from "@/lib/chessNotation";
+import GameHistory from "@/components/GameHistory.vue";
 
 const router = useRouter();
 const hubConnection = new SignalrConnection();
@@ -172,6 +155,9 @@ const initialize = async () => {
       });
     }
 
+    // set move history
+    set(moveHistory, e.moves);
+
     // set active color
     set(activeColor, e.activeColor as PieceColor);
   });
@@ -195,8 +181,16 @@ const initialize = async () => {
     });
   });
 
-  hubConnection.onMove(async (e: MoveItem) => {
-    resolveMove(e);
+  hubConnection.onMove(async (e: Partial<MoveItem>) => {
+    // add promoteToType to the move
+    // even if a move is a promotion, the server will not send the promotion with the onMove event
+    // we will set promotion to its real value later
+    const move = {
+      ...e,
+      promoteToType: null,
+    } as MoveItem;
+
+    resolveMove(move);
   });
 
   // join the game
@@ -207,11 +201,7 @@ const getPieceAtCell = (x: number, y: number) => {
   return get(board).pieces.find((piece) => piece.x === x && piece.y === y);
 };
 
-const getCellNotation = (x: number, y: number) => {
-  return `${String.fromCharCode(97 + x)}${8 - y}`;
-};
-
-const resolveMove = async (move: MoveItem) => {
+const resolveMove = (move: MoveItem) => {
   console.log("resolving move", move);
 
   // get the piece at the form cell
@@ -229,7 +219,7 @@ const resolveMove = async (move: MoveItem) => {
     throw new Error(
       `Cannot move piece that does not exist! ${move.color} ${
         move.type
-      } at ${getCellNotation(move.from.x, move.from.y)} to ${getCellNotation(
+      } at ${getSquareName(move.from.x, move.from.y)} to ${getSquareName(
         move.to.x,
         move.to.y
       )} (${move.kind})`
@@ -242,7 +232,7 @@ const resolveMove = async (move: MoveItem) => {
       throw new Error(
         `Cannot take piece that does not exist! ${move.color} ${
           move.type
-        } at ${getCellNotation(move.from.x, move.from.y)} to ${getCellNotation(
+        } at ${getSquareName(move.from.x, move.from.y)} to ${getSquareName(
           move.to.x,
           move.to.y
         )} (${move.kind})`

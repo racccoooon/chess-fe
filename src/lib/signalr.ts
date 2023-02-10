@@ -70,7 +70,7 @@ export class SignalrConnection {
     this.connection.on("gameStarted", callback);
   }
 
-  onMove(callback: (e: MoveItem) => Promise<void>) {
+  onMove(callback: (e: Partial<MoveItem>) => Promise<void>) {
     this.connection.on("move", callback);
   }
 

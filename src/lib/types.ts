@@ -56,9 +56,9 @@ export enum MoveType {
 
 export enum KingStatus {
   IsNoCheck = "isNoCheck",
-  ICheck = "iCheck",
-  ICheckmate = "iCheckmate",
-  IStalemate = "iStalemate",
+  IsCheck = "isCheck",
+  IsCheckmate = "isCheckmate",
+  IsStalemate = "isStalemate",
 }
 
 export interface Move {
@@ -78,6 +78,8 @@ export interface MoveItem {
   type: PieceType;
   kind: MoveType;
   status: KingStatus;
+  captures: boolean;
+  promoteToType: PieceType | null;
 }
 
 export interface Player {
