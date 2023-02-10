@@ -64,7 +64,7 @@
         :width="tileAbsoluteWidth"
         :height="tileAbsoluteHeight"
         class="fill-yellow-300/75"
-        @click="handleClick(lastMove?.from.x, lastMove?.from.y)"
+        @click="handleClick(lastMove?.from.x || 0, lastMove?.from.y || 0)"
       />
       <rect
         v-if="lastMove !== null"
@@ -75,7 +75,7 @@
         :width="tileAbsoluteWidth"
         :height="tileAbsoluteHeight"
         class="fill-yellow-300/75"
-        @click="handleClick(lastMove?.to.x, lastMove?.to.y)"
+        @click="handleClick(lastMove?.to.x || 0, lastMove?.to.y || 0)"
       />
       <rect
         v-if="currentMove !== null"
