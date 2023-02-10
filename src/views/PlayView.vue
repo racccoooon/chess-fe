@@ -28,7 +28,25 @@
     </div>
     <div class="h-full flex flex-col basis-2/6 w-full lg:w-auto">
       <div class="grow lg:my-16 p-16 bg-gray-100 dark:bg-gray-800 rounded-2xl">
-        <!--/-->
+        <div class="flex flex-col gap-2 overflow-y-auto">
+          <div v-for="move in moveHistory" :key="hash(move)">
+            <div class="flex flex-wrap items-center gap-2">
+              <div
+                class="w-4 h-4 rounded-full border-2 border-gray-200"
+                :class="{
+                  'bg-white': move.color === PieceColor.White,
+                  'bg-black': move.color === PieceColor.Black,
+                }"
+              ></div>
+              <div>{{ move.type }}</div>
+              <div>{{ getCellNotation(move.from.x, move.from.y) }}</div>
+              <div>-></div>
+              <div>{{ getCellNotation(move.to.x, move.to.y) }}</div>
+              <div>{{ move.kind }}</div>
+              <div>{{ move.status }}</div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -51,6 +69,7 @@ import { computed, onMounted, ref, watch } from "vue";
 import { get, set } from "@vueuse/core";
 import { SignalrConnection } from "@/lib/signalr";
 import { usePlayerStore } from "@/stores/player";
+import hash from "object-hash";
 
 const router = useRouter();
 const hubConnection = new SignalrConnection();
@@ -83,7 +102,11 @@ const reverseBoard = computed(() => {
   return get(player)?.color === PieceColor.Black;
 });
 
-const lastMove = ref<Move | null>(null);
+const moveHistory = ref<MoveItem[]>([]);
+
+const lastMove = computed(() => {
+  return get(moveHistory)[get(moveHistory).length - 1] || null;
+});
 const currentMove = ref<PartialMove | null>(null);
 
 const activeColor = ref<PieceColor>(PieceColor.White);
@@ -173,11 +196,6 @@ const initialize = async () => {
   });
 
   hubConnection.onMove(async (e: MoveItem) => {
-    set(lastMove, {
-      from: e.from,
-      to: e.to,
-    });
-
     resolveMove(e);
   });
 
@@ -236,6 +254,9 @@ const resolveMove = async (move: MoveItem) => {
   // move the piece to its new position
   pieceToMove.x = move.to.x;
   pieceToMove.y = move.to.y;
+
+  // push the move to the move history
+  get(moveHistory).push(move);
 
   // change the active color
   set(

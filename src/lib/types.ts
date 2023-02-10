@@ -54,6 +54,13 @@ export enum MoveType {
   Promotion = "promotion",
 }
 
+export enum KingStatus {
+  IsNoCheck = "isNoCheck",
+  ICheck = "iCheck",
+  ICheckmate = "iCheckmate",
+  IStalemate = "iStalemate",
+}
+
 export interface Move {
   from: Cell;
   to: Cell;
@@ -70,6 +77,7 @@ export interface MoveItem {
   color: PieceColor;
   type: PieceType;
   kind: MoveType;
+  status: KingStatus;
 }
 
 export interface Player {
