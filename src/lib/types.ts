@@ -108,3 +108,9 @@ export interface GameStartedResponse {
   whitePlayerName: string;
   blackPlayerName: string;
 }
+
+export enum ChessBoardBorder {
+  None = "none",
+  Thin = "thin",
+  Thick = "thick",
+}

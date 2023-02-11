@@ -9,31 +9,35 @@
     ref="outerSvg"
   >
     <rect width="100%" height="100%" class="fill-gray-100 dark:fill-gray-800" />
-    <template v-for="i in 8" :key="i">
-      <text
-        :x="borderAbsoluteSize / 2"
-        :y="(i - 1) * squareAbsoluteHeight + borderAbsoluteSize + 18"
-        class="fill-gray-800 dark:fill-gray-100"
-        font-size="20"
-        font-weight="500"
-        text-anchor="middle"
-        dominant-baseline="middle"
-        v-text="getRankName(displayYToBoardY(i - 1))"
-      />
-    </template>
-    <template v-for="i in 8" :key="i">
-      <text
-        :x="i * squareAbsoluteWidth + borderAbsoluteSize - 18"
-        :y="
-          squareAbsoluteHeight * 8 + borderAbsoluteSize + borderAbsoluteSize / 2
-        "
-        class="fill-gray-800 dark:fill-gray-100"
-        font-size="20"
-        font-weight="500"
-        text-anchor="middle"
-        dominant-baseline="middle"
-        v-text="getFileName(displayXToBoardX(i - 1))"
-      />
+    <template v-if="borderAbsoluteSize > 0">
+      <template v-for="i in 8" :key="i">
+        <text
+          :x="borderAbsoluteSize / 2"
+          :y="(i - 1) * squareAbsoluteHeight + borderAbsoluteSize + 18"
+          class="fill-gray-800 dark:fill-gray-100"
+          font-size="20"
+          font-weight="500"
+          text-anchor="middle"
+          dominant-baseline="middle"
+          v-text="getRankName(displayYToBoardY(i - 1))"
+        />
+      </template>
+      <template v-for="i in 8" :key="i">
+        <text
+          :x="i * squareAbsoluteWidth + borderAbsoluteSize - 18"
+          :y="
+            squareAbsoluteHeight * 8 +
+            borderAbsoluteSize +
+            borderAbsoluteSize / 2
+          "
+          class="fill-gray-800 dark:fill-gray-100"
+          font-size="20"
+          font-weight="500"
+          text-anchor="middle"
+          dominant-baseline="middle"
+          v-text="getFileName(displayXToBoardX(i - 1))"
+        />
+      </template>
     </template>
     <svg
       :x="borderAbsoluteSize"
@@ -71,6 +75,32 @@
           :key="index"
         />
       </g>
+      <template v-if="borderAbsoluteSize === 0">
+        <template v-for="i in 8" :key="i">
+          <text
+            :x="12"
+            :y="(i - 1) * squareAbsoluteHeight + borderAbsoluteSize + 18"
+            :class="['fill-green-100', 'fill-green-500'][i % 2]"
+            font-size="20"
+            font-weight="500"
+            text-anchor="middle"
+            dominant-baseline="middle"
+            v-text="getRankName(displayYToBoardY(i - 1))"
+          />
+        </template>
+        <template v-for="i in 8" :key="i">
+          <text
+            :x="i * squareAbsoluteWidth + borderAbsoluteSize - 18"
+            :y="squareAbsoluteHeight * 8 - 12"
+            :class="['fill-green-100', 'fill-green-500'][(i + 1) % 2]"
+            font-size="20"
+            font-weight="500"
+            text-anchor="middle"
+            dominant-baseline="middle"
+            v-text="getFileName(displayXToBoardX(i - 1))"
+          />
+        </template>
+      </template>
       <g>
         <template v-for="piece in board.pieces" :key="piece.id">
           <svg
@@ -121,7 +151,13 @@
 <script setup lang="ts">
 import PieceRenderer from "@/components/PieceRenderer.vue";
 import type { Board, BoardHighlightSquare } from "@/lib/types";
-import { HighlightColor, Piece, PieceColor, PieceType } from "@/lib/types";
+import {
+  ChessBoardBorder,
+  HighlightColor,
+  Piece,
+  PieceColor,
+  PieceType,
+} from "@/lib/types";
 import { storeToRefs } from "pinia";
 import { useSettingsStore } from "@/stores/settings";
 import { computed, ref } from "vue";
@@ -155,9 +191,23 @@ const emit = defineEmits<{
   (event: "pieceMoved", payload: PieceMovedEvent): void;
 }>();
 
+const { raccoonMode, chessBoardBorder } = storeToRefs(useSettingsStore());
+
 const squareAbsoluteWidth = 100;
 const squareAbsoluteHeight = 100;
-const borderAbsoluteSize = 33;
+
+const borderAbsoluteSize = computed(() => {
+  switch (get(chessBoardBorder)) {
+    case ChessBoardBorder.None:
+      return 0;
+    case ChessBoardBorder.Thin:
+      return 33;
+    case ChessBoardBorder.Thick:
+      return 48;
+    default:
+      return 0;
+  }
+});
 
 const outerSvg = ref<SVGSVGElement>();
 const innerSvg = ref<SVGSVGElement>();
@@ -313,6 +363,4 @@ const dragMouseDeltaScaled = computed(() => {
     y: get(dragMouseDelta).y * scale,
   };
 });
-
-const { raccoonMode } = storeToRefs(useSettingsStore());
 </script>
