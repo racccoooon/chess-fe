@@ -130,13 +130,17 @@ const initialize = async () => {
     // set player color
     set(playerColor, e.playerColor as PieceColor);
 
+    if (e.playerColor === PieceColor.White) {
+      set(whitePlayerName, userStore.name);
+    } else {
+      set(blackPlayerName, userStore.name);
+    }
+
     // set opponent if they already joined before us
-    if (e.opponentName) {
-      if (e.playerColor === PieceColor.White) {
-        set(blackPlayerName, e.opponentName);
-      } else {
-        set(whitePlayerName, e.opponentName);
-      }
+    if (e.playerColor === PieceColor.White) {
+      set(blackPlayerName, e.opponentName || "Opponent");
+    } else {
+      set(whitePlayerName, e.opponentName || "Opponent");
     }
 
     // set move history
