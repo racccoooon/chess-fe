@@ -7,7 +7,7 @@
       <input
         class="grow px-6 py-4 text-gray-900 dark:text-gray-50 bg-gray-200 dark:bg-gray-700 rounded-xl"
         :value="invitePlayerLink"
-        @focus="$event.target.select()"
+        @focus="$event?.target?.select()"
         readonly
       />
       <div class="flex flex-row gap-4">
