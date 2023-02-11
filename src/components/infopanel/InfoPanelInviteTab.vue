@@ -7,7 +7,8 @@
       <input
         class="grow px-6 py-4 text-gray-900 dark:text-gray-50 bg-gray-200 dark:bg-gray-700 rounded-xl"
         :value="invitePlayerLink"
-        @focus="$event?.target?.select()"
+        ref="playerLinkInput"
+        @focus="focusInput"
         readonly
       />
       <div class="flex flex-row gap-4">
@@ -34,6 +35,8 @@ import { computed, ref } from "vue";
 import { useRoute } from "vue-router";
 import { get, useShare } from "@vueuse/core";
 
+const playerLinkInput = ref<HTMLInputElement>();
+
 const gameId = ref(useRoute().params.gameId as string);
 
 const { share, isSupported: shareIsSupported } = useShare();
@@ -52,5 +55,9 @@ const startShare = () => {
 
 const copyToClipboard = () => {
   navigator.clipboard.writeText(get(invitePlayerLink));
+};
+
+const focusInput = () => {
+  get(playerLinkInput)?.select();
 };
 </script>
