@@ -1,6 +1,11 @@
 import type { MoveItem } from "@/lib/types";
 import { KingStatus, MoveType, PieceColor, PieceType } from "@/lib/types";
 
+export enum NotationType {
+  Algebraic = "algebraic",
+  LongAlgebraic = "longAlgebraic",
+}
+
 export const getStandardPieceNotation = (type: PieceType) => {
   switch (type) {
     case PieceType.Pawn:
@@ -24,17 +29,17 @@ export const getUnicodePieceNotation = (
 ) => {
   switch (type) {
     case PieceType.Pawn:
-      return pieceColor === PieceColor.White ? "♙" : "♟";
+      return "";
     case PieceType.Rook:
-      return pieceColor === PieceColor.White ? "♖" : "♜";
+      return pieceColor === PieceColor.White ? "♜" : "♖";
     case PieceType.Knight:
-      return pieceColor === PieceColor.White ? "♘" : "♞";
+      return pieceColor === PieceColor.White ? "♞" : "♘";
     case PieceType.Bishop:
-      return pieceColor === PieceColor.White ? "♗" : "♝";
+      return pieceColor === PieceColor.White ? "♝" : "♗";
     case PieceType.Queen:
-      return pieceColor === PieceColor.White ? "♕" : "♛";
+      return pieceColor === PieceColor.White ? "♛" : "♕";
     case PieceType.King:
-      return pieceColor === PieceColor.White ? "♔" : "♚";
+      return pieceColor === PieceColor.White ? "♚" : "♔";
   }
 };
 
@@ -62,7 +67,11 @@ export const getSquareName = (x: number, y: number) => {
   return `${getFileName(x)}${getRankName(y)}`;
 };
 
-export const getMoveNotation = (move: MoveItem, useUnicodeIcons: boolean) => {
+export const getMoveNotation = (
+  move: MoveItem,
+  notationType: NotationType,
+  useUnicodeIcons: boolean
+) => {
   const from = getSquareName(move.from.x, move.from.y);
   const to = getSquareName(move.to.x, move.to.y);
   const piece = getPieceNotation(move.type, useUnicodeIcons, move.color);
@@ -94,9 +103,17 @@ export const getMoveNotation = (move: MoveItem, useUnicodeIcons: boolean) => {
     }
   }
 
-  if (move.captures) {
-    return `${piece}${from}x${to}${suffix}`;
-  }
+  if (notationType === NotationType.Algebraic) {
+    if (move.captures) {
+      return `${piece}x${to}${suffix}`;
+    }
 
-  return `${piece}${from}-${to}${suffix}`;
+    return `${piece}${to}${suffix}`;
+  } else if (notationType === NotationType.LongAlgebraic) {
+    if (move.captures) {
+      return `${piece}${from}x${to}${suffix}`;
+    }
+
+    return `${piece}${from}-${to}${suffix}`;
+  }
 };

@@ -9,7 +9,7 @@
             v-for="(move, index) in moveGroup"
             :key="index"
           >
-            {{ getMoveNotation(move, false) }}
+            {{ getMoveNotation(move, NotationType.LongAlgebraic, false) }}
           </span>
         </div>
       </div>
@@ -19,7 +19,7 @@
 
 <script setup lang="ts">
 import type { MoveItem } from "@/lib/types";
-import { getMoveNotation } from "@/lib/chessNotation";
+import { getMoveNotation, NotationType } from "@/lib/chessNotation";
 import { computed } from "vue";
 
 const props = defineProps<{
