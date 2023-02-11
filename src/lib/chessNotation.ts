@@ -4,6 +4,7 @@ import { KingStatus, MoveType, PieceColor, PieceType } from "@/lib/types";
 export enum NotationType {
   Algebraic = "algebraic",
   LongAlgebraic = "longAlgebraic",
+  Spoken = "spoken",
 }
 
 export const getStandardPieceNotation = (type: PieceType) => {
@@ -43,6 +44,23 @@ export const getUnicodePieceNotation = (
   }
 };
 
+export const getPieceName = (type: PieceType) => {
+  switch (type) {
+    case PieceType.Pawn:
+      return "pawn";
+    case PieceType.Rook:
+      return "rook";
+    case PieceType.Knight:
+      return "knight";
+    case PieceType.Bishop:
+      return "bishop";
+    case PieceType.Queen:
+      return "queen";
+    case PieceType.King:
+      return "king";
+  }
+};
+
 export const getPieceNotation = (
   type: PieceType,
   useUnicodeIcons: boolean,
@@ -72,6 +90,10 @@ export const getMoveNotation = (
   notationType: NotationType,
   useUnicodeIcons: boolean
 ) => {
+  if (notationType === NotationType.Spoken) {
+    return getSpokenMoveNotation(move);
+  }
+
   const from = getSquareName(move.from.x, move.from.y);
   const to = getSquareName(move.to.x, move.to.y);
   const piece = getPieceNotation(move.type, useUnicodeIcons, move.color);
@@ -116,4 +138,39 @@ export const getMoveNotation = (
 
     return `${piece}${from}-${to}${suffix}`;
   }
+};
+
+export const getSpokenMoveNotation = (move: MoveItem) => {
+  const from = getSquareName(move.from.x, move.from.y);
+  const to = getSquareName(move.to.x, move.to.y);
+  const piece = getPieceName(move.type);
+
+  let suffix = "";
+  if (move.kind === MoveType.EnPassant) {
+    suffix = " e.p.";
+  } else if (move.kind === MoveType.Promotion && move.promoteToType) {
+    suffix = `promotes to ${getPieceName(move.promoteToType)}`;
+  } else if (move.status === KingStatus.IsCheck) {
+    suffix = "check";
+  } else if (move.status === KingStatus.IsCheckmate) {
+    suffix = "checkmate";
+  }
+
+  // if move is castling return O-O or O-O-O notation
+  // we can ignore everything else because it is not possible to perform a castle that results in a check
+  if (move.kind === MoveType.Castling) {
+    if (move.from.x === 4) {
+      if (move.to.x === 6) {
+        return "king-side castle";
+      } else if (move.to.x === 2) {
+        return "queen-side castle";
+      }
+    }
+  }
+
+  if (move.captures) {
+    return `${piece} ${from} captures ${to} ${suffix}`;
+  }
+
+  return `${piece} ${from} to ${to} ${suffix}`;
 };
