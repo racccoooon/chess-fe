@@ -28,11 +28,11 @@
         </button>
       </div>
     </div>
-    <div class="flex flex-wrap gap-4">
+    <div class="flex flex-col gap-4">
       <label class="text-gray-900 dark:text-gray-50 font-medium"
         >Use icons in notation</label
       >
-      <div class="flex flex-row gap-4 items-center">
+      <div class="flex flex-wrap gap-4 items-center">
         <button
           @click="useUnicodeIconsInNotation = true"
           :aria-selected="useUnicodeIconsInNotation"
@@ -49,11 +49,11 @@
         </button>
       </div>
     </div>
-    <div class="flex flex-wrap gap-4">
+    <div class="flex flex-col gap-4">
       <label class="text-gray-900 dark:text-gray-50 font-medium"
         >Raccoon Mode</label
       >
-      <div class="flex flex-row gap-4 items-center">
+      <div class="flex flex-wrap gap-4 items-center">
         <button
           @click="raccoonMode = true"
           :aria-selected="raccoonMode"
@@ -70,11 +70,11 @@
         </button>
       </div>
     </div>
-    <div class="flex flex-wrap gap-4">
+    <div class="flex flex-col gap-4">
       <label class="text-gray-900 dark:text-gray-50 font-medium"
         >Chess Board Border</label
       >
-      <div class="flex flex-row gap-4 items-center">
+      <div class="flex flex-wrap gap-4 items-center">
         <button
           @click="chessBoardBorder = ChessBoardBorder.None"
           :aria-selected="chessBoardBorder === ChessBoardBorder.None"
