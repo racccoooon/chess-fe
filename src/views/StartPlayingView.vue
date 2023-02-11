@@ -89,7 +89,7 @@ import { useRouter } from "vue-router";
 import { ref } from "vue";
 import { GameStartColor } from "@/lib/types";
 import { get } from "@vueuse/core";
-import { useUserStore } from "@/stores/player";
+import { useUserStore } from "@/stores/user";
 
 const store = useUserStore();
 

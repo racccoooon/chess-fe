@@ -35,7 +35,7 @@ import {
 import { computed, onMounted, ref } from "vue";
 import { get, set } from "@vueuse/core";
 import { SignalrConnection } from "@/lib/signalr";
-import { useUserStore } from "@/stores/player";
+import { useUserStore } from "@/stores/user";
 import { getSquareName } from "@/lib/chessNotation";
 import { invertColor } from "@/lib/chess";
 import GameLayout from "@/components/GameLayout.vue";

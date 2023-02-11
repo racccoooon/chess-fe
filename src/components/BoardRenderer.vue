@@ -86,8 +86,8 @@
           height="80"
           :type="piece.type"
           :color="piece.color"
-          :use-raccoon-tail="true"
-          :use-raccoon-pawn="true"
+          :use-raccoon-tail="raccoonMode"
+          :use-raccoon-pawn="raccoonMode"
           :key="piece.id"
           @click="handleClick(piece.x, piece.y)"
           :style="{
@@ -109,11 +109,12 @@
 
 <script setup lang="ts">
 import PieceRenderer from "@/components/PieceRenderer.vue";
-import type { Board, BoardHighlightSquare, Cell } from "@/lib/types";
-import { computed } from "vue";
+import type { Board, BoardHighlightSquare } from "@/lib/types";
 import { HighlightColor, PieceColor, PieceType } from "@/lib/types";
+import { storeToRefs } from "pinia";
+import { useSettingsStore } from "@/stores/settings";
 
-const props = defineProps<{
+defineProps<{
   board: Board;
   reverse: boolean;
   isWhiteInCheck: boolean;
@@ -133,16 +134,5 @@ const handleClick = (x: number, y: number) => {
   emit("click", x, y);
 };
 
-/***
- * the cell that is currently selected, with reversed board.
- */
-const selectedCell = computed((): Cell => {
-  let x = props.currentMove?.from?.x || 0;
-  let y = props.currentMove?.from?.y || 0;
-
-  return {
-    x: props.reverse ? 7 - x : x,
-    y: props.reverse ? y : 7 - y,
-  };
-});
+const { raccoonMode } = storeToRefs(useSettingsStore());
 </script>

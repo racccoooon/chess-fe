@@ -29,26 +29,18 @@
         :captured-pieces="bottomPlayerCapturedPieces"
       />
     </div>
-    <div class="h-full flex flex-col basis-1/4 w-full lg:w-auto">
-      <div class="grow lg:my-16 p-8 bg-gray-100 dark:bg-gray-800 rounded-2xl">
-        <div class="flex flex-col gap-4">
-          <GameHistory :moveHistory="moveHistory" />
-          <div>
-            <span
-              class="px-1 bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-300 font-medium rounded-lg"
-            >
-              {{ activeColor === PieceColor.White ? "White" : "Black" }} to move
-            </span>
-          </div>
-        </div>
-      </div>
+    <div class="h-full flex flex-col basis-2/6 w-full lg:w-auto">
+      <GameInfoPanel
+        :is-player="isPlayer"
+        :move-history="moveHistory"
+        :active-color="activeColor"
+      />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import BoardRenderer from "@/components/BoardRenderer.vue";
-import GameHistory from "@/components/GameHistory.vue";
 import PlayerInfo from "@/components/PlayerInfo.vue";
 import type { Board, BoardHighlightSquare, MoveItem } from "@/lib/types";
 import { HighlightColor, PieceColor, PieceType } from "@/lib/types";
@@ -60,6 +52,7 @@ import {
   getPiecesByType,
   isInCheck,
 } from "@/lib/chess";
+import GameInfoPanel from "@/components/GameInfoPanel.vue";
 
 const props = defineProps<{
   board: Board;

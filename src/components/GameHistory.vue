@@ -9,7 +9,7 @@
             v-for="(move, index) in moveGroup"
             :key="index"
           >
-            {{ getMoveNotation(move, NotationType.LongAlgebraic, false) }}
+            {{ getMoveNotation(move, notationType, useUnicodeIconsInNotation) }}
           </span>
         </div>
       </div>
@@ -19,8 +19,10 @@
 
 <script setup lang="ts">
 import type { MoveItem } from "@/lib/types";
-import { getMoveNotation, NotationType } from "@/lib/chessNotation";
+import { getMoveNotation } from "@/lib/chessNotation";
 import { computed } from "vue";
+import { storeToRefs } from "pinia";
+import { useSettingsStore } from "@/stores/settings";
 
 const props = defineProps<{
   moveHistory: MoveItem[];
@@ -42,4 +44,8 @@ const groupedMoves = computed(() => {
 
   return groupedMoves;
 });
+
+const { notationType, useUnicodeIconsInNotation } = storeToRefs(
+  useSettingsStore()
+);
 </script>
