@@ -8,6 +8,7 @@
     :player-color="playerColor"
     :white-player-name="whitePlayerName"
     :black-player-name="blackPlayerName"
+    :highlight-squares="highlightSquares"
     @click="handleClick"
   />
 </template>
@@ -21,8 +22,16 @@ import type {
   Move,
   MoveItem,
   PartialMove,
+  BoardHighlightSquare,
+  Cell,
 } from "@/lib/types";
-import { MoveType, Piece, PieceColor, PieceType } from "@/lib/types";
+import {
+  HighlightColor,
+  MoveType,
+  Piece,
+  PieceColor,
+  PieceType,
+} from "@/lib/types";
 import { computed, onMounted, ref } from "vue";
 import { get, set } from "@vueuse/core";
 import { SignalrConnection } from "@/lib/signalr";
@@ -61,6 +70,19 @@ const activeColor = ref<PieceColor>(PieceColor.White);
 
 const playerCanMove = computed(() => {
   return get(activeColor) === get(playerColor) && get(gameHasStarted);
+});
+
+const highlightSquares = computed((): BoardHighlightSquare[] => {
+  const list: BoardHighlightSquare[] = [];
+
+  if (get(currentMove)) {
+    list.push({
+      cell: get(currentMove)!.from as Cell,
+      color: HighlightColor.Yellow,
+    });
+  }
+
+  return list;
 });
 
 const initialize = async () => {

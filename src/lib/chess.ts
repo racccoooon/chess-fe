@@ -41,3 +41,11 @@ export const getMaterialValue = (pieces: Piece[]) => {
 export const getMaterialValueByColor = (pieces: Piece[], color: PieceColor) => {
   return getMaterialValue(getPiecesByColor(pieces, color));
 };
+
+export const getPiecesByType = (
+  pieces: Piece[],
+  type: PieceType,
+  color: PieceColor
+) => {
+  return pieces.filter((piece) => piece.type === type && piece.color === color);
+};

@@ -52,40 +52,31 @@
           />
         </template>
       </template>
-      <rect
-        v-if="lastMove !== null"
-        :x="
-          (reverse ? 7 - lastMove.from.x : lastMove.from.x) * tileAbsoluteWidth
-        "
-        :y="
-          (reverse ? lastMove.from.y : 8 - lastMove.from.y - 1) *
-          tileAbsoluteHeight
-        "
-        :width="tileAbsoluteWidth"
-        :height="tileAbsoluteHeight"
-        class="fill-yellow-300/75"
-        @click="handleClick(lastMove?.from.x || 0, lastMove?.from.y || 0)"
-      />
-      <rect
-        v-if="lastMove !== null"
-        :x="(reverse ? 7 - lastMove.to.x : lastMove.to.x) * tileAbsoluteWidth"
-        :y="
-          (reverse ? lastMove.to.y : 8 - lastMove.to.y - 1) * tileAbsoluteHeight
-        "
-        :width="tileAbsoluteWidth"
-        :height="tileAbsoluteHeight"
-        class="fill-yellow-300/75"
-        @click="handleClick(lastMove?.to.x || 0, lastMove?.to.y || 0)"
-      />
-      <rect
-        v-if="currentMove !== null"
-        :x="selectedCell.x * tileAbsoluteWidth"
-        :y="selectedCell.y * tileAbsoluteHeight"
-        :width="tileAbsoluteWidth"
-        :height="tileAbsoluteHeight"
-        class="fill-red-300/75"
-        @click="handleClick(selectedCell.x, selectedCell.y)"
-      />
+      <g>
+        <rect
+          v-for="(highlight, index) in highlightSquares"
+          :x="
+            (reverse ? 7 - highlight.cell.x : highlight.cell.x) *
+            tileAbsoluteWidth
+          "
+          :y="
+            (reverse ? highlight.cell.y : 8 - highlight.cell.y - 1) *
+            tileAbsoluteHeight
+          "
+          :width="tileAbsoluteWidth"
+          :height="tileAbsoluteHeight"
+          :data-dark="!!((highlight.cell.x + highlight.cell.y) % 2)"
+          :class="{
+            'fill-yellow-300/75': highlight.color === HighlightColor.Yellow,
+            'fill-red-400/75 data-[dark=true]:fill-red-300/90':
+              highlight.color === HighlightColor.Red,
+            'fill-lime-400/75 data-[dark=true]:fill-lime-500/90':
+              highlight.color === HighlightColor.Green,
+          }"
+          @click="handleClick(selectedCell.x, selectedCell.y)"
+          :key="index"
+        />
+      </g>
       <TransitionGroup>
         <PieceRenderer
           v-for="piece in board.pieces"
@@ -100,10 +91,10 @@
               ((piece.color === PieceColor.White && isWhiteInCheck) ||
                 (piece.color === PieceColor.Black && isBlackInCheck)) &&
               piece.type === PieceType.King
-                ? 'drop-shadow(-1px -1px 4px rgba(239, 68, 68, 0.7)) \n' +
-                  'drop-shadow(2px -1px 4px rgba(239, 68, 68, 0.7)) \n' +
-                  'drop-shadow(2px 2px 4px rgba(239, 68, 68, 0.7))\n' +
-                  'drop-shadow(-1px 2px 4px rgba(239, 68, 68, 0.7))'
+                ? 'drop-shadow(-4px -4px 1px rgba(239, 68, 68, 0.4)) \n' +
+                  'drop-shadow(4px -4px 1px rgba(239, 68, 68, 0.4)) \n' +
+                  'drop-shadow(4px 4px 1px rgba(239, 68, 68, 0.4))\n' +
+                  'drop-shadow(-4px 4px 1px rgba(239, 68, 68, 0.4))'
                 : '',
           }"
         />
@@ -114,17 +105,16 @@
 
 <script setup lang="ts">
 import PieceRenderer from "@/components/PieceRenderer.vue";
-import type { Board, Cell, Move, PartialMove } from "@/lib/types";
+import type { Board, BoardHighlightSquare, Cell } from "@/lib/types";
 import { computed } from "vue";
-import { PieceColor, PieceType } from "@/lib/types";
+import { HighlightColor, PieceColor, PieceType } from "@/lib/types";
 
 const props = defineProps<{
   board: Board;
   reverse: boolean;
-  currentMove: PartialMove | null;
-  lastMove: Move | null;
   isWhiteInCheck: boolean;
   isBlackInCheck: boolean;
+  highlightSquares: BoardHighlightSquare[];
 }>();
 
 const emit = defineEmits<{

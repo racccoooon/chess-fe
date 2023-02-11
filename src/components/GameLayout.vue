@@ -13,10 +13,9 @@
         <BoardRenderer
           :board="board"
           :reverse="reverseBoard"
-          :currentMove="null"
-          :lastMove="null"
           :isWhiteInCheck="isWhiteInCheck"
           :isBlackInCheck="isBlackInCheck"
+          :highlight-squares="highlightSquares"
           @click="handleClick"
           class="h-full rounded-2xl"
         />
@@ -47,11 +46,15 @@
 import BoardRenderer from "@/components/BoardRenderer.vue";
 import GameHistory from "@/components/GameHistory.vue";
 import PlayerInfo from "@/components/PlayerInfo.vue";
-import type { Board, MoveItem } from "@/lib/types";
+import type { Board, BoardHighlightSquare, MoveItem } from "@/lib/types";
+import { HighlightColor, PieceColor, PieceType } from "@/lib/types";
 import { computed } from "vue";
 import { get } from "@vueuse/core";
-import { getMaterialValueByColor, isInCheck } from "@/lib/chess";
-import { PieceColor } from "@/lib/types";
+import {
+  getMaterialValueByColor,
+  getPiecesByType,
+  isInCheck,
+} from "@/lib/chess";
 
 const props = defineProps<{
   board: Board;
@@ -62,6 +65,7 @@ const props = defineProps<{
   playerColor: PieceColor;
   whitePlayerName: string;
   blackPlayerName: string;
+  highlightSquares: BoardHighlightSquare[];
 }>();
 
 const emit = defineEmits<{
@@ -81,6 +85,10 @@ const isWhiteInCheck = computed(() => {
 const isBlackInCheck = computed(() => {
   if (!get(lastMove)) return false;
   return isInCheck(get(lastMove), PieceColor.Black);
+});
+
+const isAnyInCheck = computed(() => {
+  return get(isWhiteInCheck) || get(isBlackInCheck);
 });
 
 // computed values for material advantage
@@ -131,6 +139,37 @@ const bottomPlayerMaterialAdvantage = computed(() => {
   } else {
     return get(whiteMaterialAdvantage);
   }
+});
+
+const highlightSquares = computed((): BoardHighlightSquare[] => {
+  const list: BoardHighlightSquare[] = [];
+
+  if (get(isAnyInCheck)) {
+    const king = getPiecesByType(
+      props.board.pieces,
+      PieceType.King,
+      props.activeColor
+    )[0];
+    list.push({
+      cell: { x: king.x, y: king.y },
+      color: HighlightColor.Red,
+    });
+  }
+
+  if (get(lastMove)) {
+    list.push({
+      cell: get(lastMove).from,
+      color: HighlightColor.Yellow,
+    });
+    list.push({
+      cell: get(lastMove).to,
+      color: HighlightColor.Yellow,
+    });
+  }
+
+  list.push(...props.highlightSquares);
+
+  return list;
 });
 
 const handleClick = (x: number, y: number) => {

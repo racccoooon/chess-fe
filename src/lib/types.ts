@@ -21,6 +21,12 @@ export enum GameStartColor {
   Random = "randomColor",
 }
 
+export enum HighlightColor {
+  Green = "green",
+  Yellow = "yellow",
+  Red = "red",
+}
+
 export class Piece {
   type: PieceType;
   color: PieceColor;
@@ -44,6 +50,11 @@ export interface Board {
 export interface Cell {
   x: number;
   y: number;
+}
+
+export interface BoardHighlightSquare {
+  cell: Cell;
+  color: HighlightColor;
 }
 
 export enum MoveType {
