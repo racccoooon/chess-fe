@@ -61,6 +61,7 @@ import { SignalrConnection } from "@/lib/signalr";
 import { usePlayerStore } from "@/stores/player";
 import { getSquareName } from "@/lib/chessNotation";
 import GameHistory from "@/components/GameHistory.vue";
+import { invertColor } from "@/lib/chess";
 
 const router = useRouter();
 const hubConnection = new SignalrConnection();
@@ -81,9 +82,7 @@ const player = ref<Player>({
 });
 const opponent = ref<Player>({
   color: computed(() => {
-    return get(player).color === PieceColor.White
-      ? PieceColor.Black
-      : PieceColor.White;
+    return invertColor(get(player).color);
   }),
   name: ref(""),
 });
@@ -119,8 +118,7 @@ const isInCheck = (color: PieceColor) => {
     return false;
   }
 
-  let opponentColor =
-    color === PieceColor.White ? PieceColor.Black : PieceColor.White;
+  let opponentColor = invertColor(color);
 
   return (
     get(lastMove).color === opponentColor &&
@@ -267,10 +265,7 @@ const resolveMove = (move: MoveItem) => {
   get(moveHistory).push(move);
 
   // change the active color
-  set(
-    activeColor,
-    move.color === PieceColor.White ? PieceColor.Black : PieceColor.White
-  );
+  set(activeColor, invertColor(move.color));
 };
 
 const handleClick = async (x: number, y: number) => {
