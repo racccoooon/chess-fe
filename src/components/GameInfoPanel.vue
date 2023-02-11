@@ -13,6 +13,13 @@
         Game
       </button>
       <button
+        @click="activeTab = Tab.Invite"
+        :aria-selected="activeTab === Tab.Invite"
+        class="px-6 py-2 text-gray-500 dark:text-gray-300 aria-selected:text-gray-900 aria-selected:dark:text-gray-50 aria-selected:bg-gray-200 aria-selected:dark:bg-gray-700 text-md font-medium rounded-xl transition-all ease-in-out"
+      >
+        Invite
+      </button>
+      <button
         @click="activeTab = Tab.Settings"
         :aria-selected="activeTab === Tab.Settings"
         class="px-6 py-2 text-gray-500 dark:text-gray-300 aria-selected:text-gray-900 aria-selected:dark:text-gray-50 aria-selected:bg-gray-200 aria-selected:dark:bg-gray-700 text-md font-medium rounded-xl transition-all ease-in-out"
@@ -28,6 +35,7 @@
         :active-color="activeColor"
         :game-has-started="gameHasStarted"
       />
+      <InfoPanelInviteTab v-else-if="activeTab === Tab.Invite" />
       <InfoPanelSettingsTab v-else-if="activeTab === Tab.Settings" />
     </div>
   </div>
@@ -39,8 +47,10 @@ import type { PieceColor } from "@/lib/types";
 import { ref } from "vue";
 import InfoPanelGameTab from "@/components/infopanel/InfoPanelGameTab.vue";
 import InfoPanelSettingsTab from "@/components/infopanel/InfoPanelSettingsTab.vue";
+import InfoPanelInviteTab from "@/components/infopanel/InfoPanelInviteTab.vue";
+import { set, watchOnce } from "@vueuse/core";
 
-defineProps<{
+const props = defineProps<{
   moveHistory: MoveItem[];
   activeColor: PieceColor;
   isPlayer: boolean;
@@ -49,8 +59,16 @@ defineProps<{
 
 enum Tab {
   Game,
+  Invite,
   Settings,
 }
 
-const activeTab = ref<Tab>(Tab.Game);
+const activeTab = ref<Tab>(Tab.Invite);
+
+watchOnce(
+  () => props.gameHasStarted,
+  () => {
+    set(activeTab, Tab.Game);
+  }
+);
 </script>
