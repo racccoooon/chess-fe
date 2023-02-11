@@ -6,9 +6,14 @@
       class="flex flex-col justify-center lg:basis-5/12 xl:basis-1 w-full lg:w-auto lg:h-screen"
     >
       <div class="p-6">
-        <h2 class="dark:text-gray-50 text-gray-900 text-xl font-bold">
+        <h2 class="text-gray-900 dark:text-gray-50 text-xl font-bold">
           {{ opponent?.name || "Opponent hasn't joined yet..." }}
         </h2>
+        <span
+          v-if="opponentMaterialAdvantage > 0"
+          class="text-gray-500 dark:text-gray-300"
+          >+{{ opponentMaterialAdvantage }}</span
+        >
       </div>
       <div class="w-full xl:h-3/4">
         <BoardRenderer
@@ -23,9 +28,14 @@
         />
       </div>
       <div class="p-6">
-        <h2 class="dark:text-gray-50 text-gray-900 text-xl font-bold">
+        <h2 class="text-gray-900 dark:text-gray-50 text-xl font-bold">
           <input class="bg-transparent" v-model="player.name" />
         </h2>
+        <span
+          v-if="playerMaterialAdvantage > 0"
+          class="text-gray-500 dark:text-gray-300"
+          >+{{ playerMaterialAdvantage }}</span
+        >
       </div>
     </div>
     <div class="h-full flex flex-col basis-1/4 w-full lg:w-auto">
@@ -48,20 +58,14 @@ import type {
   PartialMove,
   Player,
 } from "@/lib/types";
-import {
-  KingStatus,
-  MoveType,
-  Piece,
-  PieceColor,
-  PieceType,
-} from "@/lib/types";
+import { MoveType, Piece, PieceColor, PieceType } from "@/lib/types";
 import { computed, onMounted, ref, watch } from "vue";
 import { get, set } from "@vueuse/core";
 import { SignalrConnection } from "@/lib/signalr";
 import { usePlayerStore } from "@/stores/player";
 import { getSquareName } from "@/lib/chessNotation";
 import GameHistory from "@/components/GameHistory.vue";
-import { invertColor } from "@/lib/chess";
+import { getMaterialValueByColor, invertColor, isInCheck } from "@/lib/chess";
 
 const router = useRouter();
 const hubConnection = new SignalrConnection();
@@ -113,30 +117,58 @@ const canMove = computed(() => {
   return get(activeColor) === get(player).color && get(gameHasStarted);
 });
 
-const isInCheck = (color: PieceColor) => {
-  if (!get(lastMove)) {
-    return false;
-  }
-
-  let opponentColor = invertColor(color);
-
-  return (
-    get(lastMove).color === opponentColor &&
-    get(lastMove).status === KingStatus.IsCheck
-  );
-};
-
+// computed values for checking if the player is in check
 const isWhiteInCheck = computed(() => {
-  return isInCheck(PieceColor.White);
+  if (!get(lastMove)) return false;
+  return isInCheck(get(lastMove), PieceColor.White);
 });
 
 const isBlackInCheck = computed(() => {
-  return isInCheck(PieceColor.Black);
+  if (!get(lastMove)) return false;
+  return isInCheck(get(lastMove), PieceColor.Black);
 });
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const isPlayerInCheck = computed(() => {
-  return isInCheck(get(player).color);
+  return get(player).color === PieceColor.White
+    ? get(isWhiteInCheck)
+    : get(isBlackInCheck);
+});
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const isOpponentInCheck = computed(() => {
+  return get(opponent).color === PieceColor.White
+    ? get(isWhiteInCheck)
+    : get(isBlackInCheck);
+});
+
+// computed values for material advantage
+const whiteMaterialValue = computed(() => {
+  return getMaterialValueByColor(get(board).pieces, PieceColor.White);
+});
+
+const blackMaterialValue = computed(() => {
+  return getMaterialValueByColor(get(board).pieces, PieceColor.Black);
+});
+
+const whiteMaterialAdvantage = computed(() => {
+  return get(whiteMaterialValue) - get(blackMaterialValue);
+});
+
+const blackMaterialAdvantage = computed(() => {
+  return get(blackMaterialValue) - get(whiteMaterialValue);
+});
+
+const playerMaterialAdvantage = computed(() => {
+  return get(player).color === PieceColor.White
+    ? get(whiteMaterialAdvantage)
+    : get(blackMaterialAdvantage);
+});
+
+const opponentMaterialAdvantage = computed(() => {
+  return get(opponent).color === PieceColor.White
+    ? get(whiteMaterialAdvantage)
+    : get(blackMaterialAdvantage);
 });
 
 const initialize = async () => {
