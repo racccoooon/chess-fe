@@ -30,7 +30,7 @@
 </template>
 
 <script setup lang="ts">
-import { PieceColor, PieceType } from "@/lib/types";
+import type { PieceColor, PieceType } from "@/lib/types";
 import PieceRenderer from "@/components/PieceRenderer.vue";
 import { invertColor } from "@/lib/chess";
 import { computed } from "vue";
