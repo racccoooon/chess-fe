@@ -1,6 +1,6 @@
 <template>
   <div
-    class="mb-12 sm:m-12 xl:my-0 xl:h-screen flex flex-col xl:flex-row gap-6 xl:gap-16 justify-center items-center"
+    class="sm:m-12 xl:my-0 xl:h-screen flex flex-col xl:flex-row gap-6 xl:gap-16 justify-center items-center"
   >
     <div
       class="flex flex-col justify-center xl:basis-5/12 xl:basis-1 w-full sm:w-5/6 md:w-3/4 lg:w-2/3 xl:w-auto xl:h-screen"
@@ -39,7 +39,7 @@
       />
     </div>
     <div
-      class="px-6 sm:px-0 h-full flex flex-col basis-2/6 w-full sm:w-5/6 md:w-3/4 lg:w-2/3 xl:w-auto"
+      class="h-full flex flex-col basis-2/6 w-full sm:w-5/6 md:w-3/4 lg:w-2/3 xl:w-auto"
     >
       <GameInfoPanel
         :is-player="isPlayer"
