@@ -256,7 +256,7 @@ const initialize = async () => {
   await hubConnection.joinGame(get(gameId), get(token)!, get(player).name);
 };
 
-const getPieceAtCell = (x: number, y: number) => {
+const getPieceAtCell = (x: number, y: number): Piece | undefined => {
   return get(board).pieces.find((piece) => piece.x === x && piece.y === y);
 };
 
@@ -292,6 +292,22 @@ const resolveMove = (move: MoveItem) => {
   // move the piece to its new position
   pieceToMove.x = move.to.x;
   pieceToMove.y = move.to.y;
+
+  // if its a castling move, move the rook
+  if (move.kind === MoveType.Castling) {
+    let rook = null
+    if (move.to.x == 2){
+      let rook = getPieceAtCell(0, move.to.y);
+      if(rook){
+        rook.x = 3;
+      }
+    }else{
+      let rook = getPieceAtCell(7, move.to.y);
+      if(rook){
+        rook.x = 5;
+      }
+    }
+  }
 
   // push the move to the move history
   get(moveHistory).push(move);
