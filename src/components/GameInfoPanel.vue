@@ -1,31 +1,35 @@
 <template>
   <div
-    class="grow lg:my-16 p-8 bg-gray-100 dark:bg-gray-800 rounded-2xl flex flex-col gap-6"
+    class="grow lg:my-16 bg-gray-100 dark:bg-gray-800 rounded-2xl overflow-hidden flex flex-col"
   >
-    <div class="flex flex-row gap-2 items-center">
+    <div
+      class="p-2 flex flex-row items-center border-b-2 border-gray-200 dark:border-gray-700"
+    >
       <button
         @click="activeTab = Tab.Game"
         :aria-selected="activeTab === Tab.Game"
-        class="px-4 p-1 text-gray-500 dark:text-gray-300 aria-selected:text-gray-900 aria-selected:dark:text-gray-50 text-lg font-medium"
+        class="px-6 py-2 text-gray-500 dark:text-gray-300 aria-selected:text-gray-900 aria-selected:dark:text-gray-50 aria-selected:bg-gray-200 aria-selected:dark:bg-gray-700 text-md font-medium rounded-xl transition-all ease-in-out"
       >
         Game
       </button>
       <button
         @click="activeTab = Tab.Settings"
         :aria-selected="activeTab === Tab.Settings"
-        class="px-4 p-1 text-gray-500 dark:text-gray-300 aria-selected:text-gray-900 aria-selected:dark:text-gray-50 text-lg font-medium"
+        class="px-6 py-2 text-gray-500 dark:text-gray-300 aria-selected:text-gray-900 aria-selected:dark:text-gray-50 aria-selected:bg-gray-200 aria-selected:dark:bg-gray-700 text-md font-medium rounded-xl transition-all ease-in-out"
       >
         Settings
       </button>
     </div>
-    <InfoPanelGameTab
-      v-if="activeTab === Tab.Game"
-      :is-player="isPlayer"
-      :move-history="moveHistory"
-      :active-color="activeColor"
-      :game-has-started="gameHasStarted"
-    />
-    <InfoPanelSettingsTab v-else-if="activeTab === Tab.Settings" />
+    <div class="grow flex p-8">
+      <InfoPanelGameTab
+        v-if="activeTab === Tab.Game"
+        :is-player="isPlayer"
+        :move-history="moveHistory"
+        :active-color="activeColor"
+        :game-has-started="gameHasStarted"
+      />
+      <InfoPanelSettingsTab v-else-if="activeTab === Tab.Settings" />
+    </div>
   </div>
 </template>
 
