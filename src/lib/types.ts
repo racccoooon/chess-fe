@@ -1,6 +1,5 @@
 // @ts-ignore
 import { v4 as uuidv4 } from "uuid";
-import type { Ref } from "vue";
 
 export enum PieceType {
   Pawn = "pawn",
@@ -80,11 +79,6 @@ export interface MoveItem {
   status: KingStatus;
   captures: boolean;
   promoteToType: PieceType | null;
-}
-
-export interface Player {
-  color: Ref<PieceColor> | PieceColor;
-  name: Ref<string> | string;
 }
 
 export interface JoinGameResponse {

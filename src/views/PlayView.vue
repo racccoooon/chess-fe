@@ -1,53 +1,18 @@
 <template>
-  <div
-    class="mx-6 md:m-12 lg:my-0 lg:h-screen flex flex-col lg:flex-row gap-6 lg:gap-16 justify-center items-center"
-  >
-    <div
-      class="flex flex-col justify-center lg:basis-5/12 xl:basis-1 w-full lg:w-auto lg:h-screen"
-    >
-      <div class="p-6">
-        <h2 class="text-gray-900 dark:text-gray-50 text-xl font-bold">
-          {{ opponent?.name || "Opponent hasn't joined yet..." }}
-        </h2>
-        <span
-          v-if="opponentMaterialAdvantage > 0"
-          class="text-gray-500 dark:text-gray-300"
-          >+{{ opponentMaterialAdvantage }}</span
-        >
-      </div>
-      <div class="w-full xl:h-3/4">
-        <BoardRenderer
-          :board="board"
-          :reverse="reverseBoard"
-          :currentMove="currentMove"
-          :lastMove="lastMove"
-          :isWhiteInCheck="isWhiteInCheck"
-          :isBlackInCheck="isBlackInCheck"
-          @click="handleClick"
-          class="h-full rounded-2xl"
-        />
-      </div>
-      <div class="p-6">
-        <h2 class="text-gray-900 dark:text-gray-50 text-xl font-bold">
-          <input class="bg-transparent" v-model="player.name" />
-        </h2>
-        <span
-          v-if="playerMaterialAdvantage > 0"
-          class="text-gray-500 dark:text-gray-300"
-          >+{{ playerMaterialAdvantage }}</span
-        >
-      </div>
-    </div>
-    <div class="h-full flex flex-col basis-1/4 w-full lg:w-auto">
-      <div class="grow lg:my-16 p-8 bg-gray-100 dark:bg-gray-800 rounded-2xl">
-        <GameHistory :moveHistory="moveHistory" />
-      </div>
-    </div>
-  </div>
+  <GameLayout
+    :board="board"
+    :move-history="moveHistory"
+    :reverse-board="reverseBoard"
+    :active-color="activeColor"
+    :is-player="true"
+    :player-color="playerColor"
+    :white-player-name="whitePlayerName"
+    :black-player-name="blackPlayerName"
+    @click="handleClick"
+  />
 </template>
 
 <script setup lang="ts">
-import BoardRenderer from "@/components/BoardRenderer.vue";
 import { useRoute, useRouter } from "vue-router";
 import type {
   Board,
@@ -56,119 +21,46 @@ import type {
   Move,
   MoveItem,
   PartialMove,
-  Player,
 } from "@/lib/types";
 import { MoveType, Piece, PieceColor, PieceType } from "@/lib/types";
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { get, set } from "@vueuse/core";
 import { SignalrConnection } from "@/lib/signalr";
-import { usePlayerStore } from "@/stores/player";
+import { useUserStore } from "@/stores/player";
 import { getSquareName } from "@/lib/chessNotation";
-import GameHistory from "@/components/GameHistory.vue";
-import { getMaterialValueByColor, invertColor, isInCheck } from "@/lib/chess";
+import { invertColor } from "@/lib/chess";
+import GameLayout from "@/components/GameLayout.vue";
 
 const router = useRouter();
 const hubConnection = new SignalrConnection();
 
-const store = usePlayerStore();
+const userStore = useUserStore();
 
 const gameId = ref(useRoute().params.gameId as string);
-const token = store.token;
 
 const board = ref<Board>({
   pieces: [],
 });
 
-// set up players
-const player = ref<Player>({
-  color: ref(PieceColor.White),
-  name: ref(store.name),
-});
-const opponent = ref<Player>({
-  color: computed(() => {
-    return invertColor(get(player).color);
-  }),
-  name: ref(""),
-});
+const whitePlayerName = ref("");
+const blackPlayerName = ref("");
 
-// update the store when the player name changes
-watch(
-  () => get(player).name,
-  (newName) => {
-    store.$patch({ name: newName });
-  }
-);
+const playerColor = ref(PieceColor.White);
 
 const reverseBoard = computed(() => {
-  return get(player)?.color === PieceColor.Black;
+  return get(playerColor) === PieceColor.Black;
 });
 
 const moveHistory = ref<MoveItem[]>([]);
 
-const lastMove = computed(() => {
-  return get(moveHistory)[get(moveHistory).length - 1] || null;
-});
 const currentMove = ref<PartialMove | null>(null);
 
 const gameHasStarted = ref(false);
+
 const activeColor = ref<PieceColor>(PieceColor.White);
 
-const canMove = computed(() => {
-  return get(activeColor) === get(player).color && get(gameHasStarted);
-});
-
-// computed values for checking if the player is in check
-const isWhiteInCheck = computed(() => {
-  if (!get(lastMove)) return false;
-  return isInCheck(get(lastMove), PieceColor.White);
-});
-
-const isBlackInCheck = computed(() => {
-  if (!get(lastMove)) return false;
-  return isInCheck(get(lastMove), PieceColor.Black);
-});
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const isPlayerInCheck = computed(() => {
-  return get(player).color === PieceColor.White
-    ? get(isWhiteInCheck)
-    : get(isBlackInCheck);
-});
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const isOpponentInCheck = computed(() => {
-  return get(opponent).color === PieceColor.White
-    ? get(isWhiteInCheck)
-    : get(isBlackInCheck);
-});
-
-// computed values for material advantage
-const whiteMaterialValue = computed(() => {
-  return getMaterialValueByColor(get(board).pieces, PieceColor.White);
-});
-
-const blackMaterialValue = computed(() => {
-  return getMaterialValueByColor(get(board).pieces, PieceColor.Black);
-});
-
-const whiteMaterialAdvantage = computed(() => {
-  return get(whiteMaterialValue) - get(blackMaterialValue);
-});
-
-const blackMaterialAdvantage = computed(() => {
-  return get(blackMaterialValue) - get(whiteMaterialValue);
-});
-
-const playerMaterialAdvantage = computed(() => {
-  return get(player).color === PieceColor.White
-    ? get(whiteMaterialAdvantage)
-    : get(blackMaterialAdvantage);
-});
-
-const opponentMaterialAdvantage = computed(() => {
-  return get(opponent).color === PieceColor.White
-    ? get(whiteMaterialAdvantage)
-    : get(blackMaterialAdvantage);
+const playerCanMove = computed(() => {
+  return get(activeColor) === get(playerColor) && get(gameHasStarted);
 });
 
 const initialize = async () => {
@@ -214,11 +106,15 @@ const initialize = async () => {
     });
 
     // set player color
-    get(player).color = e.playerColor as PieceColor;
+    set(playerColor, e.playerColor as PieceColor);
 
     // set opponent if they already joined before us
     if (e.opponentName) {
-      get(opponent).name = e.opponentName;
+      if (e.playerColor === PieceColor.White) {
+        set(blackPlayerName, e.opponentName);
+      } else {
+        set(whitePlayerName, e.opponentName);
+      }
     }
 
     // set move history
@@ -231,11 +127,9 @@ const initialize = async () => {
   hubConnection.onGameStarted((e: GameStartedResponse) => {
     // the game started event means the opponent joined
 
-    // set opponent name
-    get(opponent).name =
-      get(opponent).color === PieceColor.White
-        ? e.whitePlayerName
-        : e.blackPlayerName;
+    // set names
+    set(whitePlayerName, e.whitePlayerName);
+    set(blackPlayerName, e.blackPlayerName);
 
     set(gameHasStarted, true);
   });
@@ -253,7 +147,7 @@ const initialize = async () => {
   });
 
   // join the game
-  await hubConnection.joinGame(get(gameId), get(token)!, get(player).name);
+  await hubConnection.joinGame(get(gameId), userStore.token, userStore.name);
 };
 
 const getPieceAtCell = (x: number, y: number): Piece | undefined => {
@@ -295,15 +189,14 @@ const resolveMove = (move: MoveItem) => {
 
   // if its a castling move, move the rook
   if (move.kind === MoveType.Castling) {
-    let rook = null
-    if (move.to.x == 2){
+    if (move.to.x == 2) {
       let rook = getPieceAtCell(0, move.to.y);
-      if(rook){
+      if (rook) {
         rook.x = 3;
       }
-    }else{
+    } else {
       let rook = getPieceAtCell(7, move.to.y);
-      if(rook){
+      if (rook) {
         rook.x = 5;
       }
     }
@@ -317,7 +210,7 @@ const resolveMove = (move: MoveItem) => {
 };
 
 const handleClick = async (x: number, y: number) => {
-  if (!get(canMove)) {
+  if (!get(playerCanMove)) {
     set(currentMove, null);
     return;
   }
@@ -328,7 +221,7 @@ const handleClick = async (x: number, y: number) => {
     // if there is no piece at the selected cell, or the piece is not the player's color, do nothing
     if (
       selectedPiece === undefined ||
-      selectedPiece.color !== get(player).color
+      selectedPiece.color !== get(playerColor)
     ) {
       return;
     }
@@ -339,7 +232,7 @@ const handleClick = async (x: number, y: number) => {
     } as PartialMove);
   } else {
     // if the player selects a cell with a piece of their color as the target position, cancel the move
-    if (selectedPiece?.color === get(player).color) {
+    if (selectedPiece?.color === get(playerColor)) {
       set(currentMove, null);
       return;
     }
@@ -354,7 +247,6 @@ const handleClick = async (x: number, y: number) => {
     // send move to server
     await hubConnection.makeMove(get(gameId), get(currentMove) as Move);
 
-    set(lastMove, get(currentMove) as Move);
     set(currentMove, null);
   }
 };

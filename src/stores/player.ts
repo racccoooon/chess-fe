@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 import { get, set, useStorage } from "@vueuse/core";
 import { v4 as uuid } from "uuid";
 
-export const usePlayerStore = defineStore("player", () => {
+export const useUserStore = defineStore("player", () => {
   const token = useStorage("playerToken", "");
   const name = useStorage("playerName", "");
 
