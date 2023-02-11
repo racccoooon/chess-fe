@@ -237,11 +237,10 @@ const resolveMove = (move: MoveItem) => {
   let pieceToMove = getPieceAtCell(move.from.x, move.from.y);
 
   // get the piece at the to cell
-  let pieceToTake = getPieceAtCell(move.to.x, move.to.y);
+  let pieceToCapture = getPieceAtCell(move.to.x, move.to.y);
 
   if (move.kind === MoveType.EnPassant) {
-    // if the move is en passant, remove the piece that was taken
-    pieceToTake = getPieceAtCell(move.to.x, move.from.y);
+    pieceToCapture = getPieceAtCell(move.to.x, move.from.y);
   }
 
   if (!pieceToMove) {
@@ -255,19 +254,9 @@ const resolveMove = (move: MoveItem) => {
     );
   }
 
-  // if there is a piece to take, remove it from the board
-  if (pieceToTake) {
-    if (!pieceToTake) {
-      throw new Error(
-        `Cannot take piece that does not exist! ${move.color} ${
-          move.type
-        } at ${getSquareName(move.from.x, move.from.y)} to ${getSquareName(
-          move.to.x,
-          move.to.y
-        )} (${move.kind})`
-      );
-    }
-    get(board).pieces = get(board).pieces.filter((p) => p !== pieceToTake);
+  // if there is a piece to capture, remove it from the board
+  if (pieceToCapture) {
+    get(board).pieces = get(board).pieces.filter((p) => p !== pieceToCapture);
   }
 
   // move the piece to its new position
