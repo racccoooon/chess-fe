@@ -80,10 +80,14 @@
       <TransitionGroup>
         <PieceRenderer
           v-for="piece in board.pieces"
-          :x="reverse ? 7 - piece.x : piece.x"
-          :y="reverse ? 7 - piece.y : piece.y"
+          :x="(reverse ? 7 - piece.x : piece.x) * 100 + 10"
+          :y="(reverse ? piece.y : 7 - piece.y) * 100 + 10"
+          width="80"
+          height="80"
           :type="piece.type"
           :color="piece.color"
+          :use-raccoon-tail="true"
+          :use-raccoon-pawn="true"
           :key="piece.id"
           @click="handleClick(piece.x, piece.y)"
           :style="{

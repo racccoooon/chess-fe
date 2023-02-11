@@ -1,19 +1,17 @@
 <template>
-  <svg
-    :x="x * 100 + 10"
-    :y="(7 - y) * 100 + 10"
-    width="80"
-    height="80"
-    viewBox="0 0 100 100"
-  >
+  <svg viewBox="0 0 100 100">
     <RaccoonTail
+      v-if="useRaccoonTail"
       :color="color"
       :flipped="
         (type !== PieceType.Bishop && !!Math.round(Math.random())) ||
         type === PieceType.Knight
       "
     />
-    <PawnIcon v-if="type === PieceType.Pawn" :color="color" />
+    <template v-if="type === PieceType.Pawn">
+      <RaccoonPawnIcon v-if="useRaccoonPawn" :color="color" />
+      <PawnIcon v-else :color="color" />
+    </template>
     <RookIcon v-else-if="type === PieceType.Rook" :color="color" />
     <KingIcon v-else-if="type === PieceType.King" :color="color" />
     <QueenIcon v-else-if="type === PieceType.Queen" :color="color" />
@@ -53,11 +51,12 @@ import QueenIcon from "@/components/pieces/QueenIcon.vue";
 import RaccoonTail from "@/components/pieces/RaccoonTail.vue";
 import BishopIcon from "@/components/pieces/BishopIcon.vue";
 import KnightIcon from "@/components/pieces/KnightIcon.vue";
+import RaccoonPawnIcon from "@/components/pieces/RaccoonPawnIcon.vue";
 
 defineProps<{
-  x: number;
-  y: number;
   color: PieceColor;
   type: PieceType;
+  useRaccoonTail?: boolean;
+  useRaccoonPawn?: boolean;
 }>();
 </script>
