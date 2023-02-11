@@ -50,12 +50,14 @@
 
 <script setup lang="ts">
 import BoardRenderer from "@/components/BoardRenderer.vue";
+import PlayerInfo from "@/components/PlayerInfo.vue";
 import type {
+  Board,
+  BoardHighlightSquare,
+  MoveItem,
   PieceMovedEvent,
   PieceSelectedEvent,
-} from "@/components/BoardRenderer.vue";
-import PlayerInfo from "@/components/PlayerInfo.vue";
-import type { Board, BoardHighlightSquare, MoveItem } from "@/lib/types";
+} from "@/lib/types";
 import { HighlightColor, PieceColor, PieceType } from "@/lib/types";
 import { computed } from "vue";
 import { get } from "@vueuse/core";

@@ -26,6 +26,8 @@ import type {
   MoveItem,
   BoardHighlightSquare,
   Cell,
+  PieceSelectedEvent,
+  PieceMovedEvent,
 } from "@/lib/types";
 import {
   HighlightColor,
@@ -41,10 +43,6 @@ import { useUserStore } from "@/stores/user";
 import { getSquareName } from "@/lib/chessNotation";
 import { invertColor } from "@/lib/chess";
 import GameLayout from "@/components/GameLayout.vue";
-import type {
-  PieceMovedEvent,
-  PieceSelectedEvent,
-} from "@/components/BoardRenderer.vue";
 
 const router = useRouter();
 const hubConnection = new SignalrConnection();

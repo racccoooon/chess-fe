@@ -150,7 +150,12 @@
 
 <script setup lang="ts">
 import PieceRenderer from "@/components/PieceRenderer.vue";
-import type { Board, BoardHighlightSquare } from "@/lib/types";
+import type {
+  Board,
+  BoardHighlightSquare,
+  PieceMovedEvent,
+  PieceSelectedEvent,
+} from "@/lib/types";
 import {
   ChessBoardBorder,
   HighlightColor,
@@ -175,15 +180,6 @@ const props = defineProps<{
   allowInteractionWithBlack: boolean;
   highlightSquares: BoardHighlightSquare[];
 }>();
-
-export interface PieceSelectedEvent {
-  piece: Piece;
-}
-
-export interface PieceMovedEvent {
-  piece: Piece;
-  to: { x: number; y: number };
-}
 
 const emit = defineEmits<{
   (event: "pieceSelected", payload: PieceSelectedEvent): void;

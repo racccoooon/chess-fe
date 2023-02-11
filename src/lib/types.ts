@@ -109,6 +109,15 @@ export interface GameStartedResponse {
   blackPlayerName: string;
 }
 
+export interface PieceSelectedEvent {
+  piece: Piece;
+}
+
+export interface PieceMovedEvent {
+  piece: Piece;
+  to: { x: number; y: number };
+}
+
 export enum ChessBoardBorder {
   None = "none",
   Thin = "thin",

@@ -5,7 +5,7 @@
     </h2>
     <div class="flex flex-row gap-4 items-center">
       <div class="flex flex-row gap-4 items-center">
-        <template v-for="type in Object.keys(capturedPieces)" :key="type">
+        <template v-for="type in pieceTypes" :key="type">
           <div
             v-if="capturedPieces[type] > 0"
             class="flex flex-row -gap-2 items-center h-5"
@@ -33,11 +33,16 @@
 import { PieceColor, PieceType } from "@/lib/types";
 import PieceRenderer from "@/components/PieceRenderer.vue";
 import { invertColor } from "@/lib/chess";
+import { computed } from "vue";
 
-defineProps<{
+const props = defineProps<{
   name: string;
   materialAdvantage: number;
   color: PieceColor;
   capturedPieces: Record<PieceType, number>;
 }>();
+
+const pieceTypes = computed(
+  () => Object.keys(props.capturedPieces) as PieceType[]
+);
 </script>

@@ -30,7 +30,7 @@
 
 <script setup lang="ts">
 import type { MoveItem } from "@/lib/types";
-import { PieceColor } from "@/lib/types";
+import type { PieceColor } from "@/lib/types";
 import { ref } from "vue";
 import InfoPanelGameTab from "@/components/infopanel/InfoPanelGameTab.vue";
 import InfoPanelSettingsTab from "@/components/infopanel/InfoPanelSettingsTab.vue";
