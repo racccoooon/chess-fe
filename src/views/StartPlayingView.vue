@@ -3,25 +3,25 @@
     class="mx-3 sm:mx-auto sm:w-3/4 lg:w-1/2 max-w-7xl py-24 flex flex-col gap-12"
   >
     <div
-      class="p-16 flex flex-col gap-12 bg-gray-100 dark:bg-gray-800 rounded-3xl"
+      class="p-6 sm:p-16 flex flex-col gap-12 bg-gray-100 dark:bg-gray-800 rounded-3xl"
     >
-      <div class="flex flex-row gap-4 items-center">
+      <div class="flex flex-col sm:flex-row gap-4 sm:items-center">
         <h2 class="font-medium text-lg">Your Name</h2>
         <input
           v-model="playerName"
           type="text"
           placeholder="ChessMaster3000"
-          class="px-6 py-3 rounded-2xl bg-gray-200 dark:bg-gray-700 border-t-4 border-gray-300 dark:border-gray-900 text-gray-800 dark:text-gray-50 font-medium text-lg"
+          class="flex-1 px-6 py-3 rounded-2xl bg-gray-200 dark:bg-gray-700 border-t-4 border-gray-300 dark:border-gray-900 text-gray-800 dark:text-gray-50 font-medium text-lg"
         />
       </div>
     </div>
     <div
-      class="p-16 flex flex-col gap-12 bg-gray-100 dark:bg-gray-800 rounded-3xl"
+      class="p-6 sm:p-16 flex flex-col gap-12 bg-gray-100 dark:bg-gray-800 rounded-3xl"
     >
       <div class="flex flex-col justify-between gap-12">
         <div class="flex flex-col gap-4">
           <label class="font-medium text-lg">You Play As</label>
-          <div class="flex flex-row gap-4 items-center">
+          <div class="flex flex-wrap gap-4 items-center">
             <button
               @click="selectedColor = GameStartColor.White"
               :aria-selected="selectedColor === GameStartColor.White"
@@ -63,7 +63,7 @@
           class="flex-1 border-b-[1.5px] border-gray-300 dark:border-gray-600 translate-y-4"
         />
       </div>
-      <div class="flex flex-wrap gap-4 items-center">
+      <div class="flex flex-col sm:flex-row gap-4 sm:items-center">
         <div class="flex-1">
           <input
             v-model="gameId"
@@ -74,7 +74,7 @@
         </div>
         <button
           @click="join"
-          class="px-6 py-3 rounded-2xl bg-gray-200 dark:bg-gray-700 border-b-4 active:border-b-0 active:border-t-4 border-gray-300 dark:border-gray-900 text-gray-800 dark:text-gray-50 font-medium text-lg transition-all ease-in-out"
+          class="w-full sm:w-auto px-6 py-3 rounded-2xl bg-gray-200 dark:bg-gray-700 border-b-4 active:border-b-0 active:border-t-4 border-gray-300 dark:border-gray-900 text-gray-800 dark:text-gray-50 font-medium text-lg transition-all ease-in-out"
         >
           Join Game
         </button>

@@ -3,7 +3,7 @@
     class="grow lg:my-16 bg-gray-100 dark:bg-gray-800 rounded-2xl overflow-hidden flex flex-col"
   >
     <div
-      class="p-2 flex flex-row items-center border-b-2 border-gray-200 dark:border-gray-700"
+      class="p-2 flex flex-row items-center border-b-2 border-gray-200 dark:border-gray-700 overflow-x-auto"
     >
       <button
         @click="activeTab = Tab.Game"

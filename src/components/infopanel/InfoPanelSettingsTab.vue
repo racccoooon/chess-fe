@@ -4,7 +4,7 @@
       <label class="text-gray-900 dark:text-gray-50 font-medium"
         >Notation style</label
       >
-      <div class="flex flex-row gap-4 items-center">
+      <div class="flex flex-wrap gap-4 items-center">
         <button
           @click="notationType = NotationType.Algebraic"
           :aria-selected="notationType === NotationType.Algebraic"
@@ -28,7 +28,7 @@
         </button>
       </div>
     </div>
-    <div class="flex flex-col gap-4">
+    <div class="flex flex-wrap gap-4">
       <label class="text-gray-900 dark:text-gray-50 font-medium"
         >Use icons in notation</label
       >
@@ -49,7 +49,7 @@
         </button>
       </div>
     </div>
-    <div class="flex flex-col gap-4">
+    <div class="flex flex-wrap gap-4">
       <label class="text-gray-900 dark:text-gray-50 font-medium"
         >Raccoon Mode</label
       >
@@ -70,7 +70,7 @@
         </button>
       </div>
     </div>
-    <div class="flex flex-col gap-4">
+    <div class="flex flex-wrap gap-4">
       <label class="text-gray-900 dark:text-gray-50 font-medium"
         >Chess Board Border</label
       >

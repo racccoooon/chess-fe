@@ -1,9 +1,9 @@
 <template>
   <div
-    class="mx-6 md:m-12 lg:my-0 lg:h-screen flex flex-col lg:flex-row gap-6 lg:gap-16 justify-center items-center"
+    class="mb-12 sm:m-12 xl:my-0 xl:h-screen flex flex-col xl:flex-row gap-6 xl:gap-16 justify-center items-center"
   >
     <div
-      class="flex flex-col justify-center lg:basis-5/12 xl:basis-1 w-full lg:w-auto lg:h-screen"
+      class="flex flex-col justify-center xl:basis-5/12 xl:basis-1 w-full sm:w-5/6 md:w-3/4 lg:w-2/3 xl:w-auto xl:h-screen"
     >
       <PlayerInfo
         :color="topPlayerColor"
@@ -28,7 +28,7 @@
           @piece-selected="onPieceSelected"
           @piece-deselected="onPieceDeselected"
           @piece-moved="onPieceMoved"
-          class="h-full rounded-2xl"
+          class="h-full sm:rounded-2xl"
         />
       </div>
       <PlayerInfo
@@ -38,7 +38,9 @@
         :captured-pieces="bottomPlayerCapturedPieces"
       />
     </div>
-    <div class="h-full flex flex-col basis-2/6 w-full lg:w-auto">
+    <div
+      class="px-6 sm:px-0 h-full flex flex-col basis-2/6 w-full sm:w-5/6 md:w-3/4 lg:w-2/3 xl:w-auto"
+    >
       <GameInfoPanel
         :is-player="isPlayer"
         :game-has-started="gameHasStarted"
