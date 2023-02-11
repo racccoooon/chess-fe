@@ -3,10 +3,7 @@
     <RaccoonTail
       v-if="useRaccoonTail"
       :color="color"
-      :flipped="
-        (type !== PieceType.Bishop && !!Math.round(Math.random())) ||
-        type === PieceType.Knight
-      "
+      :flipped="type === PieceType.Knight"
     />
     <template v-if="type === PieceType.Pawn">
       <RaccoonPawnIcon v-if="useRaccoonPawn" :color="color" />

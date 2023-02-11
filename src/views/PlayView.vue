@@ -5,11 +5,14 @@
     :reverse-board="reverseBoard"
     :active-color="activeColor"
     :is-player="true"
+    :can-move="playerCanMove"
     :player-color="playerColor"
     :white-player-name="whitePlayerName"
     :black-player-name="blackPlayerName"
     :highlight-squares="highlightSquares"
-    @click="handleClick"
+    @piece-selected="onPieceSelected"
+    @piece-deselected="onPieceDeselected"
+    @piece-moved="onPieceMoved"
   />
 </template>
 
@@ -21,7 +24,6 @@ import type {
   JoinGameResponse,
   Move,
   MoveItem,
-  PartialMove,
   BoardHighlightSquare,
   Cell,
 } from "@/lib/types";
@@ -39,6 +41,10 @@ import { useUserStore } from "@/stores/user";
 import { getSquareName } from "@/lib/chessNotation";
 import { invertColor } from "@/lib/chess";
 import GameLayout from "@/components/GameLayout.vue";
+import type {
+  PieceMovedEvent,
+  PieceSelectedEvent,
+} from "@/components/BoardRenderer.vue";
 
 const router = useRouter();
 const hubConnection = new SignalrConnection();
@@ -62,8 +68,6 @@ const reverseBoard = computed(() => {
 
 const moveHistory = ref<MoveItem[]>([]);
 
-const currentMove = ref<PartialMove | null>(null);
-
 const gameHasStarted = ref(false);
 
 const activeColor = ref<PieceColor>(PieceColor.White);
@@ -72,12 +76,14 @@ const playerCanMove = computed(() => {
   return get(activeColor) === get(playerColor) && get(gameHasStarted);
 });
 
+const selectedPiece = ref<Piece | null>(null);
+
 const highlightSquares = computed((): BoardHighlightSquare[] => {
   const list: BoardHighlightSquare[] = [];
 
-  if (get(currentMove)) {
+  if (get(selectedPiece)) {
     list.push({
-      cell: get(currentMove)!.from as Cell,
+      cell: { x: get(selectedPiece)!.x, y: get(selectedPiece)!.y } as Cell,
       color: HighlightColor.Yellow,
     });
   }
@@ -235,46 +241,47 @@ const resolveMove = (move: MoveItem) => {
   set(activeColor, invertColor(move.color));
 };
 
-const handleClick = async (x: number, y: number) => {
-  if (!get(playerCanMove)) {
-    set(currentMove, null);
+const onPieceSelected = (e: PieceSelectedEvent) => {
+  const piece = e.piece;
+
+  if (piece.color !== get(playerColor)) {
     return;
   }
 
-  let selectedPiece = getPieceAtCell(x, y);
+  console.log("piece selected", piece);
 
-  if (get(currentMove) === null) {
-    // if there is no piece at the selected cell, or the piece is not the player's color, do nothing
-    if (
-      selectedPiece === undefined ||
-      selectedPiece.color !== get(playerColor)
-    ) {
-      return;
-    }
+  set(selectedPiece, piece);
+};
 
-    set(currentMove, {
-      from: { x, y },
-      to: null,
-    } as PartialMove);
-  } else {
-    // if the player selects a cell with a piece of their color as the target position, cancel the move
-    if (selectedPiece?.color === get(playerColor)) {
-      set(currentMove, null);
-      return;
-    }
+const onPieceDeselected = () => {
+  console.log("piece deselected");
+  set(selectedPiece, null);
+};
 
-    // TODO: check if the move is valid
-
-    // complete current move
-    get(currentMove)!.to = { x, y };
-
-    console.log("sending move", get(currentMove));
-
-    // send move to server
-    await hubConnection.makeMove(get(gameId), get(currentMove) as Move);
-
-    set(currentMove, null);
+const onPieceMoved = async (e: PieceMovedEvent) => {
+  if (!get(playerCanMove)) {
+    return;
   }
+
+  const piece = e.piece;
+  const to = e.to;
+
+  console.log(`piece moved to ${getSquareName(to.x, to.y)}`, piece);
+
+  if (piece?.color !== get(playerColor)) {
+    return;
+  }
+
+  const move = {
+    from: { x: piece.x, y: piece.y },
+    to: { x: to.x, y: to.y },
+  } as Move;
+
+  // TODO: validate move
+
+  await hubConnection.makeMove(get(gameId), move);
+
+  set(selectedPiece, null);
 };
 
 onMounted(async () => {

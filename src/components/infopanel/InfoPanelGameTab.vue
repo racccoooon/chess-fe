@@ -10,12 +10,6 @@
         </span>
       </div>
     </div>
-    <div>
-      <p class="text-gray-200 dark:text-gray-700 text-sm font-medium">
-        click the piece you want to move ... then click the square you want it
-        to move to
-      </p>
-    </div>
   </div>
 </template>
 

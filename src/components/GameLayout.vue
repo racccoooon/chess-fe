@@ -18,7 +18,16 @@
           :isWhiteInCheck="isWhiteInCheck"
           :isBlackInCheck="isBlackInCheck"
           :highlight-squares="highlightSquares"
-          @click="handleClick"
+          :allow-drag="canMove"
+          :allow-interaction-with-white="
+            canMove && playerColor === PieceColor.White
+          "
+          :allow-interaction-with-black="
+            canMove && playerColor === PieceColor.Black
+          "
+          @piece-selected="onPieceSelected"
+          @piece-deselected="onPieceDeselected"
+          @piece-moved="onPieceMoved"
           class="h-full rounded-2xl"
         />
       </div>
@@ -41,6 +50,10 @@
 
 <script setup lang="ts">
 import BoardRenderer from "@/components/BoardRenderer.vue";
+import type {
+  PieceMovedEvent,
+  PieceSelectedEvent,
+} from "@/components/BoardRenderer.vue";
 import PlayerInfo from "@/components/PlayerInfo.vue";
 import type { Board, BoardHighlightSquare, MoveItem } from "@/lib/types";
 import { HighlightColor, PieceColor, PieceType } from "@/lib/types";
@@ -60,6 +73,7 @@ const props = defineProps<{
   reverseBoard: boolean;
   activeColor: PieceColor;
   isPlayer: boolean;
+  canMove: boolean;
   playerColor: PieceColor;
   whitePlayerName: string;
   blackPlayerName: string;
@@ -67,7 +81,9 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (event: "click", ...args: [number, number]): void;
+  (event: "pieceSelected", payload: PieceSelectedEvent): void;
+  (event: "pieceDeselected"): void;
+  (event: "pieceMoved", payload: PieceMovedEvent): void;
 }>();
 
 const lastMove = computed(() => {
@@ -211,7 +227,15 @@ const highlightSquares = computed((): BoardHighlightSquare[] => {
   return list;
 });
 
-const handleClick = (x: number, y: number) => {
-  emit("click", x, y);
+const onPieceSelected = (e: PieceSelectedEvent) => {
+  emit("pieceSelected", { piece: e.piece });
+};
+
+const onPieceDeselected = () => {
+  emit("pieceDeselected");
+};
+
+const onPieceMoved = (e: PieceMovedEvent) => {
+  emit("pieceMoved", { piece: e.piece, to: e.to });
 };
 </script>

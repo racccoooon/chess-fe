@@ -50,6 +50,14 @@ export const getPiecesByType = (
   return pieces.filter((piece) => piece.type === type && piece.color === color);
 };
 
+export const getPieceAtSquare = (
+  pieces: Piece[],
+  x: number,
+  y: number
+): Piece | undefined => {
+  return pieces.find((piece) => piece.x === x && piece.y === y);
+};
+
 /***
  * Returns the number of pieces of each type that have been captured by the given color
  * @param pieces

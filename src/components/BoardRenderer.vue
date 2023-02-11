@@ -1,70 +1,65 @@
 <template>
   <svg
     class="aspect-square select-none overflow-hidden"
-    :viewBox="`0 0 ${tileAbsoluteWidth * 8 + borderAbsoluteSize * 2} ${
-      tileAbsoluteHeight * 8 + borderAbsoluteSize * 2
+    :viewBox="`0 0 ${squareAbsoluteWidth * 8 + borderAbsoluteSize * 2} ${
+      squareAbsoluteHeight * 8 + borderAbsoluteSize * 2
     }`"
+    @mousedown="handleMouseDown"
+    @mouseup="handleMouseUp"
+    ref="outerSvg"
   >
     <rect width="100%" height="100%" class="fill-gray-100 dark:fill-gray-800" />
     <template v-for="i in 8" :key="i">
       <text
         :x="borderAbsoluteSize / 2"
-        :y="(i - 1) * tileAbsoluteHeight + borderAbsoluteSize + 18"
+        :y="(i - 1) * squareAbsoluteHeight + borderAbsoluteSize + 18"
         class="fill-gray-800 dark:fill-gray-100"
         font-size="20"
         font-weight="500"
         text-anchor="middle"
         dominant-baseline="middle"
-        v-text="reverse ? i : 8 - i + 1"
+        v-text="getRankName(displayYToBoardY(i - 1))"
       />
     </template>
     <template v-for="i in 8" :key="i">
       <text
-        :x="i * tileAbsoluteWidth + borderAbsoluteSize - 18"
+        :x="i * squareAbsoluteWidth + borderAbsoluteSize - 18"
         :y="
-          tileAbsoluteHeight * 8 + borderAbsoluteSize + borderAbsoluteSize / 2
+          squareAbsoluteHeight * 8 + borderAbsoluteSize + borderAbsoluteSize / 2
         "
         class="fill-gray-800 dark:fill-gray-100"
         font-size="20"
         font-weight="500"
         text-anchor="middle"
         dominant-baseline="middle"
-        v-text="String.fromCharCode(96 + (reverse ? 9 - i : i))"
+        v-text="getFileName(displayXToBoardX(i - 1))"
       />
     </template>
     <svg
       :x="borderAbsoluteSize"
       :y="borderAbsoluteSize"
-      :width="tileAbsoluteWidth * 8"
-      :height="tileAbsoluteHeight * 8"
+      :width="squareAbsoluteWidth * 8"
+      :height="squareAbsoluteHeight * 8"
+      ref="innerSvg"
     >
       <template v-for="x in 8" :key="x">
         <template v-for="y in 8" :key="y">
           <rect
-            :x="(x - 1) * tileAbsoluteWidth"
-            :y="(y - 1) * tileAbsoluteHeight"
-            :width="tileAbsoluteWidth"
-            :height="tileAbsoluteHeight"
+            :x="(x - 1) * squareAbsoluteWidth"
+            :y="(y - 1) * squareAbsoluteHeight"
+            :width="squareAbsoluteWidth"
+            :height="squareAbsoluteHeight"
             :class="['fill-green-100', 'fill-green-500'][(x + y) % 2]"
-            @click="
-              handleClick(reverse ? 8 - x : x - 1, reverse ? y - 1 : 8 - y)
-            "
           />
         </template>
       </template>
       <g>
         <rect
           v-for="(highlight, index) in highlightSquares"
-          :x="
-            (reverse ? 7 - highlight.cell.x : highlight.cell.x) *
-            tileAbsoluteWidth
-          "
-          :y="
-            (reverse ? highlight.cell.y : 8 - highlight.cell.y - 1) *
-            tileAbsoluteHeight
-          "
-          :width="tileAbsoluteWidth"
-          :height="tileAbsoluteHeight"
+          :x="boardXToDisplayX(highlight.cell.x) * squareAbsoluteWidth"
+          :y="boardYToDisplayY(highlight.cell.y) * squareAbsoluteHeight"
+          :width="squareAbsoluteWidth"
+          :height="squareAbsoluteHeight"
           :data-dark="!!((highlight.cell.x + highlight.cell.y) % 2)"
           :class="{
             'fill-yellow-300/75': highlight.color === HighlightColor.Yellow,
@@ -73,36 +68,52 @@
             'fill-lime-400/75 data-[dark=true]:fill-lime-500/90':
               highlight.color === HighlightColor.Green,
           }"
-          @click="handleClick(selectedCell.x, selectedCell.y)"
           :key="index"
         />
       </g>
-      <TransitionGroup>
-        <PieceRenderer
-          v-for="piece in board.pieces"
-          :x="(reverse ? 7 - piece.x : piece.x) * 100 + 10"
-          :y="(reverse ? piece.y : 7 - piece.y) * 100 + 10"
-          width="80"
-          height="80"
-          :type="piece.type"
-          :color="piece.color"
-          :use-raccoon-tail="raccoonMode"
-          :use-raccoon-pawn="raccoonMode"
-          :key="piece.id"
-          @click="handleClick(piece.x, piece.y)"
-          :style="{
-            filter:
-              ((piece.color === PieceColor.White && isWhiteInCheck) ||
-                (piece.color === PieceColor.Black && isBlackInCheck)) &&
-              piece.type === PieceType.King
-                ? 'drop-shadow(-4px -4px 1px rgba(239, 68, 68, 0.4)) \n' +
-                  'drop-shadow(4px -4px 1px rgba(239, 68, 68, 0.4)) \n' +
-                  'drop-shadow(4px 4px 1px rgba(239, 68, 68, 0.4))\n' +
-                  'drop-shadow(-4px 4px 1px rgba(239, 68, 68, 0.4))'
-                : '',
-          }"
-        />
-      </TransitionGroup>
+      <g>
+        <template v-for="piece in board.pieces" :key="piece.id">
+          <svg
+            :x="
+              piece.id === selectedPiece?.id
+                ? boardXToDisplayX(piece.x) * squareAbsoluteWidth +
+                  dragMouseDeltaScaled.x
+                : boardXToDisplayX(piece.x) * squareAbsoluteWidth
+            "
+            :y="
+              piece.id === selectedPiece?.id
+                ? boardYToDisplayY(piece.y) * squareAbsoluteHeight +
+                  dragMouseDeltaScaled.y
+                : boardYToDisplayY(piece.y) * squareAbsoluteHeight
+            "
+            width="100"
+            height="100"
+          >
+            <PieceRenderer
+              x="10"
+              y="10"
+              width="80"
+              height="80"
+              :type="piece.type"
+              :color="piece.color"
+              :use-raccoon-tail="raccoonMode"
+              :use-raccoon-pawn="raccoonMode"
+              :style="{
+                filter:
+                  ((piece.color === PieceColor.White && isWhiteInCheck) ||
+                    (piece.color === PieceColor.Black && isBlackInCheck)) &&
+                  piece.type === PieceType.King
+                    ? 'drop-shadow(-4px -4px 1px rgba(239, 68, 68, 0.4)) \n' +
+                      'drop-shadow(4px -4px 1px rgba(239, 68, 68, 0.4)) \n' +
+                      'drop-shadow(4px 4px 1px rgba(239, 68, 68, 0.4))\n' +
+                      'drop-shadow(-4px 4px 1px rgba(239, 68, 68, 0.4))'
+                    : '',
+              }"
+              style="transform: translate(300px, 0)"
+            />
+          </svg>
+        </template>
+      </g>
     </svg>
   </svg>
 </template>
@@ -110,29 +121,198 @@
 <script setup lang="ts">
 import PieceRenderer from "@/components/PieceRenderer.vue";
 import type { Board, BoardHighlightSquare } from "@/lib/types";
-import { HighlightColor, PieceColor, PieceType } from "@/lib/types";
+import { HighlightColor, Piece, PieceColor, PieceType } from "@/lib/types";
 import { storeToRefs } from "pinia";
 import { useSettingsStore } from "@/stores/settings";
+import { computed, ref } from "vue";
+import { get, set, useMouse } from "@vueuse/core";
+import { getFileName, getRankName } from "@/lib/chessNotation";
+import { getPieceAtSquare } from "@/lib/chess";
 
-defineProps<{
+const props = defineProps<{
   board: Board;
   reverse: boolean;
   isWhiteInCheck: boolean;
   isBlackInCheck: boolean;
+  allowDrag: boolean;
+  allowInteractionWithWhite: boolean;
+  allowInteractionWithBlack: boolean;
   highlightSquares: BoardHighlightSquare[];
 }>();
 
+export interface PieceSelectedEvent {
+  piece: Piece;
+}
+
+export interface PieceMovedEvent {
+  piece: Piece;
+  to: { x: number; y: number };
+}
+
 const emit = defineEmits<{
-  (event: "click", ...args: [number, number]): void;
+  (event: "pieceSelected", payload: PieceSelectedEvent): void;
+  (event: "pieceDeselected"): void;
+  (event: "pieceMoved", payload: PieceMovedEvent): void;
 }>();
 
-const tileAbsoluteWidth = 100;
-const tileAbsoluteHeight = 100;
+const squareAbsoluteWidth = 100;
+const squareAbsoluteHeight = 100;
 const borderAbsoluteSize = 33;
 
-const handleClick = (x: number, y: number) => {
-  emit("click", x, y);
+const outerSvg = ref<SVGSVGElement>();
+const innerSvg = ref<SVGSVGElement>();
+
+const dragMouseStart = ref({ x: 0, y: 0 });
+const selectedPiece = ref<Piece | null>(null);
+const isDragging = ref(false);
+
+const { x: mouseX, y: mouseY } = useMouse();
+
+const displayXToBoardX = (x: number) => {
+  if (props.reverse) {
+    return 7 - x;
+  } else {
+    return x;
+  }
 };
+
+const displayYToBoardY = (y: number) => {
+  if (props.reverse) {
+    return y;
+  } else {
+    return 7 - y;
+  }
+};
+
+const boardXToDisplayX = (x: number) => {
+  if (props.reverse) {
+    return 7 - x;
+  } else {
+    return x;
+  }
+};
+
+const boardYToDisplayY = (y: number) => {
+  if (props.reverse) {
+    return y;
+  } else {
+    return 7 - y;
+  }
+};
+
+const mousePositionToBoardPosition = (x: number, y: number) => {
+  const rect = get(innerSvg)!.getBoundingClientRect();
+
+  const realX = x - rect.left;
+  const realY = y - rect.top;
+
+  const boardX = displayXToBoardX(Math.floor((realX / rect.width) * 8));
+  const boardY = displayYToBoardY(Math.floor((realY / rect.height) * 8));
+
+  return { x: boardX, y: boardY };
+};
+
+const handleMouseDown = () => {
+  startDrag();
+};
+
+const handleMouseUp = () => {
+  stopDrag();
+};
+
+const startDrag = () => {
+  if (!props.allowDrag) {
+    return;
+  }
+
+  if (get(isDragging)) {
+    return;
+  }
+
+  const { x: boardX, y: boardY } = mousePositionToBoardPosition(
+    get(mouseX),
+    get(mouseY)
+  );
+
+  if (boardX === get(selectedPiece)?.x && boardY === get(selectedPiece)?.y) {
+    deselect();
+    return;
+  }
+
+  const pieceAtSquare = getPieceAtSquare(props.board.pieces, boardX, boardY);
+
+  if (!pieceAtSquare) {
+    if (get(selectedPiece)) {
+      // if we already have piece selected, and we click on an empty square, stop dragging and trigger move event
+      stopDrag();
+    } else {
+      deselect();
+    }
+    return;
+  }
+
+  if (
+    (pieceAtSquare.color === PieceColor.White &&
+      !props.allowInteractionWithWhite) ||
+    (pieceAtSquare.color === PieceColor.Black &&
+      !props.allowInteractionWithBlack)
+  ) {
+    return;
+  }
+
+  set(dragMouseStart, { x: get(mouseX), y: get(mouseY) });
+  set(selectedPiece, pieceAtSquare ?? null);
+  set(isDragging, true);
+
+  if (pieceAtSquare) {
+    emit("pieceSelected", { piece: pieceAtSquare });
+  }
+};
+
+const stopDrag = () => {
+  const to = mousePositionToBoardPosition(get(mouseX), get(mouseY));
+
+  if (!(to.x === get(selectedPiece)?.x && to.y === get(selectedPiece)?.y)) {
+    emit("pieceMoved", {
+      piece: get(selectedPiece)!,
+      to,
+    });
+
+    set(selectedPiece, null);
+  }
+
+  set(dragMouseStart, { x: 0, y: 0 });
+  set(isDragging, false);
+
+  // TODO: set dragPiece to null if we moved outside the original square at least once
+};
+
+const deselect = () => {
+  emit("pieceDeselected");
+  set(dragMouseStart, { x: 0, y: 0 });
+  set(selectedPiece, null);
+  set(isDragging, false);
+};
+
+const dragMouseDelta = computed(() => {
+  if (!get(isDragging)) return { x: 0, y: 0 };
+  return {
+    x: get(mouseX) - get(dragMouseStart).x,
+    y: get(mouseY) - get(dragMouseStart).y,
+  };
+});
+
+const dragMouseDeltaScaled = computed(() => {
+  const outerRect = get(outerSvg)!.getBoundingClientRect();
+  const innerRect = get(innerSvg)!.getBoundingClientRect();
+
+  const scale = (8 / 7) * (outerRect.width / innerRect.width);
+
+  return {
+    x: get(dragMouseDelta).x * scale,
+    y: get(dragMouseDelta).y * scale,
+  };
+});
 
 const { raccoonMode } = storeToRefs(useSettingsStore());
 </script>
