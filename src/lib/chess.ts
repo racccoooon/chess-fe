@@ -49,3 +49,42 @@ export const getPiecesByType = (
 ) => {
   return pieces.filter((piece) => piece.type === type && piece.color === color);
 };
+
+/***
+ * Returns the number of pieces of each type that have been captured by the given color
+ * @param pieces
+ * @param capturedBy The color of the player whose opponents pieces we want to count
+ */
+export const getCapturedPieces = (
+  pieces: Piece[],
+  capturedBy: PieceColor
+): Record<PieceType, number> => {
+  const normalValues: Record<PieceType, number> = {
+    [PieceType.Pawn]: 8,
+    [PieceType.Knight]: 2,
+    [PieceType.Bishop]: 2,
+    [PieceType.Rook]: 2,
+    [PieceType.Queen]: 1,
+    [PieceType.King]: 1,
+  };
+
+  const result: Record<PieceType, number> = {
+    [PieceType.Pawn]: 0,
+    [PieceType.Knight]: 0,
+    [PieceType.Bishop]: 0,
+    [PieceType.Rook]: 0,
+    [PieceType.Queen]: 0,
+    [PieceType.King]: 0,
+  };
+
+  for (const type of Object.keys(normalValues)) {
+    const remaining = getPiecesByType(
+      pieces,
+      type as PieceType,
+      invertColor(capturedBy)
+    ).length;
+    result[type as PieceType] = normalValues[type as PieceType] - remaining;
+  }
+
+  return result;
+};

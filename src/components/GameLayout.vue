@@ -6,8 +6,10 @@
       class="flex flex-col justify-center lg:basis-5/12 xl:basis-1 w-full lg:w-auto lg:h-screen"
     >
       <PlayerInfo
+        :color="topPlayerColor"
         :name="topPlayerName"
         :material-advantage="topPlayerMaterialAdvantage"
+        :captured-pieces="topPlayerCapturedPieces"
       />
       <div class="w-full xl:h-3/4">
         <BoardRenderer
@@ -21,8 +23,10 @@
         />
       </div>
       <PlayerInfo
+        :color="bottomPlayerColor"
         :name="bottomPlayerName"
         :material-advantage="bottomPlayerMaterialAdvantage"
+        :captured-pieces="bottomPlayerCapturedPieces"
       />
     </div>
     <div class="h-full flex flex-col basis-1/4 w-full lg:w-auto">
@@ -51,6 +55,7 @@ import { HighlightColor, PieceColor, PieceType } from "@/lib/types";
 import { computed } from "vue";
 import { get } from "@vueuse/core";
 import {
+  getCapturedPieces,
   getMaterialValueByColor,
   getPiecesByType,
   isInCheck,
@@ -108,7 +113,31 @@ const blackMaterialAdvantage = computed(() => {
   return get(blackMaterialValue) - get(whiteMaterialValue);
 });
 
+const whiteCaputredPieces = computed(() => {
+  return getCapturedPieces(props.board.pieces, PieceColor.White);
+});
+
+const blackCaputredPieces = computed(() => {
+  return getCapturedPieces(props.board.pieces, PieceColor.Black);
+});
+
 // computed values to display
+const topPlayerColor = computed(() => {
+  if (props.reverseBoard) {
+    return PieceColor.White;
+  } else {
+    return PieceColor.Black;
+  }
+});
+
+const bottomPlayerColor = computed(() => {
+  if (props.reverseBoard) {
+    return PieceColor.Black;
+  } else {
+    return PieceColor.White;
+  }
+});
+
 const topPlayerName = computed(() => {
   if (props.reverseBoard) {
     return props.whitePlayerName;
@@ -141,6 +170,23 @@ const bottomPlayerMaterialAdvantage = computed(() => {
   }
 });
 
+const topPlayerCapturedPieces = computed(() => {
+  if (props.reverseBoard) {
+    return get(whiteCaputredPieces);
+  } else {
+    return get(blackCaputredPieces);
+  }
+});
+
+const bottomPlayerCapturedPieces = computed(() => {
+  if (props.reverseBoard) {
+    return get(blackCaputredPieces);
+  } else {
+    return get(whiteCaputredPieces);
+  }
+});
+
+// compute highlights
 const highlightSquares = computed((): BoardHighlightSquare[] => {
   const list: BoardHighlightSquare[] = [];
 
