@@ -78,7 +78,7 @@ export const getFileName = (x: number) => {
 };
 
 export const getRankName = (y: number) => {
-  return 8 - y;
+  return y + 1;
 };
 
 export const getSquareName = (x: number, y: number) => {
