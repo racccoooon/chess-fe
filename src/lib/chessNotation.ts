@@ -174,3 +174,22 @@ export const getSpokenMoveNotation = (move: MoveItem) => {
 
   return `${piece} ${from} to ${to} ${suffix}`;
 };
+
+export const getGameNotation = (
+  moves: MoveItem[],
+  notationType: NotationType
+) => {
+  const gameNotation: string[] = [];
+  let moveNumber = 1;
+
+  moves.forEach((move, index) => {
+    if (index % 2 === 0) {
+      gameNotation.push(`${moveNumber}.`);
+      moveNumber++;
+    }
+
+    gameNotation.push(getMoveNotation(move, notationType, false) as string);
+  });
+
+  return gameNotation.join(" ");
+};
