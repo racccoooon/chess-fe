@@ -7,6 +7,7 @@
     :is-player="true"
     :can-move="playerCanMove"
     :player-color="playerColor"
+    :game-has-started="gameHasStarted"
     :white-player-name="whitePlayerName"
     :black-player-name="blackPlayerName"
     :highlight-squares="highlightSquares"

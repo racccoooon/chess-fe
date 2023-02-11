@@ -23,6 +23,7 @@
       :is-player="isPlayer"
       :move-history="moveHistory"
       :active-color="activeColor"
+      :game-has-started="gameHasStarted"
     />
     <InfoPanelSettingsTab v-else-if="activeTab === Tab.Settings" />
   </div>
@@ -39,6 +40,7 @@ defineProps<{
   moveHistory: MoveItem[];
   activeColor: PieceColor;
   isPlayer: boolean;
+  gameHasStarted: boolean;
 }>();
 
 enum Tab {

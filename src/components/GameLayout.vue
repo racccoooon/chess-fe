@@ -41,6 +41,7 @@
     <div class="h-full flex flex-col basis-2/6 w-full lg:w-auto">
       <GameInfoPanel
         :is-player="isPlayer"
+        :game-has-started="gameHasStarted"
         :move-history="moveHistory"
         :active-color="activeColor"
       />
@@ -77,6 +78,7 @@ const props = defineProps<{
   isPlayer: boolean;
   canMove: boolean;
   playerColor: PieceColor;
+  gameHasStarted: boolean;
   whitePlayerName: string;
   blackPlayerName: string;
   highlightSquares: BoardHighlightSquare[];
