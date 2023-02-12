@@ -136,6 +136,22 @@
           Thick border
         </button>
       </div>
+      <div class="flex flex-wrap items-center">
+        <button
+          @click="showCoordinates = true"
+          :aria-selected="showCoordinates"
+          class="px-4 py-2 text-gray-500 dark:text-gray-300 aria-selected:text-gray-900 aria-selected:dark:text-gray-50 aria-selected:bg-gray-200 aria-selected:dark:bg-gray-700 text-sm font-medium rounded-xl transition-all ease-in-out"
+        >
+          Show coordinates
+        </button>
+        <button
+          @click="showCoordinates = false"
+          :aria-selected="!showCoordinates"
+          class="px-4 py-2 text-gray-500 dark:text-gray-300 aria-selected:text-gray-900 aria-selected:dark:text-gray-50 aria-selected:bg-gray-200 aria-selected:dark:bg-gray-700 text-sm font-medium rounded-xl transition-all ease-in-out"
+        >
+          Hide coordinates
+        </button>
+      </div>
     </div>
     <div class="flex flex-col gap-4">
       <label class="text-gray-900 dark:text-gray-50 font-medium"
@@ -175,5 +191,6 @@ const {
   raccoonMode,
   boardColor,
   boardBorder,
+  showCoordinates,
 } = storeToRefs(settingsStore);
 </script>

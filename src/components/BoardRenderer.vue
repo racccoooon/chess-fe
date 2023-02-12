@@ -9,7 +9,7 @@
     ref="outerSvg"
   >
     <rect width="100%" height="100%" class="fill-gray-100 dark:fill-gray-800" />
-    <template v-if="borderAbsoluteSize > 0">
+    <template v-if="borderAbsoluteSize > 0 && showCoordinates">
       <template v-for="i in 8" :key="i">
         <text
           :x="borderAbsoluteSize / 2"
@@ -77,7 +77,7 @@
           :key="index"
         />
       </g>
-      <template v-if="borderAbsoluteSize === 0">
+      <template v-if="borderAbsoluteSize === 0 && showCoordinates">
         <g>
           <template v-for="i in 8" :key="i">
             <text
@@ -170,7 +170,7 @@ import {
   HighlightColor,
   Piece,
   PieceColor,
-  PieceType
+  PieceType,
 } from "@/lib/types";
 import { storeToRefs } from "pinia";
 import { useSettingsStore } from "@/stores/settings";
@@ -196,7 +196,9 @@ const emit = defineEmits<{
   (event: "pieceMoved", payload: PieceMovedEvent): void;
 }>();
 
-const { raccoonMode, boardColor, boardBorder } = storeToRefs(useSettingsStore());
+const { raccoonMode, boardColor, boardBorder, showCoordinates } = storeToRefs(
+  useSettingsStore()
+);
 
 const squareAbsoluteWidth = 100;
 const squareAbsoluteHeight = 100;

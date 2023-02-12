@@ -12,9 +12,10 @@ export const useSettingsStore = defineStore("settings", () => {
     {
       notationType: NotationType.Algebraic,
       useUnicodeIconsInNotation: true,
-      raccoonMode: true,
+      raccoonMode: false,
       boardColor: ChessBoardColor.Green,
       boardBorder: ChessBoardBorder.None,
+      showCoordinates: true,
     },
     localStorage,
     { mergeDefaults: true }
@@ -27,14 +28,7 @@ export const useSettingsStore = defineStore("settings", () => {
   const raccoonMode = ref(get(settings).raccoonMode);
   const boardColor = ref(get(settings).boardColor);
   const boardBorder = ref(get(settings).boardBorder);
-
-  watch(settings, (newSettings) => {
-    set(notationType, newSettings.notationType);
-    set(useUnicodeIconsInNotation, newSettings.useUnicodeIconsInNotation);
-    set(raccoonMode, newSettings.raccoonMode);
-    set(boardColor, newSettings.boardColor);
-    set(boardBorder, newSettings.boardBorder);
-  });
+  const showCoordinates = ref(get(settings).showCoordinates);
 
   watch(notationType, (newNotationType) => {
     set(settings, { ...get(settings), notationType: newNotationType });
@@ -59,11 +53,16 @@ export const useSettingsStore = defineStore("settings", () => {
     set(settings, { ...get(settings), boardBorder: newBoardBorder });
   });
 
+  watch(showCoordinates, (newShowCoordinates) => {
+    set(settings, { ...get(settings), showCoordinates: newShowCoordinates });
+  });
+
   return {
     notationType,
     useUnicodeIconsInNotation,
     raccoonMode,
     boardColor,
     boardBorder,
+    showCoordinates,
   };
 });
