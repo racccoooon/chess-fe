@@ -123,3 +123,15 @@ export enum ChessBoardBorder {
   Thin = "thin",
   Thick = "thick",
 }
+
+export enum ChessBoardColor {
+  Neutral = "neutral",
+  Wood = "wood",
+  Green = "green",
+  Blue = "blue",
+  Red = "red",
+  Orange = "orange",
+  Purple = "purple",
+  Pink = "pink",
+  HighContrast = "highContrast",
+}

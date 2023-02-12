@@ -53,7 +53,9 @@
             :y="(y - 1) * squareAbsoluteHeight"
             :width="squareAbsoluteWidth"
             :height="squareAbsoluteHeight"
-            :class="['fill-green-100', 'fill-green-500'][(x + y) % 2]"
+            :data-dark="!!((x + y) % 2)"
+            :class="fillClass"
+            class="transition duration-300 ease-in-out"
           />
         </template>
       </template>
@@ -76,30 +78,36 @@
         />
       </g>
       <template v-if="borderAbsoluteSize === 0">
-        <template v-for="i in 8" :key="i">
-          <text
-            :x="12"
-            :y="(i - 1) * squareAbsoluteHeight + borderAbsoluteSize + 18"
-            :class="['fill-green-100', 'fill-green-500'][i % 2]"
-            font-size="20"
-            font-weight="500"
-            text-anchor="middle"
-            dominant-baseline="middle"
-            v-text="getRankName(displayYToBoardY(i - 1))"
-          />
-        </template>
-        <template v-for="i in 8" :key="i">
-          <text
-            :x="i * squareAbsoluteWidth + borderAbsoluteSize - 18"
-            :y="squareAbsoluteHeight * 8 - 12"
-            :class="['fill-green-100', 'fill-green-500'][(i + 1) % 2]"
-            font-size="20"
-            font-weight="500"
-            text-anchor="middle"
-            dominant-baseline="middle"
-            v-text="getFileName(displayXToBoardX(i - 1))"
-          />
-        </template>
+        <g>
+          <template v-for="i in 8" :key="i">
+            <text
+              :x="12"
+              :y="(i - 1) * squareAbsoluteHeight + borderAbsoluteSize + 18"
+              :data-dark="!!(i % 2)"
+              :class="fillClass"
+              class="transition duration-300 ease-in-out"
+              font-size="20"
+              font-weight="500"
+              text-anchor="middle"
+              dominant-baseline="middle"
+              v-text="getRankName(displayYToBoardY(i - 1))"
+            />
+          </template>
+          <template v-for="i in 8" :key="i">
+            <text
+              :x="i * squareAbsoluteWidth + borderAbsoluteSize - 18"
+              :y="squareAbsoluteHeight * 8 - 12"
+              :data-dark="!!((i + 1) % 2)"
+              :class="fillClass"
+              class="transition duration-300 ease-in-out"
+              font-size="20"
+              font-weight="500"
+              text-anchor="middle"
+              dominant-baseline="middle"
+              v-text="getFileName(displayXToBoardX(i - 1))"
+            />
+          </template>
+        </g>
       </template>
       <g>
         <template v-for="piece in board.pieces" :key="piece.id">
@@ -157,11 +165,12 @@ import type {
   PieceSelectedEvent,
 } from "@/lib/types";
 import {
+  ChessBoardColor,
   ChessBoardBorder,
   HighlightColor,
   Piece,
   PieceColor,
-  PieceType,
+  PieceType
 } from "@/lib/types";
 import { storeToRefs } from "pinia";
 import { useSettingsStore } from "@/stores/settings";
@@ -187,13 +196,13 @@ const emit = defineEmits<{
   (event: "pieceMoved", payload: PieceMovedEvent): void;
 }>();
 
-const { raccoonMode, chessBoardBorder } = storeToRefs(useSettingsStore());
+const { raccoonMode, boardColor, boardBorder } = storeToRefs(useSettingsStore());
 
 const squareAbsoluteWidth = 100;
 const squareAbsoluteHeight = 100;
 
 const borderAbsoluteSize = computed(() => {
-  switch (get(chessBoardBorder)) {
+  switch (get(boardBorder)) {
     case ChessBoardBorder.None:
       return 0;
     case ChessBoardBorder.Thin:
@@ -245,6 +254,31 @@ const boardYToDisplayY = (y: number) => {
     return 7 - y;
   }
 };
+
+const fillClass = computed(() => {
+  switch (get(boardColor)) {
+    case ChessBoardColor.Neutral:
+      return "fill-gray-100 data-[dark=true]:fill-gray-500";
+    case ChessBoardColor.Wood:
+      return "fill-brown-200 data-[dark=true]:fill-brown-500";
+    case ChessBoardColor.Green:
+      return "fill-green-100 data-[dark=true]:fill-green-500";
+    case ChessBoardColor.Blue:
+      return "fill-blue-100 data-[dark=true]:fill-blue-500";
+    case ChessBoardColor.Red:
+      return "fill-red-200 data-[dark=true]:fill-red-500";
+    case ChessBoardColor.Orange:
+      return "fill-orange-100 data-[dark=true]:fill-orange-400";
+    case ChessBoardColor.Purple:
+      return "fill-purple-100 data-[dark=true]:fill-purple-500";
+    case ChessBoardColor.Pink:
+      return "fill-pink-200 data-[dark=true]:fill-pink-400";
+    case ChessBoardColor.HighContrast:
+      return "fill-white data-[dark=true]:fill-gray-800";
+    default:
+      return "";
+  }
+});
 
 const mousePositionToBoardPosition = (x: number, y: number) => {
   const rect = get(innerSvg)!.getBoundingClientRect();

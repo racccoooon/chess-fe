@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 import { NotationType } from "@/lib/chessNotation";
 import { ref, watch } from "vue";
 import { get, set, useStorage } from "@vueuse/core";
-import { ChessBoardBorder } from "@/lib/types";
+import { ChessBoardBorder, ChessBoardColor } from "@/lib/types";
 
 export const useSettingsStore = defineStore("settings", () => {
   // there must be a better way to do this...
@@ -13,7 +13,8 @@ export const useSettingsStore = defineStore("settings", () => {
       notationType: NotationType.Algebraic,
       useUnicodeIconsInNotation: true,
       raccoonMode: true,
-      chessBoardBorder: ChessBoardBorder.Thin,
+      boardColor: ChessBoardColor.Green,
+      boardBorder: ChessBoardBorder.None,
     },
     localStorage,
     { mergeDefaults: true }
@@ -24,13 +25,15 @@ export const useSettingsStore = defineStore("settings", () => {
     get(settings).useUnicodeIconsInNotation
   );
   const raccoonMode = ref(get(settings).raccoonMode);
-  const chessBoardBorder = ref(get(settings).chessBoardBorder);
+  const boardColor = ref(get(settings).boardColor);
+  const boardBorder = ref(get(settings).boardBorder);
 
   watch(settings, (newSettings) => {
     set(notationType, newSettings.notationType);
     set(useUnicodeIconsInNotation, newSettings.useUnicodeIconsInNotation);
     set(raccoonMode, newSettings.raccoonMode);
-    set(chessBoardBorder, newSettings.chessBoardBorder);
+    set(boardColor, newSettings.boardColor);
+    set(boardBorder, newSettings.boardBorder);
   });
 
   watch(notationType, (newNotationType) => {
@@ -48,14 +51,19 @@ export const useSettingsStore = defineStore("settings", () => {
     set(settings, { ...get(settings), raccoonMode: newRaccoonMode });
   });
 
-  watch(chessBoardBorder, (newChessBoardBorder) => {
-    set(settings, { ...get(settings), chessBoardBorder: newChessBoardBorder });
+  watch(boardColor, (newBoardColor) => {
+    set(settings, { ...get(settings), boardColor: newBoardColor });
+  });
+
+  watch(boardBorder, (newBoardBorder) => {
+    set(settings, { ...get(settings), boardBorder: newBoardBorder });
   });
 
   return {
     notationType,
     useUnicodeIconsInNotation,
     raccoonMode,
-    chessBoardBorder,
+    boardColor,
+    boardBorder,
   };
 });
