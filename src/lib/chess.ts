@@ -24,7 +24,7 @@ export const getPieceMaterialValue = (type: PieceType) => {
     case PieceType.Queen:
       return 9;
     case PieceType.King:
-      return 0;
+      return Infinity;
   }
 };
 
