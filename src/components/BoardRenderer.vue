@@ -60,22 +60,47 @@
         </template>
       </template>
       <g>
-        <rect
-          v-for="(highlight, index) in highlightSquares"
-          :x="boardXToDisplayX(highlight.cell.x) * squareAbsoluteWidth"
-          :y="boardYToDisplayY(highlight.cell.y) * squareAbsoluteHeight"
-          :width="squareAbsoluteWidth"
-          :height="squareAbsoluteHeight"
-          :data-dark="!!((highlight.cell.x + highlight.cell.y) % 2)"
-          :class="{
-            'fill-yellow-300/75': highlight.color === HighlightColor.Yellow,
-            'fill-red-400/75 data-[dark=true]:fill-red-300/90':
-              highlight.color === HighlightColor.Red,
-            'fill-lime-400/75 data-[dark=true]:fill-lime-500/90':
-              highlight.color === HighlightColor.Green,
-          }"
-          :key="index"
-        />
+        <template v-for="(highlight, index) in highlightSquares" :key="index">
+          <g
+            :transform="`
+              translate(
+                ${boardXToDisplayX(highlight.cell.x) * squareAbsoluteWidth},
+                ${boardYToDisplayY(highlight.cell.y) * squareAbsoluteHeight}
+            )`"
+            :class="{
+              'fill-gray-50/50 data-[dark=true]:fill-white/75':
+                highlight.color === HighlightColor.Highlight,
+              'fill-yellow-300/75': highlight.color === HighlightColor.Yellow,
+              'fill-red-400/75 data-[dark=true]:fill-red-300/90':
+                highlight.color === HighlightColor.Red,
+              'fill-lime-400/75 data-[dark=true]:fill-lime-500/90':
+                highlight.color === HighlightColor.Green,
+              'fill-blue-400/75 data-[dark=true]:fill-blue-500/90':
+                highlight.color === HighlightColor.Blue,
+              'fill-purple-400/75 data-[dark=true]:fill-purple-500/90':
+                highlight.color === HighlightColor.Purple,
+            }"
+          >
+            <rect
+              v-if="highlight.shape === HighlightShape.SquareFill"
+              :width="squareAbsoluteWidth"
+              :height="squareAbsoluteHeight"
+              :data-dark="!((highlight.cell.x + highlight.cell.y) % 2)"
+            />
+            <path
+              v-else-if="highlight.shape === HighlightShape.SquareOutline"
+              d="M100,0L100,100L0,100L0,0L100,0ZM90,10L10,10L10,90L90,90L90,10Z"
+              :data-dark="!((highlight.cell.x + highlight.cell.y) % 2)"
+            />
+            <circle
+              v-if="highlight.shape === HighlightShape.Dot"
+              cx="50"
+              cy="50"
+              r="18"
+              :data-dark="!((highlight.cell.x + highlight.cell.y) % 2)"
+            />
+          </g>
+        </template>
       </g>
       <template v-if="borderAbsoluteSize === 0 && showCoordinates">
         <g>
@@ -126,6 +151,7 @@
             "
             width="100"
             height="100"
+            :id="piece.id === selectedPiece?.id ? 'selected-piece' : ''"
           >
             <PieceRenderer
               x="10"
@@ -152,6 +178,9 @@
           </svg>
         </template>
       </g>
+      <g>
+        <use href="#selected-piece" v-if="selectedPiece" />
+      </g>
     </svg>
   </svg>
 </template>
@@ -171,6 +200,7 @@ import {
   Piece,
   PieceColor,
   PieceType,
+  HighlightShape,
 } from "@/lib/types";
 import { storeToRefs } from "pinia";
 import { useSettingsStore } from "@/stores/settings";
@@ -282,6 +312,22 @@ const fillClass = computed(() => {
   }
 });
 
+const highlightSquares = computed(() => {
+  const list = [];
+
+  list.push(...props.highlightSquares);
+
+  if (get(hoverSquare) !== null) {
+    list.push({
+      cell: get(hoverSquare),
+      color: HighlightColor.Highlight,
+      shape: HighlightShape.SquareOutline,
+    });
+  }
+
+  return list;
+});
+
 const mousePositionToBoardPosition = (x: number, y: number) => {
   const rect = get(innerSvg)!.getBoundingClientRect();
 
@@ -376,8 +422,20 @@ const deselect = () => {
   set(isDragging, false);
 };
 
+const hoverSquare = computed(() => {
+  if (!get(isDragging)) return null;
+
+  const { x: boardX, y: boardY } = mousePositionToBoardPosition(
+    get(mouseX),
+    get(mouseY)
+  );
+
+  return { x: boardX, y: boardY };
+});
+
 const dragMouseDelta = computed(() => {
   if (!get(isDragging)) return { x: 0, y: 0 };
+
   return {
     x: get(mouseX) - get(dragMouseStart).x,
     y: get(mouseY) - get(dragMouseStart).y,

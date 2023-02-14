@@ -61,7 +61,12 @@ import type {
   PieceMovedEvent,
   PieceSelectedEvent,
 } from "@/lib/types";
-import { HighlightColor, PieceColor, PieceType } from "@/lib/types";
+import {
+  HighlightColor,
+  HighlightShape,
+  PieceColor,
+  PieceType,
+} from "@/lib/types";
 import { computed } from "vue";
 import { get } from "@vueuse/core";
 import {
@@ -214,6 +219,7 @@ const highlightSquares = computed((): BoardHighlightSquare[] => {
     list.push({
       cell: { x: king.x, y: king.y },
       color: HighlightColor.Red,
+      shape: HighlightShape.SquareFill,
     });
   }
 
@@ -221,10 +227,12 @@ const highlightSquares = computed((): BoardHighlightSquare[] => {
     list.push({
       cell: get(lastMove).from,
       color: HighlightColor.Yellow,
+      shape: HighlightShape.SquareFill,
     });
     list.push({
       cell: get(lastMove).to,
       color: HighlightColor.Yellow,
+      shape: HighlightShape.SquareFill,
     });
   }
 

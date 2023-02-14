@@ -21,17 +21,18 @@
 import { useRoute, useRouter } from "vue-router";
 import type {
   Board,
+  BoardHighlightSquare,
+  Cell,
   GameStartedResponse,
   JoinGameResponse,
   Move,
   MoveItem,
-  BoardHighlightSquare,
-  Cell,
-  PieceSelectedEvent,
   PieceMovedEvent,
+  PieceSelectedEvent,
 } from "@/lib/types";
 import {
   HighlightColor,
+  HighlightShape,
   MoveType,
   Piece,
   PieceColor,
@@ -83,7 +84,8 @@ const highlightSquares = computed((): BoardHighlightSquare[] => {
   if (get(selectedPiece)) {
     list.push({
       cell: { x: get(selectedPiece)!.x, y: get(selectedPiece)!.y } as Cell,
-      color: HighlightColor.Yellow,
+      color: HighlightColor.Green,
+      shape: HighlightShape.SquareFill,
     });
   }
 

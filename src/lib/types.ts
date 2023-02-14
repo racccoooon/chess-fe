@@ -25,6 +25,15 @@ export enum HighlightColor {
   Green = "green",
   Yellow = "yellow",
   Red = "red",
+  Blue = "blue",
+  Purple = "purple",
+  Highlight = "highlight",
+}
+
+export enum HighlightShape {
+  SquareFill = "squareFill",
+  SquareOutline = "squareOutline",
+  Dot = "dot",
 }
 
 export class Piece {
@@ -55,6 +64,7 @@ export interface Cell {
 export interface BoardHighlightSquare {
   cell: Cell;
   color: HighlightColor;
+  shape: HighlightShape;
 }
 
 export enum MoveType {
