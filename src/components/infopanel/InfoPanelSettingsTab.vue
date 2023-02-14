@@ -1,177 +1,157 @@
 <template>
-  <div class="grow flex flex-col gap-6">
+  <div class="grow flex flex-col gap-6 mb-12">
     <div class="flex flex-col gap-4">
       <label class="text-gray-900 dark:text-gray-50 font-medium"
         >Notation style</label
       >
-      <div class="flex flex-wrap items-center">
-        <button
-          @click="notationType = NotationType.Algebraic"
-          :aria-selected="notationType === NotationType.Algebraic"
-          class="px-4 py-2 text-gray-500 dark:text-gray-300 aria-selected:text-gray-900 aria-selected:dark:text-gray-50 aria-selected:bg-gray-200 aria-selected:dark:bg-gray-700 text-sm font-medium rounded-xl transition-all ease-in-out"
-        >
-          Algebraic
-        </button>
-        <button
-          @click="notationType = NotationType.LongAlgebraic"
-          :aria-selected="notationType === NotationType.LongAlgebraic"
-          class="px-4 py-2 text-gray-500 dark:text-gray-300 aria-selected:text-gray-900 aria-selected:dark:text-gray-50 aria-selected:bg-gray-200 aria-selected:dark:bg-gray-700 text-sm font-medium rounded-xl transition-all ease-in-out"
-        >
-          Long Algebraic
-        </button>
-        <button
-          @click="notationType = NotationType.Spoken"
-          :aria-selected="notationType === NotationType.Spoken"
-          class="px-4 py-2 text-gray-500 dark:text-gray-300 aria-selected:text-gray-900 aria-selected:dark:text-gray-50 aria-selected:bg-gray-200 aria-selected:dark:bg-gray-700 text-sm font-medium rounded-xl transition-all ease-in-out"
-        >
-          Spoken
-        </button>
+      <div class="md:w-3/4">
+        <SmallOptionsGroup
+          v-model="notationType"
+          :options="[
+            {
+              value: NotationType.Algebraic,
+              label: 'Algebraic',
+            },
+            {
+              value: NotationType.LongAlgebraic,
+              label: 'Long algebraic',
+            },
+            {
+              value: NotationType.Spoken,
+              label: 'Spoken',
+            },
+          ]"
+        />
       </div>
-      <div class="flex flex-wrap items-center">
-        <button
-          @click="useUnicodeIconsInNotation = true"
-          :aria-selected="useUnicodeIconsInNotation"
-          class="px-4 py-2 text-gray-500 dark:text-gray-300 aria-selected:text-gray-900 aria-selected:dark:text-gray-50 aria-selected:bg-gray-200 aria-selected:dark:bg-gray-700 text-sm font-medium rounded-xl transition-all ease-in-out"
-        >
-          Use unicode icons
-        </button>
-        <button
-          @click="useUnicodeIconsInNotation = false"
-          :aria-selected="!useUnicodeIconsInNotation"
-          class="px-4 py-2 text-gray-500 dark:text-gray-300 aria-selected:text-gray-900 aria-selected:dark:text-gray-50 aria-selected:bg-gray-200 aria-selected:dark:bg-gray-700 text-sm font-medium rounded-xl transition-all ease-in-out"
-        >
-          Use letters
-        </button>
+      <div class="md:w-3/4">
+        <SmallOptionsGroup
+          v-model="useUnicodeIconsInNotation"
+          :options="[
+            {
+              value: true,
+              label: 'Use unicode icons',
+            },
+            {
+              value: false,
+              label: 'Use Letters',
+            },
+          ]"
+        />
       </div>
     </div>
     <div class="flex flex-col gap-4">
       <label class="text-gray-900 dark:text-gray-50 font-medium"
         >Chess Board</label
       >
-      <div class="flex flex-wrap items-center">
-        <button
-          @click="boardColor = ChessBoardColor.Neutral"
-          :aria-selected="boardColor === ChessBoardColor.Neutral"
-          class="px-4 py-2 text-gray-500 dark:text-gray-300 aria-selected:text-gray-900 aria-selected:dark:text-gray-50 aria-selected:bg-gray-200 aria-selected:dark:bg-gray-700 text-sm font-medium rounded-xl transition-all ease-in-out"
-        >
-          Neutral
-        </button>
-        <button
-          @click="boardColor = ChessBoardColor.Wood"
-          :aria-selected="boardColor === ChessBoardColor.Wood"
-          class="px-4 py-2 text-gray-500 dark:text-gray-300 aria-selected:text-gray-900 aria-selected:dark:text-gray-50 aria-selected:bg-gray-200 aria-selected:dark:bg-gray-700 text-sm font-medium rounded-xl transition-all ease-in-out"
-        >
-          Wood
-        </button>
-        <button
-          @click="boardColor = ChessBoardColor.Green"
-          :aria-selected="boardColor === ChessBoardColor.Green"
-          class="px-4 py-2 text-gray-500 dark:text-gray-300 aria-selected:text-gray-900 aria-selected:dark:text-gray-50 aria-selected:bg-gray-200 aria-selected:dark:bg-gray-700 text-sm font-medium rounded-xl transition-all ease-in-out"
-        >
-          Green
-        </button>
-        <button
-          @click="boardColor = ChessBoardColor.Blue"
-          :aria-selected="boardColor === ChessBoardColor.Blue"
-          class="px-4 py-2 text-gray-500 dark:text-gray-300 aria-selected:text-gray-900 aria-selected:dark:text-gray-50 aria-selected:bg-gray-200 aria-selected:dark:bg-gray-700 text-sm font-medium rounded-xl transition-all ease-in-out"
-        >
-          Blue
-        </button>
-        <button
-          @click="boardColor = ChessBoardColor.Red"
-          :aria-selected="boardColor === ChessBoardColor.Red"
-          class="px-4 py-2 text-gray-500 dark:text-gray-300 aria-selected:text-gray-900 aria-selected:dark:text-gray-50 aria-selected:bg-gray-200 aria-selected:dark:bg-gray-700 text-sm font-medium rounded-xl transition-all ease-in-out"
-        >
-          Red
-        </button>
-        <button
-          @click="boardColor = ChessBoardColor.Orange"
-          :aria-selected="boardColor === ChessBoardColor.Orange"
-          class="px-4 py-2 text-gray-500 dark:text-gray-300 aria-selected:text-gray-900 aria-selected:dark:text-gray-50 aria-selected:bg-gray-200 aria-selected:dark:bg-gray-700 text-sm font-medium rounded-xl transition-all ease-in-out"
-        >
-          Orange
-        </button>
-        <button
-          @click="boardColor = ChessBoardColor.Purple"
-          :aria-selected="boardColor === ChessBoardColor.Purple"
-          class="px-4 py-2 text-gray-500 dark:text-gray-300 aria-selected:text-gray-900 aria-selected:dark:text-gray-50 aria-selected:bg-gray-200 aria-selected:dark:bg-gray-700 text-sm font-medium rounded-xl transition-all ease-in-out"
-        >
-          Purple
-        </button>
-        <button
-          @click="boardColor = ChessBoardColor.Pink"
-          :aria-selected="boardColor === ChessBoardColor.Pink"
-          class="px-4 py-2 text-gray-500 dark:text-gray-300 aria-selected:text-gray-900 aria-selected:dark:text-gray-50 aria-selected:bg-gray-200 aria-selected:dark:bg-gray-700 text-sm font-medium rounded-xl transition-all ease-in-out"
-        >
-          Pink
-        </button>
-        <button
-          @click="boardColor = ChessBoardColor.HighContrast"
-          :aria-selected="boardColor === ChessBoardColor.HighContrast"
-          class="px-4 py-2 text-gray-500 dark:text-gray-300 aria-selected:text-gray-900 aria-selected:dark:text-gray-50 aria-selected:bg-gray-200 aria-selected:dark:bg-gray-700 text-sm font-medium rounded-xl transition-all ease-in-out"
-        >
-          High Contrast
-        </button>
+      <div class="md:w-3/4">
+        <SmallCheckBoardOptionsGroup
+          class="sm:grid-cols-2"
+          v-model="boardColor"
+          :options="[
+            {
+              value: ChessBoardColor.Neutral,
+              label: 'Neutral',
+              lightClass: 'fill-gray-100',
+              darkClass: 'fill-gray-500',
+            },
+            {
+              value: ChessBoardColor.Wood,
+              label: 'Wood',
+              lightClass: 'fill-brown-200',
+              darkClass: 'fill-brown-500',
+            },
+            {
+              value: ChessBoardColor.Green,
+              label: 'Green',
+              lightClass: 'fill-green-100',
+              darkClass: 'fill-green-500',
+            },
+            {
+              value: ChessBoardColor.Blue,
+              label: 'Blue',
+              lightClass: 'fill-blue-100',
+              darkClass: 'fill-blue-500',
+            },
+            {
+              value: ChessBoardColor.Red,
+              label: 'Red',
+              lightClass: 'fill-red-200',
+              darkClass: 'fill-red-500',
+            },
+            {
+              value: ChessBoardColor.Orange,
+              label: 'Orange',
+              lightClass: 'fill-orange-100',
+              darkClass: 'fill-orange-400',
+            },
+            {
+              value: ChessBoardColor.Purple,
+              label: 'Purple',
+              lightClass: 'fill-purple-100',
+              darkClass: 'fill-purple-500',
+            },
+            {
+              value: ChessBoardColor.Pink,
+              label: 'Pink',
+              lightClass: 'fill-pink-200',
+              darkClass: 'fill-pink-400',
+            },
+          ]"
+        />
       </div>
-      <div class="flex flex-wrap items-center">
-        <button
-          @click="boardBorder = ChessBoardBorder.None"
-          :aria-selected="boardBorder === ChessBoardBorder.None"
-          class="px-4 py-2 text-gray-500 dark:text-gray-300 aria-selected:text-gray-900 aria-selected:dark:text-gray-50 aria-selected:bg-gray-200 aria-selected:dark:bg-gray-700 text-sm font-medium rounded-xl transition-all ease-in-out"
-        >
-          No border
-        </button>
-        <button
-          @click="boardBorder = ChessBoardBorder.Thin"
-          :aria-selected="boardBorder === ChessBoardBorder.Thin"
-          class="px-4 py-2 text-gray-500 dark:text-gray-300 aria-selected:text-gray-900 aria-selected:dark:text-gray-50 aria-selected:bg-gray-200 aria-selected:dark:bg-gray-700 text-sm font-medium rounded-xl transition-all ease-in-out"
-        >
-          Thin border
-        </button>
-        <button
-          @click="boardBorder = ChessBoardBorder.Thick"
-          :aria-selected="boardBorder === ChessBoardBorder.Thick"
-          class="px-4 py-2 text-gray-500 dark:text-gray-300 aria-selected:text-gray-900 aria-selected:dark:text-gray-50 aria-selected:bg-gray-200 aria-selected:dark:bg-gray-700 text-sm font-medium rounded-xl transition-all ease-in-out"
-        >
-          Thick border
-        </button>
+      <div class="md:w-3/4">
+        <SmallOptionsGroup
+          v-model="boardBorder"
+          :options="[
+            {
+              value: ChessBoardBorder.None,
+              label: 'No border',
+            },
+            {
+              value: ChessBoardBorder.Thin,
+              label: 'Thin border',
+            },
+            {
+              value: ChessBoardBorder.Thick,
+              label: 'Thick border',
+            },
+          ]"
+        />
       </div>
-      <div class="flex flex-wrap items-center">
-        <button
-          @click="showCoordinates = true"
-          :aria-selected="showCoordinates"
-          class="px-4 py-2 text-gray-500 dark:text-gray-300 aria-selected:text-gray-900 aria-selected:dark:text-gray-50 aria-selected:bg-gray-200 aria-selected:dark:bg-gray-700 text-sm font-medium rounded-xl transition-all ease-in-out"
-        >
-          Show coordinates
-        </button>
-        <button
-          @click="showCoordinates = false"
-          :aria-selected="!showCoordinates"
-          class="px-4 py-2 text-gray-500 dark:text-gray-300 aria-selected:text-gray-900 aria-selected:dark:text-gray-50 aria-selected:bg-gray-200 aria-selected:dark:bg-gray-700 text-sm font-medium rounded-xl transition-all ease-in-out"
-        >
-          Hide coordinates
-        </button>
+      <div class="md:w-3/4">
+        <SmallOptionsGroup
+          v-model="showCoordinates"
+          :options="[
+            {
+              value: true,
+              label: 'Show coordinates',
+            },
+            {
+              value: false,
+              label: 'Hide coordinates',
+            },
+          ]"
+        />
       </div>
     </div>
     <div class="flex flex-col gap-4">
       <label class="text-gray-900 dark:text-gray-50 font-medium"
         >Chess Pieces</label
       >
-      <div class="flex flex-wrap items-center">
-        <button
-          @click="raccoonMode = false"
-          :aria-selected="!raccoonMode"
-          class="px-4 py-2 text-gray-500 dark:text-gray-300 aria-selected:text-gray-900 aria-selected:dark:text-gray-50 aria-selected:bg-gray-200 aria-selected:dark:bg-gray-700 text-sm font-medium rounded-xl transition-all ease-in-out"
-        >
-          Normal
-        </button>
-        <button
-          @click="raccoonMode = true"
-          :aria-selected="raccoonMode"
-          class="px-4 py-2 text-gray-500 dark:text-gray-300 aria-selected:text-gray-900 aria-selected:dark:text-gray-50 aria-selected:bg-gray-200 aria-selected:dark:bg-gray-700 text-sm font-medium rounded-xl transition-all ease-in-out"
-        >
-          Racoon
-        </button>
+      <div class="md:w-3/4">
+        <SmallOptionsGroup
+          v-model="raccoonMode"
+          :options="[
+            {
+              value: false,
+              label: 'Normal',
+            },
+            {
+              value: true,
+              label: 'Raccoon',
+            },
+          ]"
+        />
       </div>
     </div>
   </div>
@@ -182,6 +162,8 @@ import { useSettingsStore } from "@/stores/settings";
 import { NotationType } from "@/lib/chessNotation";
 import { ChessBoardColor, ChessBoardBorder } from "@/lib/types";
 import { storeToRefs } from "pinia";
+import SmallOptionsGroup from "@/components/forms/SmallOptionsGroup.vue";
+import SmallCheckBoardOptionsGroup from "@/components/forms/SmallCheckBoardOptionsGroup.vue";
 
 const settingsStore = useSettingsStore();
 

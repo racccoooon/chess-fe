@@ -1,33 +1,33 @@
 <template>
   <div
-    class="grow lg:my-16 bg-gray-100 dark:bg-gray-800 sm:rounded-2xl overflow-hidden flex flex-col"
+    class="grow lg:my-16 bg-gray-100 dark:bg-gray-800 sm:rounded-3xl overflow-hidden flex flex-col"
   >
     <div
-      class="p-2 flex flex-row items-center border-b-2 border-gray-200 dark:border-gray-700 overflow-x-auto"
+      class="p-2 flex flex-row items-center border-b-2 border-gray-200 dark:border-gray-700 overflow-x-auto overflow-y-hidden"
     >
       <button
         @click="activeTab = Tab.Game"
         :aria-selected="activeTab === Tab.Game"
-        class="px-6 py-2 text-gray-500 dark:text-gray-300 aria-selected:text-gray-900 aria-selected:dark:text-gray-50 aria-selected:bg-gray-200 aria-selected:dark:bg-gray-700 text-md font-medium rounded-xl transition-all ease-in-out"
+        class="px-6 py-2 text-gray-500 dark:text-gray-300 aria-selected:text-gray-900 aria-selected:dark:text-gray-50 aria-selected:bg-gray-200 aria-selected:dark:bg-gray-700 text-md font-medium rounded-full transition-all ease-in-out"
       >
         Game
       </button>
       <button
         @click="activeTab = Tab.Invite"
         :aria-selected="activeTab === Tab.Invite"
-        class="px-6 py-2 text-gray-500 dark:text-gray-300 aria-selected:text-gray-900 aria-selected:dark:text-gray-50 aria-selected:bg-gray-200 aria-selected:dark:bg-gray-700 text-md font-medium rounded-xl transition-all ease-in-out"
+        class="px-6 py-2 text-gray-500 dark:text-gray-300 aria-selected:text-gray-900 aria-selected:dark:text-gray-50 aria-selected:bg-gray-200 aria-selected:dark:bg-gray-700 text-md font-medium rounded-full transition-all ease-in-out"
       >
         Invite
       </button>
       <button
         @click="activeTab = Tab.Settings"
         :aria-selected="activeTab === Tab.Settings"
-        class="px-6 py-2 text-gray-500 dark:text-gray-300 aria-selected:text-gray-900 aria-selected:dark:text-gray-50 aria-selected:bg-gray-200 aria-selected:dark:bg-gray-700 text-md font-medium rounded-xl transition-all ease-in-out"
+        class="px-6 py-2 text-gray-500 dark:text-gray-300 aria-selected:text-gray-900 aria-selected:dark:text-gray-50 aria-selected:bg-gray-200 aria-selected:dark:bg-gray-700 text-md font-medium rounded-full transition-all ease-in-out"
       >
         Settings
       </button>
     </div>
-    <div class="grow flex p-8">
+    <div class="flex-1 flex p-8 overflow-y-auto">
       <InfoPanelGameTab
         v-if="activeTab === Tab.Game"
         :is-player="isPlayer"
