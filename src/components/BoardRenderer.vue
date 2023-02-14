@@ -312,7 +312,7 @@ const fillClass = computed(() => {
   }
 });
 
-const highlightSquares = computed(() => {
+const highlightSquares = computed((): BoardHighlightSquare[] => {
   const list = [];
 
   list.push(...props.highlightSquares);
@@ -322,7 +322,7 @@ const highlightSquares = computed(() => {
       cell: get(hoverSquare),
       color: HighlightColor.Highlight,
       shape: HighlightShape.SquareOutline,
-    });
+    } as BoardHighlightSquare);
   }
 
   return list;
