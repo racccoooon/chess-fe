@@ -2,7 +2,7 @@
   <svg
     class="aspect-square select-none"
     :class="{
-      'cursor-grab': isHoveringPiece,
+      'cursor-grab': isAllowedToInteractWithHoveredPiece,
       'cursor-pointer': !isDragging && selectedPiece !== null,
       'cursor-grabbing': isDragging,
     }"
@@ -392,6 +392,8 @@ const startDrag = () => {
     return;
   }
 
+  // TODO: we could use the already existing computed value here
+
   const board = mousePositionToBoardPosition(get(mouseX), get(mouseY));
 
   if (!board) {
@@ -467,14 +469,29 @@ const hoverSquare = computed(() => {
   return mousePositionToBoardPosition(get(mouseX), get(mouseY));
 });
 
-const isHoveringPiece = computed(() => {
-  const pieceAtSquare = getPieceAtSquare(
+const hoveredPiece = computed(() => {
+  return getPieceAtSquare(
     props.board.pieces,
     get(hoverSquare)?.x ?? -1,
     get(hoverSquare)?.y ?? -1
   );
+});
 
-  return pieceAtSquare !== undefined;
+const isHoveringPiece = computed(() => {
+  return get(hoveredPiece) !== undefined;
+});
+
+const isAllowedToInteractWithHoveredPiece = computed(() => {
+  if (!get(isHoveringPiece)) {
+    return false;
+  }
+
+  return !(
+    (get(hoveredPiece)?.color === PieceColor.White &&
+      !props.allowInteractionWithWhite) ||
+    (get(hoveredPiece)?.color === PieceColor.Black &&
+      !props.allowInteractionWithBlack)
+  );
 });
 
 const dragMouseDelta = computed(() => {
