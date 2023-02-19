@@ -161,8 +161,6 @@
               :type="piece.type"
               :color="piece.color"
               :set="pieceSet"
-              :use-raccoon-tail="raccoonMode"
-              :use-raccoon-pawn="raccoonMode"
               :style="{
                 filter:
                   ((piece.color === PieceColor.White && isWhiteInCheck) ||
