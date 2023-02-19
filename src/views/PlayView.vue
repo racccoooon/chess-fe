@@ -298,8 +298,7 @@ const onPieceMoved = async (e: PieceMovedEvent) => {
     return;
   }
 
-  const piece = e.piece;
-  const to = e.to;
+  const { piece, to } = e;
 
   console.log(`piece moved to ${getSquareName(to.x, to.y)}`, piece);
 
