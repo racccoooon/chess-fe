@@ -1,6 +1,11 @@
 <template>
   <svg
     class="aspect-square select-none"
+    :class="{
+      'cursor-grab': isHoveringPiece,
+      'cursor-pointer': !isDragging && selectedPiece !== null,
+      'cursor-grabbing': isDragging,
+    }"
     :viewBox="`0 0 ${squareAbsoluteWidth * 8 + borderAbsoluteSize * 2} ${
       squareAbsoluteHeight * 8 + borderAbsoluteSize * 2
     }`"
@@ -193,14 +198,14 @@ import type {
   PieceSelectedEvent,
 } from "@/lib/types";
 import {
-  ChessBoardColor,
   ChessBoardBorder,
+  ChessBoardColor,
   HighlightColor,
+  HighlightShape,
   Piece,
   PieceColor,
-  PieceType,
-  HighlightShape,
   PiecesDisplaySize,
+  PieceType,
 } from "@/lib/types";
 import { storeToRefs } from "pinia";
 import { useSettingsStore } from "@/stores/settings";
@@ -340,7 +345,7 @@ const highlightSquares = computed((): BoardHighlightSquare[] => {
 
   list.push(...props.highlightSquares);
 
-  if (get(hoverSquare) !== null) {
+  if (get(hoverSquare) !== null && get(selectedPiece) !== null) {
     list.push({
       cell: get(hoverSquare),
       color: HighlightColor.Highlight,
@@ -351,7 +356,14 @@ const highlightSquares = computed((): BoardHighlightSquare[] => {
   return list;
 });
 
-const mousePositionToBoardPosition = (x: number, y: number) => {
+const mousePositionToBoardPosition = (
+  x: number,
+  y: number
+): { x: number; y: number } | null => {
+  if (!get(innerSvg)) {
+    return null;
+  }
+
   const rect = get(innerSvg)!.getBoundingClientRect();
 
   const realX = x - rect.left;
@@ -380,17 +392,18 @@ const startDrag = () => {
     return;
   }
 
-  const { x: boardX, y: boardY } = mousePositionToBoardPosition(
-    get(mouseX),
-    get(mouseY)
-  );
+  const board = mousePositionToBoardPosition(get(mouseX), get(mouseY));
 
-  if (boardX === get(selectedPiece)?.x && boardY === get(selectedPiece)?.y) {
+  if (!board) {
+    return;
+  }
+
+  if (board.x === get(selectedPiece)?.x && board.y === get(selectedPiece)?.y) {
     deselect();
     return;
   }
 
-  const pieceAtSquare = getPieceAtSquare(props.board.pieces, boardX, boardY);
+  const pieceAtSquare = getPieceAtSquare(props.board.pieces, board.x, board.y);
 
   if (!pieceAtSquare) {
     if (get(selectedPiece)) {
@@ -423,6 +436,11 @@ const startDrag = () => {
 const stopDrag = () => {
   const to = mousePositionToBoardPosition(get(mouseX), get(mouseY));
 
+  if (!to) {
+    deselect();
+    return;
+  }
+
   if (!(to.x === get(selectedPiece)?.x && to.y === get(selectedPiece)?.y)) {
     emit("pieceMoved", {
       piece: get(selectedPiece)!,
@@ -446,14 +464,17 @@ const deselect = () => {
 };
 
 const hoverSquare = computed(() => {
-  if (!get(isDragging)) return null;
+  return mousePositionToBoardPosition(get(mouseX), get(mouseY));
+});
 
-  const { x: boardX, y: boardY } = mousePositionToBoardPosition(
-    get(mouseX),
-    get(mouseY)
+const isHoveringPiece = computed(() => {
+  const pieceAtSquare = getPieceAtSquare(
+    props.board.pieces,
+    get(hoverSquare)?.x ?? -1,
+    get(hoverSquare)?.y ?? -1
   );
 
-  return { x: boardX, y: boardY };
+  return pieceAtSquare !== undefined;
 });
 
 const dragMouseDelta = computed(() => {
