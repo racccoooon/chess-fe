@@ -128,6 +128,10 @@ export interface PieceMovedEvent {
   to: { x: number; y: number };
 }
 
+export interface PromotionSelectedEvent {
+  type: PieceType;
+}
+
 export enum ChessBoardBorder {
   None = "none",
   Thin = "thin",
@@ -144,4 +148,9 @@ export enum ChessBoardColor {
   Purple = "purple",
   Pink = "pink",
   HighContrast = "highContrast",
+}
+
+export enum ModalType {
+  None = "none",
+  Promotion = "promotion",
 }

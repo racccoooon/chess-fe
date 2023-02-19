@@ -14,7 +14,16 @@
     @piece-selected="onPieceSelected"
     @piece-deselected="onPieceDeselected"
     @piece-moved="onPieceMoved"
-  />
+  >
+    <template #board-overlay>
+      <SuperDuperModal v-if="showModal !== ModalType.None">
+        <PromoteModalContent
+          v-if="showModal === ModalType.Promotion"
+          @select-type="onPromotionSelected"
+        />
+      </SuperDuperModal>
+    </template>
+  </GameLayout>
 </template>
 
 <script setup lang="ts">
@@ -29,22 +38,26 @@ import type {
   MoveItem,
   PieceMovedEvent,
   PieceSelectedEvent,
+  PromotionSelectedEvent,
 } from "@/lib/types";
 import {
   HighlightColor,
   HighlightShape,
+  ModalType,
   MoveType,
   Piece,
   PieceColor,
   PieceType,
 } from "@/lib/types";
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { get, set } from "@vueuse/core";
 import { SignalrConnection } from "@/lib/signalr";
 import { useUserStore } from "@/stores/user";
 import { getSquareName } from "@/lib/chessNotation";
 import { invertColor } from "@/lib/chess";
 import GameLayout from "@/components/GameLayout.vue";
+import SuperDuperModal from "@/components/modals/SuperDuperModal.vue";
+import PromoteModalContent from "@/components/modals/PromoteModalContent.vue";
 
 const router = useRouter();
 const hubConnection = new SignalrConnection();
@@ -91,6 +104,9 @@ const highlightSquares = computed((): BoardHighlightSquare[] => {
 
   return list;
 });
+
+const showModal = ref(ModalType.None);
+const promotionSelectedType = ref<PieceType | null>(null);
 
 const initialize = async () => {
   set(gameHasStarted, false);
@@ -167,16 +183,8 @@ const initialize = async () => {
     set(gameHasStarted, true);
   });
 
-  hubConnection.onMove(async (e: Partial<MoveItem>) => {
-    // add promoteToType to the move
-    // even if a move is a promotion, the server will not send the promotion with the onMove event
-    // we will set promotion to its real value later
-    const move = {
-      ...e,
-      promoteToType: null,
-    } as MoveItem;
-
-    resolveMove(move);
+  hubConnection.onMove(async (e: MoveItem) => {
+    resolveMove(e);
   });
 
   // join the game
@@ -233,6 +241,8 @@ const resolveMove = (move: MoveItem) => {
         rook.x = 5;
       }
     }
+  } else if (move.kind === MoveType.Promotion) {
+    pieceToMove.type = move.promoteToType as PieceType;
   }
 
   // push the move to the move history
@@ -240,6 +250,30 @@ const resolveMove = (move: MoveItem) => {
 
   // change the active color
   set(activeColor, invertColor(move.color));
+};
+
+const askForPromotion = (): Promise<PieceType> => {
+  // open the promotion modal
+  set(showModal, ModalType.Promotion);
+
+  // return a promise that will be resolved when the user selects a promotion
+  return new Promise((resolve) => {
+    watch(promotionSelectedType, (type) => {
+      if (type) {
+        resolve(type);
+      }
+    });
+  });
+};
+
+const onPromotionSelected = async (e: PromotionSelectedEvent) => {
+  const { type } = e;
+
+  // set the promotion type
+  set(promotionSelectedType, type);
+
+  // hide the modal
+  set(showModal, ModalType.None);
 };
 
 const onPieceSelected = (e: PieceSelectedEvent) => {
@@ -280,7 +314,14 @@ const onPieceMoved = async (e: PieceMovedEvent) => {
 
   // TODO: validate move
 
-  await hubConnection.makeMove(get(gameId), move);
+  let promoteToType: null | PieceType = null;
+
+  // if the move is a promotion, ask the user for the promotion type
+  if (piece.type === PieceType.Pawn && (to.y === 0 || to.y === 7)) {
+    promoteToType = await askForPromotion();
+  }
+
+  await hubConnection.makeMove(get(gameId), move, promoteToType);
 
   set(selectedPiece, null);
 };

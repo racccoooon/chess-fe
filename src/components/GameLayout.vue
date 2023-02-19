@@ -11,7 +11,10 @@
         :material-advantage="topPlayerMaterialAdvantage"
         :captured-pieces="topPlayerCapturedPieces"
       />
-      <div class="w-full xl:h-3/4">
+      <div class="w-full xl:h-3/4 relative sm:rounded-2xl overflow-hidden">
+        <div>
+          <slot name="board-overlay" />
+        </div>
         <BoardRenderer
           :board="board"
           :reverse="reverseBoard"
@@ -28,7 +31,7 @@
           @piece-selected="onPieceSelected"
           @piece-deselected="onPieceDeselected"
           @piece-moved="onPieceMoved"
-          class="h-full sm:rounded-2xl"
+          class="h-full"
         />
       </div>
       <PlayerInfo

@@ -1,6 +1,6 @@
 <template>
   <svg
-    class="aspect-square select-none overflow-hidden"
+    class="aspect-square select-none"
     :viewBox="`0 0 ${squareAbsoluteWidth * 8 + borderAbsoluteSize * 2} ${
       squareAbsoluteHeight * 8 + borderAbsoluteSize * 2
     }`"

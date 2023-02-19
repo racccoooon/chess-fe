@@ -6,6 +6,7 @@ import type {
   Move,
   MoveItem,
 } from "@/lib/types";
+import type { PieceType } from "@/lib/types";
 
 export class SignalrConnection {
   private connection: HubConnection;
@@ -38,11 +39,12 @@ export class SignalrConnection {
     });
   }
 
-  async makeMove(gameId: string, move: Move) {
+  async makeMove(gameId: string, move: Move, promoteToType: PieceType | null) {
     await this.connection.invoke("Move", {
       gameId,
       from: move.from,
       to: move.to,
+      promoteToType,
     });
   }
 
@@ -70,7 +72,7 @@ export class SignalrConnection {
     this.connection.on("gameStarted", callback);
   }
 
-  onMove(callback: (e: Partial<MoveItem>) => Promise<void>) {
+  onMove(callback: (e: MoveItem) => Promise<void>) {
     this.connection.on("move", callback);
   }
 
