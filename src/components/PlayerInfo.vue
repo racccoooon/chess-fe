@@ -31,7 +31,7 @@
 
 <script setup lang="ts">
 import type { PieceColor, PieceType } from "@/lib/types";
-import PieceRenderer from "@/components/PieceRenderer.vue";
+import PieceRenderer from "@/components/pieces/PieceRenderer.vue";
 import { invertColor } from "@/lib/chess";
 import { computed } from "vue";
 

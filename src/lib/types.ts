@@ -36,6 +36,19 @@ export enum HighlightShape {
   Dot = "dot",
 }
 
+export enum PieceSet {
+  Modern = "modern",
+  Raccoon = "raccoon",
+  Classic = "classic",
+  Blindfold = "blindfold",
+}
+
+export enum PiecesDisplaySize {
+  Small = "small",
+  Medium = "medium",
+  Large = "large",
+  ExtraLarge = "extraLarge",
+}
 export class Piece {
   type: PieceType;
   color: PieceColor;

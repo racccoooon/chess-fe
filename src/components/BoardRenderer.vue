@@ -154,12 +154,13 @@
             :id="piece.id === selectedPiece?.id ? 'selected-piece' : ''"
           >
             <PieceRenderer
-              x="10"
-              y="10"
-              width="80"
-              height="80"
+              :x="pieceAbsoluteOffset"
+              :y="pieceAbsoluteOffset"
+              :width="pieceAbsoluteSize"
+              :height="pieceAbsoluteSize"
               :type="piece.type"
               :color="piece.color"
+              :set="pieceSet"
               :use-raccoon-tail="raccoonMode"
               :use-raccoon-pawn="raccoonMode"
               :style="{
@@ -186,7 +187,7 @@
 </template>
 
 <script setup lang="ts">
-import PieceRenderer from "@/components/PieceRenderer.vue";
+import PieceRenderer from "@/components/pieces/PieceRenderer.vue";
 import type {
   Board,
   BoardHighlightSquare,
@@ -201,6 +202,7 @@ import {
   PieceColor,
   PieceType,
   HighlightShape,
+  PiecesDisplaySize,
 } from "@/lib/types";
 import { storeToRefs } from "pinia";
 import { useSettingsStore } from "@/stores/settings";
@@ -226,9 +228,13 @@ const emit = defineEmits<{
   (event: "pieceMoved", payload: PieceMovedEvent): void;
 }>();
 
-const { raccoonMode, boardColor, boardBorder, showCoordinates } = storeToRefs(
-  useSettingsStore()
-);
+const {
+  boardColor,
+  boardBorder,
+  showCoordinates,
+  pieceSet,
+  piecesDisplaySize,
+} = storeToRefs(useSettingsStore());
 
 const squareAbsoluteWidth = 100;
 const squareAbsoluteHeight = 100;
@@ -310,6 +316,25 @@ const fillClass = computed(() => {
     default:
       return "";
   }
+});
+
+const pieceAbsoluteSize = computed(() => {
+  switch (get(piecesDisplaySize)) {
+    case PiecesDisplaySize.Small:
+      return 50;
+    case PiecesDisplaySize.Medium:
+      return 80;
+    case PiecesDisplaySize.Large:
+      return 90;
+    case PiecesDisplaySize.ExtraLarge:
+      return 100;
+    default:
+      return 80;
+  }
+});
+
+const pieceAbsoluteOffset = computed(() => {
+  return (squareAbsoluteWidth - get(pieceAbsoluteSize)) / 2;
 });
 
 const highlightSquares = computed((): BoardHighlightSquare[] => {

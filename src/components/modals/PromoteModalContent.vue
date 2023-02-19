@@ -49,7 +49,7 @@
 </template>
 
 <script setup lang="ts">
-import PieceRenderer from "@/components/PieceRenderer.vue";
+import PieceRenderer from "@/components/pieces/PieceRenderer.vue";
 import { PieceColor, PieceType } from "@/lib/types";
 import type { PromotionSelectedEvent } from "@/lib/types";
 
