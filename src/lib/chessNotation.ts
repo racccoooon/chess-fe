@@ -99,18 +99,23 @@ export const getMoveNotation = (
   const piece = getPieceNotation(move.type, useUnicodeIcons, move.color);
 
   let suffix = "";
-  if (move.kind === MoveType.EnPassant) {
-    suffix = " e.p.";
-  } else if (move.kind === MoveType.Promotion && move.promoteToType) {
+
+  if (move.kind === MoveType.Promotion && move.promoteToType) {
     suffix = `=${getPieceNotation(
       move.promoteToType,
       useUnicodeIcons,
       move.color
     )}`;
-  } else if (move.status === KingStatus.IsCheck) {
-    suffix = "+";
+  }
+
+  if (move.status === KingStatus.IsCheck) {
+    suffix += "+";
   } else if (move.status === KingStatus.IsCheckmate) {
-    suffix = "#";
+    suffix += "#";
+  }
+
+  if (move.kind === MoveType.EnPassant && suffix.length === 0) {
+    suffix += " e.p.";
   }
 
   // if move is castling return O-O or O-O-O notation
@@ -146,14 +151,28 @@ export const getSpokenMoveNotation = (move: MoveItem) => {
   const piece = getPieceName(move.type);
 
   let suffix = "";
-  if (move.kind === MoveType.EnPassant) {
-    suffix = " e.p.";
-  } else if (move.kind === MoveType.Promotion && move.promoteToType) {
-    suffix = `promotes to ${getPieceName(move.promoteToType)}`;
-  } else if (move.status === KingStatus.IsCheck) {
-    suffix = "check";
+
+  if (move.kind === MoveType.Promotion && move.promoteToType) {
+    suffix += `promotes to ${getPieceName(move.promoteToType)}`;
+  }
+
+  if (move.status === KingStatus.IsCheck) {
+    if (suffix !== ",") {
+      suffix += " and ";
+    }
+    suffix += "check";
   } else if (move.status === KingStatus.IsCheckmate) {
-    suffix = "checkmate";
+    if (suffix.length > 0) {
+      suffix += " and ";
+    }
+    suffix += "checkmate";
+  }
+
+  if (move.kind === MoveType.EnPassant) {
+    if (suffix.length > 0) {
+      suffix += " and ";
+    }
+    suffix += " e.p.";
   }
 
   // if move is castling return O-O or O-O-O notation
@@ -169,10 +188,12 @@ export const getSpokenMoveNotation = (move: MoveItem) => {
   }
 
   if (move.captures) {
-    return `${piece} ${from} captures ${to} ${suffix}`;
+    return `${piece} ${from} captures ${to}${
+      suffix.length > 0 ? ", " : ""
+    }${suffix}`;
   }
 
-  return `${piece} ${from} to ${to} ${suffix}`;
+  return `${piece} ${from} to ${to}${suffix.length > 0 ? "," : ""}${suffix}`;
 };
 
 export const getGameNotation = (
