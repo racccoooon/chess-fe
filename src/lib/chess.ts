@@ -1,5 +1,12 @@
-import { KingStatus, Piece, PieceColor, PieceType } from "@/lib/types";
+import {
+  KingStatus,
+  MoveType,
+  Piece,
+  PieceColor,
+  PieceType,
+} from "@/lib/types";
 import type { MoveItem } from "@/lib/types";
+import { getSquareName } from "@/lib/chessNotation";
 
 export const invertColor = (color: PieceColor) => {
   return color === PieceColor.White ? PieceColor.Black : PieceColor.White;
@@ -96,4 +103,58 @@ export const getCapturedPieces = (
   }
 
   return result;
+};
+
+export const applyMove = (pieces: Piece[], move: MoveItem) => {
+  // get the piece at the form cell
+  const pieceToMove = getPieceAtSquare(pieces, move.from.x, move.from.y);
+
+  // get the piece at the to cell
+  let pieceToCapture = getPieceAtSquare(pieces, move.to.x, move.to.y);
+
+  if (move.kind === MoveType.EnPassant) {
+    pieceToCapture = getPieceAtSquare(pieces, move.to.x, move.from.y);
+  }
+
+  if (!pieceToMove) {
+    throw new Error(
+      `Cannot move piece that does not exist! ${move.color} ${
+        move.type
+      } at ${getSquareName(move.from.x, move.from.y)} to ${getSquareName(
+        move.to.x,
+        move.to.y
+      )} (${move.kind})`
+    );
+  }
+
+  // if there is a piece to capture, remove it from the pieces
+  if (pieceToCapture) {
+    pieces = pieces.filter((p) => p !== pieceToCapture);
+  }
+
+  // move the piece to its new position
+  pieceToMove.x = move.to.x;
+  pieceToMove.y = move.to.y;
+
+  // if it's a castling move, move the rook
+  if (move.kind === MoveType.Castling) {
+    if (move.to.x === 2) {
+      const rook = getPieceAtSquare(pieces, 0, move.to.y);
+      if (rook) {
+        rook.x = 3;
+      }
+    } else if (move.to.x === 6) {
+      const rook = getPieceAtSquare(pieces, 7, move.to.y);
+      if (rook) {
+        rook.x = 5;
+      }
+    }
+  }
+
+  // if it's a promotion move, change the piece type
+  if (move.kind === MoveType.Promotion) {
+    pieceToMove.type = move.promoteToType as PieceType;
+  }
+
+  return pieces;
 };

@@ -44,7 +44,6 @@ import {
   HighlightColor,
   HighlightShape,
   ModalType,
-  MoveType,
   Piece,
   PieceColor,
   PieceType,
@@ -54,7 +53,7 @@ import { get, set } from "@vueuse/core";
 import { SignalrConnection } from "@/lib/signalr";
 import { useUserStore } from "@/stores/user";
 import { getSquareName } from "@/lib/chessNotation";
-import { invertColor } from "@/lib/chess";
+import { applyMove, invertColor } from "@/lib/chess";
 import GameLayout from "@/components/GameLayout.vue";
 import SuperDuperModal from "@/components/modals/SuperDuperModal.vue";
 import PromoteModalContent from "@/components/modals/PromoteModalContent.vue";
@@ -191,62 +190,11 @@ const initialize = async () => {
   await hubConnection.joinGame(get(gameId), userStore.token, userStore.name);
 };
 
-const getPieceAtCell = (x: number, y: number): Piece | undefined => {
-  return get(board).pieces.find((piece) => piece.x === x && piece.y === y);
-};
-
 const resolveMove = (move: MoveItem) => {
   console.log("resolving move", move);
 
-  // get the piece at the form cell
-  let pieceToMove = getPieceAtCell(move.from.x, move.from.y);
-
-  // get the piece at the to cell
-  let pieceToCapture = getPieceAtCell(move.to.x, move.to.y);
-
-  if (move.kind === MoveType.EnPassant) {
-    pieceToCapture = getPieceAtCell(move.to.x, move.from.y);
-  }
-
-  if (!pieceToMove) {
-    throw new Error(
-      `Cannot move piece that does not exist! ${move.color} ${
-        move.type
-      } at ${getSquareName(move.from.x, move.from.y)} to ${getSquareName(
-        move.to.x,
-        move.to.y
-      )} (${move.kind})`
-    );
-  }
-
-  // if there is a piece to capture, remove it from the board
-  if (pieceToCapture) {
-    get(board).pieces = get(board).pieces.filter((p) => p !== pieceToCapture);
-  }
-
-  // move the piece to its new position
-  pieceToMove.x = move.to.x;
-  pieceToMove.y = move.to.y;
-
-  // if it's a castling move, move the rook
-  if (move.kind === MoveType.Castling) {
-    if (move.to.x === 2) {
-      let rook = getPieceAtCell(0, move.to.y);
-      if (rook) {
-        rook.x = 3;
-      }
-    } else if (move.to.x === 6) {
-      let rook = getPieceAtCell(7, move.to.y);
-      if (rook) {
-        rook.x = 5;
-      }
-    }
-  }
-
-  // if it's a promotion move, change the piece type
-  if (move.kind === MoveType.Promotion) {
-    pieceToMove.type = move.promoteToType as PieceType;
-  }
+  // update the board
+  get(board).pieces = applyMove(get(board).pieces, move);
 
   // push the move to the move history
   get(moveHistory).push(move);
