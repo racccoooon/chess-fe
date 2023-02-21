@@ -8,7 +8,8 @@ export const invertColor = (color: PieceColor) => {
 export const isInCheck = (lastMove: MoveItem, color: PieceColor) => {
   return (
     lastMove.color === invertColor(color) &&
-    lastMove.status === KingStatus.IsCheck
+    (lastMove.status === KingStatus.IsCheck ||
+      lastMove.status === KingStatus.IsCheckmate)
   );
 };
 

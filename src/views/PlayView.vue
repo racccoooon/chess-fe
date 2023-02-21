@@ -228,20 +228,23 @@ const resolveMove = (move: MoveItem) => {
   pieceToMove.x = move.to.x;
   pieceToMove.y = move.to.y;
 
-  // if its a castling move, move the rook
+  // if it's a castling move, move the rook
   if (move.kind === MoveType.Castling) {
-    if (move.to.x == 2) {
+    if (move.to.x === 2) {
       let rook = getPieceAtCell(0, move.to.y);
       if (rook) {
         rook.x = 3;
       }
-    } else {
+    } else if (move.to.x === 6) {
       let rook = getPieceAtCell(7, move.to.y);
       if (rook) {
         rook.x = 5;
       }
     }
-  } else if (move.kind === MoveType.Promotion) {
+  }
+
+  // if it's a promotion move, change the piece type
+  if (move.kind === MoveType.Promotion) {
     pieceToMove.type = move.promoteToType as PieceType;
   }
 
