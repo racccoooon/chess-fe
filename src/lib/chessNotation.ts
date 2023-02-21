@@ -98,6 +98,14 @@ export const getMoveNotation = (
   const to = getSquareName(move.to.x, move.to.y);
   const piece = getPieceNotation(move.type, useUnicodeIcons, move.color);
 
+  let idPiece = "";
+
+  if (move.captures && move.type === PieceType.Pawn) {
+    idPiece = getFileName(move.from.x);
+  }
+
+  // TODO: Disambiguate between moves that are the same except for the file, rank, or both
+
   let suffix = "";
 
   if (move.kind === MoveType.Promotion && move.promoteToType) {
@@ -132,10 +140,10 @@ export const getMoveNotation = (
 
   if (notationType === NotationType.Algebraic) {
     if (move.captures) {
-      return `${piece}x${to}${suffix}`;
+      return `${piece}${idPiece}x${to}${suffix}`;
     }
 
-    return `${piece}${to}${suffix}`;
+    return `${piece}${idPiece}${to}${suffix}`;
   } else if (notationType === NotationType.LongAlgebraic) {
     if (move.captures) {
       return `${piece}${from}x${to}${suffix}`;
