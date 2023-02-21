@@ -34,6 +34,9 @@
         :move-history="moveHistory"
         :active-color="activeColor"
         :game-has-started="gameHasStarted"
+        :history-index="historyIndex"
+        @time-travel-relative="emit('timeTravelRelative', $event)"
+        @time-travel-absolute="emit('timeTravelAbsolute', $event)"
       />
       <InfoPanelInviteTab v-else-if="activeTab === Tab.Invite" />
       <InfoPanelSettingsTab v-else-if="activeTab === Tab.Settings" />
@@ -55,6 +58,12 @@ const props = defineProps<{
   activeColor: PieceColor;
   isPlayer: boolean;
   gameHasStarted: boolean;
+  historyIndex: number;
+}>();
+
+const emit = defineEmits<{
+  (event: "timeTravelRelative", payload: number): void;
+  (event: "timeTravelAbsolute", payload: number): void;
 }>();
 
 enum Tab {

@@ -1,16 +1,20 @@
 <template>
   <div class="flex flex-wrap gap-2 overflow-y-auto">
-    <div v-for="(moveGroup, index) in groupedMoves" :key="index">
+    <div v-for="(moveGroup, groupIndex) in groupedMoves" :key="groupIndex">
       <div class="flex flex-row items-center gap-2">
-        <span class="text-gray-500 dark:text-gray-300">{{ index + 1 }}.</span>
+        <span class="text-gray-500 dark:text-gray-300"
+          >{{ groupIndex + 1 }}.</span
+        >
         <div class="flex flex-row items-center gap-1">
-          <span
-            class="px-1 bg-gray-200 dark:bg-gray-700 font-bold rounded-lg"
-            v-for="(move, index) in moveGroup"
-            :key="index"
+          <button
+            :aria-selected="historyIndex === groupIndex * 2 + itemIndex + 1"
+            class="px-1 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 aria-selected:bg-yellow-300 aria-selected:dark:bg-yellow-600 font-bold rounded-lg transition-colors"
+            v-for="(move, itemIndex) in moveGroup"
+            :key="itemIndex"
+            @click="emit('timeTravelAbsolute', groupIndex * 2 + itemIndex + 1)"
           >
             {{ getMoveNotation(move, notationType, useUnicodeIconsInNotation) }}
-          </span>
+          </button>
         </div>
       </div>
     </div>
@@ -26,6 +30,11 @@ import { useSettingsStore } from "@/stores/settings";
 
 const props = defineProps<{
   moveHistory: MoveItem[];
+  historyIndex?: number;
+}>();
+
+const emit = defineEmits<{
+  (event: "timeTravelAbsolute", payload: number): void;
 }>();
 
 const groupedMoves = computed(() => {

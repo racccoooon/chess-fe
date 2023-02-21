@@ -1,11 +1,5 @@
-import {
-  KingStatus,
-  MoveType,
-  Piece,
-  PieceColor,
-  PieceType,
-} from "@/lib/types";
-import type { MoveItem } from "@/lib/types";
+import { KingStatus, MoveType, PieceColor, PieceType } from "@/lib/types";
+import type { MoveItem, Piece } from "@/lib/types";
 import { getSquareName } from "@/lib/chessNotation";
 
 export const invertColor = (color: PieceColor) => {
@@ -105,6 +99,67 @@ export const getCapturedPieces = (
   return result;
 };
 
+export const charToPiece = (
+  char: string,
+  x: number,
+  y: number
+): Piece | null => {
+  switch (char) {
+    case "p":
+      return { type: PieceType.Pawn, color: PieceColor.Black, x, y };
+    case "P":
+      return { type: PieceType.Pawn, color: PieceColor.White, x, y };
+    case "n":
+      return { type: PieceType.Knight, color: PieceColor.Black, x, y };
+    case "N":
+      return { type: PieceType.Knight, color: PieceColor.White, x, y };
+    case "b":
+      return { type: PieceType.Bishop, color: PieceColor.Black, x, y };
+    case "B":
+      return { type: PieceType.Bishop, color: PieceColor.White, x, y };
+    case "r":
+      return { type: PieceType.Rook, color: PieceColor.Black, x, y };
+    case "R":
+      return { type: PieceType.Rook, color: PieceColor.White, x, y };
+    case "q":
+      return { type: PieceType.Queen, color: PieceColor.Black, x, y };
+    case "Q":
+      return { type: PieceType.Queen, color: PieceColor.White, x, y };
+    case "k":
+      return { type: PieceType.King, color: PieceColor.Black, x, y };
+    case "K":
+      return { type: PieceType.King, color: PieceColor.White, x, y };
+    default:
+      return null;
+  }
+};
+
+export const fenToPieces = (fen: string): Piece[] => {
+  const pieces: Piece[] = [];
+  const rows = fen.split("/");
+  let y = 7;
+  for (const row of rows) {
+    let x = 0;
+    for (const char of row) {
+      const piece = charToPiece(char, x, y);
+      if (piece) {
+        pieces.push(piece);
+      }
+      if (isNaN(parseInt(char))) {
+        x++;
+      } else {
+        x += parseInt(char);
+      }
+    }
+    y--;
+  }
+  return pieces;
+};
+
+export const getInitialBoard = (): Piece[] => {
+  return fenToPieces("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
+};
+
 export const applyMove = (pieces: Piece[], move: MoveItem) => {
   // get the piece at the form cell
   const pieceToMove = getPieceAtSquare(pieces, move.from.x, move.from.y);
@@ -157,4 +212,17 @@ export const applyMove = (pieces: Piece[], move: MoveItem) => {
   }
 
   return pieces;
+};
+
+export const getBoardAtHistoryIndex = (
+  history: MoveItem[],
+  index: number
+): Piece[] => {
+  let board = getInitialBoard();
+
+  for (let i = 0; i < index; i++) {
+    board = applyMove(board, history[i]);
+  }
+
+  return board;
 };

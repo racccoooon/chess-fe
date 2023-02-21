@@ -16,18 +16,14 @@
           <slot name="board-overlay" />
         </div>
         <BoardRenderer
-          :board="board"
+          :pieces="pieces"
           :reverse="reverseBoard"
           :isWhiteInCheck="isWhiteInCheck"
           :isBlackInCheck="isBlackInCheck"
           :highlight-squares="highlightSquares"
           :allow-drag="canMove"
-          :allow-interaction-with-white="
-            canMove && playerColor === PieceColor.White
-          "
-          :allow-interaction-with-black="
-            canMove && playerColor === PieceColor.Black
-          "
+          :allow-interaction-with-white="allowInteractionWithWhite"
+          :allow-interaction-with-black="allowInteractionWithBlack"
           @piece-selected="onPieceSelected"
           @piece-deselected="onPieceDeselected"
           @piece-moved="onPieceMoved"
@@ -49,6 +45,9 @@
         :game-has-started="gameHasStarted"
         :move-history="moveHistory"
         :active-color="activeColor"
+        :history-index="historyIndex"
+        @time-travel-relative="historyIndex += $event"
+        @time-travel-absolute="historyIndex = $event"
       />
     </div>
   </div>
@@ -58,9 +57,9 @@
 import BoardRenderer from "@/components/BoardRenderer.vue";
 import PlayerInfo from "@/components/PlayerInfo.vue";
 import type {
-  Board,
   BoardHighlightSquare,
   MoveItem,
+  Piece,
   PieceMovedEvent,
   PieceSelectedEvent,
 } from "@/lib/types";
@@ -70,9 +69,11 @@ import {
   PieceColor,
   PieceType,
 } from "@/lib/types";
-import { computed } from "vue";
-import { get } from "@vueuse/core";
+import { computed, ref, watch } from "vue";
+import { get, set, whenever } from "@vueuse/core";
+import { useClamp } from "@vueuse/math";
 import {
+  getBoardAtHistoryIndex,
   getCapturedPieces,
   getMaterialValueByColor,
   getPiecesByType,
@@ -81,7 +82,7 @@ import {
 import GameInfoPanel from "@/components/GameInfoPanel.vue";
 
 const props = defineProps<{
-  board: Board;
+  pieces: Piece[];
   moveHistory: MoveItem[];
   reverseBoard: boolean;
   activeColor: PieceColor;
@@ -100,8 +101,54 @@ const emit = defineEmits<{
   (event: "pieceMoved", payload: PieceMovedEvent): void;
 }>();
 
+const historyIndex_ = ref(props.moveHistory.length);
+
+const historyIndex = computed({
+  get() {
+    return get(historyIndex_);
+  },
+  set(value: number) {
+    set(historyIndex_, get(useClamp(value, 0, props.moveHistory.length)));
+  },
+});
+
+watch(
+  () => props.moveHistory.length,
+  (newValue) => {
+    set(historyIndex, newValue);
+  }
+);
+
+const isTimeTraveling = computed({
+  get() {
+    return get(historyIndex) !== props.moveHistory.length;
+  },
+  set(value: boolean) {
+    if (!value) {
+      set(historyIndex, props.moveHistory.length);
+    }
+  },
+});
+
+whenever(isTimeTraveling, () => {
+  emit("pieceDeselected");
+  // TODO: we are only deselecting on the parent component but not on the board
+});
+
 const lastMove = computed(() => {
-  return props.moveHistory[props.moveHistory.length - 1] || null;
+  if (!get(isTimeTraveling)) {
+    return props.moveHistory[props.moveHistory.length - 1] || null;
+  }
+
+  return props.moveHistory[get(historyIndex) - 1];
+});
+
+const pieces = computed(() => {
+  if (!get(isTimeTraveling)) {
+    return props.pieces;
+  }
+
+  return getBoardAtHistoryIndex(props.moveHistory, get(historyIndex));
 });
 
 // computed values for checking if the player is in check
@@ -121,11 +168,11 @@ const isAnyInCheck = computed(() => {
 
 // computed values for material advantage
 const whiteMaterialValue = computed(() => {
-  return getMaterialValueByColor(props.board.pieces, PieceColor.White);
+  return getMaterialValueByColor(get(pieces), PieceColor.White);
 });
 
 const blackMaterialValue = computed(() => {
-  return getMaterialValueByColor(props.board.pieces, PieceColor.Black);
+  return getMaterialValueByColor(get(pieces), PieceColor.Black);
 });
 
 const whiteMaterialAdvantage = computed(() => {
@@ -136,12 +183,12 @@ const blackMaterialAdvantage = computed(() => {
   return get(blackMaterialValue) - get(whiteMaterialValue);
 });
 
-const whiteCaputredPieces = computed(() => {
-  return getCapturedPieces(props.board.pieces, PieceColor.White);
+const whiteCapturedPieces = computed(() => {
+  return getCapturedPieces(get(pieces), PieceColor.White);
 });
 
-const blackCaputredPieces = computed(() => {
-  return getCapturedPieces(props.board.pieces, PieceColor.Black);
+const blackCapturedPieces = computed(() => {
+  return getCapturedPieces(get(pieces), PieceColor.Black);
 });
 
 // computed values to display
@@ -195,18 +242,36 @@ const bottomPlayerMaterialAdvantage = computed(() => {
 
 const topPlayerCapturedPieces = computed(() => {
   if (props.reverseBoard) {
-    return get(whiteCaputredPieces);
+    return get(whiteCapturedPieces);
   } else {
-    return get(blackCaputredPieces);
+    return get(blackCapturedPieces);
   }
 });
 
 const bottomPlayerCapturedPieces = computed(() => {
   if (props.reverseBoard) {
-    return get(blackCaputredPieces);
+    return get(blackCapturedPieces);
   } else {
-    return get(whiteCaputredPieces);
+    return get(whiteCapturedPieces);
   }
+});
+
+// compute allow interaction
+
+const allowInteractionWithWhite = computed(() => {
+  return (
+    props.canMove &&
+    props.playerColor === PieceColor.White &&
+    !get(isTimeTraveling)
+  );
+});
+
+const allowInteractionWithBlack = computed(() => {
+  return (
+    props.canMove &&
+    props.playerColor === PieceColor.Black &&
+    !get(isTimeTraveling)
+  );
 });
 
 // compute highlights
@@ -215,9 +280,9 @@ const highlightSquares = computed((): BoardHighlightSquare[] => {
 
   if (get(isAnyInCheck)) {
     const king = getPiecesByType(
-      props.board.pieces,
+      get(pieces),
       PieceType.King,
-      props.activeColor
+      props.activeColor // TODO: this doesnt work for time travel
     )[0];
     list.push({
       cell: { x: king.x, y: king.y },
@@ -245,14 +310,17 @@ const highlightSquares = computed((): BoardHighlightSquare[] => {
 });
 
 const onPieceSelected = (e: PieceSelectedEvent) => {
+  if (get(isTimeTraveling)) return;
   emit("pieceSelected", { piece: e.piece });
 };
 
 const onPieceDeselected = () => {
+  if (get(isTimeTraveling)) return;
   emit("pieceDeselected");
 };
 
 const onPieceMoved = (e: PieceMovedEvent) => {
+  if (get(isTimeTraveling)) return;
   emit("pieceMoved", { piece: e.piece, to: e.to });
 };
 </script>

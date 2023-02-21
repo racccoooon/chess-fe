@@ -8,7 +8,18 @@
         >
           {{ opening }}
         </div>
-        <GameHistory :moveHistory="moveHistory" />
+        <GameHistory
+          :moveHistory="moveHistory"
+          :history-index="historyIndex"
+          @time-travel-absolute="emit('timeTravelAbsolute', $event)"
+        />
+        <div>
+          <span
+            class="px-1 bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-300 font-medium rounded-lg"
+          >
+            {{ activeColor === PieceColor.White ? "White" : "Black" }}'s move
+          </span>
+        </div>
       </template>
       <template v-else>
         <h2 class="p-4 text-gray-700 dark:text-gray-200 text-xl font-bold">
@@ -16,12 +27,33 @@
         </h2>
       </template>
     </div>
-    <div>
-      <span
-        class="px-1 bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-300 font-medium rounded-lg"
-      >
-        {{ activeColor === PieceColor.White ? "White" : "Black" }}'s move
-      </span>
+    <div class="flex flex-col gap-4">
+      <div class="flex flex-row gap-2">
+        <LargeSecondaryButton
+          @click="emit('timeTravelRelative', -Infinity)"
+          class="grow"
+        >
+          {{ "<<" }}
+        </LargeSecondaryButton>
+        <LargeSecondaryButton
+          @click="emit('timeTravelRelative', -1)"
+          class="grow"
+        >
+          {{ "<" }}
+        </LargeSecondaryButton>
+        <LargeSecondaryButton
+          @click="emit('timeTravelRelative', 1)"
+          class="grow"
+        >
+          {{ ">" }}
+        </LargeSecondaryButton>
+        <LargeSecondaryButton
+          @click="emit('timeTravelRelative', Infinity)"
+          class="grow"
+        >
+          {{ ">>" }}
+        </LargeSecondaryButton>
+      </div>
     </div>
   </div>
 </template>
@@ -33,12 +65,19 @@ import { PieceColor } from "@/lib/types";
 import { getChessOpening } from "@/lib/chessOpenings";
 import { set } from "@vueuse/core";
 import { ref, watch } from "vue";
+import LargeSecondaryButton from "@/components/forms/LargeSecondaryButton.vue";
 
 const props = defineProps<{
   moveHistory: MoveItem[];
   activeColor: PieceColor;
   isPlayer: boolean;
   gameHasStarted: boolean;
+  historyIndex: number;
+}>();
+
+const emit = defineEmits<{
+  (event: "timeTravelRelative", payload: number): void;
+  (event: "timeTravelAbsolute", payload: number): void;
 }>();
 
 const opening = ref<string | null>(null);

@@ -140,23 +140,27 @@
         </g>
       </template>
       <g>
-        <template v-for="piece in board.pieces" :key="piece.id">
+        <template v-for="piece in pieces" :key="objectHash(piece)">
           <svg
             :x="
-              piece.id === selectedPiece?.id
+              objectHash(piece) === objectHash(selectedPiece)
                 ? boardXToDisplayX(piece.x) * squareAbsoluteWidth +
                   dragMouseDeltaScaled.x
                 : boardXToDisplayX(piece.x) * squareAbsoluteWidth
             "
             :y="
-              piece.id === selectedPiece?.id
+              objectHash(piece) === objectHash(selectedPiece)
                 ? boardYToDisplayY(piece.y) * squareAbsoluteHeight +
                   dragMouseDeltaScaled.y
                 : boardYToDisplayY(piece.y) * squareAbsoluteHeight
             "
             width="100"
             height="100"
-            :id="piece.id === selectedPiece?.id ? 'selected-piece' : ''"
+            :id="
+              objectHash(piece) === objectHash(selectedPiece)
+                ? 'selected-piece'
+                : ''
+            "
           >
             <PieceRenderer
               :x="pieceAbsoluteOffset"
@@ -192,8 +196,8 @@
 <script setup lang="ts">
 import PieceRenderer from "@/components/pieces/PieceRenderer.vue";
 import type {
-  Board,
   BoardHighlightSquare,
+  Piece,
   PieceMovedEvent,
   PieceSelectedEvent,
 } from "@/lib/types";
@@ -202,7 +206,6 @@ import {
   ChessBoardColor,
   HighlightColor,
   HighlightShape,
-  Piece,
   PieceColor,
   PiecesDisplaySize,
   PieceType,
@@ -213,9 +216,10 @@ import { computed, ref } from "vue";
 import { get, set, useMouse } from "@vueuse/core";
 import { getFileName, getRankName } from "@/lib/chessNotation";
 import { getPieceAtSquare } from "@/lib/chess";
+import objectHash from "object-hash";
 
 const props = defineProps<{
-  board: Board;
+  pieces: Piece[];
   reverse: boolean;
   isWhiteInCheck: boolean;
   isBlackInCheck: boolean;
@@ -405,7 +409,7 @@ const startDrag = () => {
     return;
   }
 
-  const pieceAtSquare = getPieceAtSquare(props.board.pieces, board.x, board.y);
+  const pieceAtSquare = getPieceAtSquare(props.pieces, board.x, board.y);
 
   if (!pieceAtSquare) {
     if (get(selectedPiece)) {
@@ -471,7 +475,7 @@ const hoverSquare = computed(() => {
 
 const hoveredPiece = computed(() => {
   return getPieceAtSquare(
-    props.board.pieces,
+    props.pieces,
     get(hoverSquare)?.x ?? -1,
     get(hoverSquare)?.y ?? -1
   );

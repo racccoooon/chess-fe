@@ -1,6 +1,3 @@
-// @ts-ignore
-import { v4 as uuidv4 } from "uuid";
-
 export enum PieceType {
   Pawn = "pawn",
   Rook = "rook",
@@ -49,20 +46,11 @@ export enum PiecesDisplaySize {
   Large = "large",
   ExtraLarge = "extraLarge",
 }
-export class Piece {
+export interface Piece {
   type: PieceType;
   color: PieceColor;
-  id: string;
   x: number;
   y: number;
-
-  constructor(type: PieceType, color: PieceColor, x: number, y: number) {
-    this.type = type;
-    this.color = color;
-    this.id = uuidv4();
-    this.x = x;
-    this.y = y;
-  }
 }
 
 export interface Board {

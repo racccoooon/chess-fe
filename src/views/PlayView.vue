@@ -1,6 +1,6 @@
 <template>
   <GameLayout
-    :board="board"
+    :pieces="pieces"
     :move-history="moveHistory"
     :reverse-board="reverseBoard"
     :active-color="activeColor"
@@ -29,13 +29,13 @@
 <script setup lang="ts">
 import { useRoute, useRouter } from "vue-router";
 import type {
-  Board,
   BoardHighlightSquare,
   Cell,
   GameStartedResponse,
   JoinGameResponse,
   Move,
   MoveItem,
+  Piece,
   PieceMovedEvent,
   PieceSelectedEvent,
   PromotionSelectedEvent,
@@ -44,7 +44,6 @@ import {
   HighlightColor,
   HighlightShape,
   ModalType,
-  Piece,
   PieceColor,
   PieceType,
 } from "@/lib/types";
@@ -65,9 +64,7 @@ const userStore = useUserStore();
 
 const gameId = ref(useRoute().params.gameId as string);
 
-const board = ref<Board>({
-  pieces: [],
-});
+const pieces = ref<Piece[]>([]);
 
 const whitePlayerName = ref("");
 const blackPlayerName = ref("");
@@ -139,14 +136,12 @@ const initialize = async () => {
 
     // setup board
     e.board.forEach((piece) => {
-      get(board).pieces.push(
-        new Piece(
-          piece.type as PieceType,
-          piece.color as PieceColor,
-          piece.position.x,
-          piece.position.y
-        )
-      );
+      get(pieces).push({
+        type: piece.type as PieceType,
+        color: piece.color as PieceColor,
+        x: piece.position.x,
+        y: piece.position.y,
+      });
     });
 
     // set player color
@@ -194,7 +189,7 @@ const resolveMove = (move: MoveItem) => {
   console.log("resolving move", move);
 
   // update the board
-  get(board).pieces = applyMove(get(board).pieces, move);
+  set(pieces, applyMove(get(pieces), move));
 
   // push the move to the move history
   get(moveHistory).push(move);
