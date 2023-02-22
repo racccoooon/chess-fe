@@ -167,6 +167,7 @@ export enum ClickDuration {
 export enum ModalType {
   None = "none",
   Promotion = "promotion",
+  IllegalMove = "illegalMove",
 }
 
 export interface Vector2 {

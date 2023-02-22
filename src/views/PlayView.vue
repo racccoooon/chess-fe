@@ -21,6 +21,19 @@
           v-if="showModal === ModalType.Promotion"
           @select-type="onPromotionSelected"
         />
+        <div
+          class="flex flex-col gap-4"
+          v-if="showModal === ModalType.IllegalMove"
+        >
+          <h2 class="font-bold text-lg">Whoops! An illegal move?!</h2>
+          <p>Don't do that</p>
+          <button
+            @click="showModal = ModalType.None"
+            class="p-2 bg-gray-200 dark:bg-gray-700 rounded-xl"
+          >
+            ok
+          </button>
+        </div>
       </SuperDuperModal>
     </template>
   </GameLayout>
@@ -160,7 +173,7 @@ const initialize = async () => {
   });
 
   hubConnection.onInvalidMove(() => {
-    alert("Invalid move!");
+    set(showModal, ModalType.IllegalMove);
   });
 
   hubConnection.onGameJoined((e: JoinGameResponse) => {
