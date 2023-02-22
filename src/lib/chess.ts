@@ -1,5 +1,5 @@
 import { KingStatus, MoveType, PieceColor, PieceType } from "@/lib/types";
-import type { MoveItem, Piece } from "@/lib/types";
+import type { Move, MoveItem, Piece, Square } from "@/lib/types";
 import { getSquareName } from "@/lib/chessNotation";
 
 export const invertColor = (color: PieceColor) => {
@@ -225,4 +225,272 @@ export const getBoardAtHistoryIndex = (
   }
 
   return board;
+};
+
+export const hasPieceMoved = (piece: Piece, history: MoveItem[]): boolean => {
+  for (const move of history) {
+    if (move.to.x === piece.x && move.to.y === piece.y) {
+      return true;
+    }
+  }
+  return false;
+};
+
+/***
+ * Returns true if the there is a piece between the from and to squares
+ * @param pieces
+ * @param move
+ */
+export const pieceIsBlocking = (
+  pieces: Piece[],
+  move: Move
+): false | Square => {
+  const xDiff = move.to.x - move.from.x;
+  const yDiff = move.to.y - move.from.y;
+
+  const normalizedXDiff = xDiff === 0 ? 0 : xDiff / Math.abs(xDiff);
+  const normalizedYDiff = yDiff === 0 ? 0 : yDiff / Math.abs(yDiff);
+
+  // check if provided move is horizontal, vertical or diagonal
+  if (!(xDiff === 0 || yDiff === 0 || Math.abs(xDiff) === Math.abs(yDiff))) {
+    throw new Error("Move is not horizontal, vertical or diagonal");
+  }
+
+  // get all the squares between the from and to squares
+  const squares = [];
+  let x = move.from.x;
+  let y = move.from.y;
+  while (x !== move.to.x || y !== move.to.y) {
+    x += normalizedXDiff;
+    y += normalizedYDiff;
+    squares.push({ x, y });
+  }
+
+  // check if any of the squares has a piece
+  for (const square of squares) {
+    if (getPieceAtSquare(pieces, square.x, square.y)) {
+      return square;
+    }
+  }
+
+  return false;
+};
+
+export const isValidMove = (
+  pieces: Piece[],
+  move: Move,
+  history: MoveItem[]
+): boolean => {
+  const pieceToMove = getPieceAtSquare(pieces, move.from.x, move.from.y);
+
+  if (!pieceToMove) {
+    return false;
+  }
+
+  const xDiff = Math.abs(move.to.x - move.from.x);
+  const yDiff = Math.abs(move.to.y - move.from.y);
+
+  if (xDiff === 0 && yDiff === 0) {
+    return false;
+  }
+
+  if (pieceToMove.type === PieceType.Pawn) {
+    return isValidPawnMove(pieces, move, history);
+  } else if (pieceToMove.type === PieceType.Knight) {
+    return isValidKnightMove(pieces, move);
+  } else if (pieceToMove.type === PieceType.Bishop) {
+    return isValidBishopMove(pieces, move);
+  } else if (pieceToMove.type === PieceType.Rook) {
+    return isValidRookMove(pieces, move);
+  } else if (pieceToMove.type === PieceType.Queen) {
+    return isValidQueenMove(pieces, move);
+  } else if (pieceToMove.type === PieceType.King) {
+    return isValidKingMove(pieces, move, history);
+  }
+
+  return false;
+};
+
+export const isValidPawnMove = (
+  pieces: Piece[],
+  move: Move,
+  history: MoveItem[]
+): boolean => {
+  const pieceToMove = getPieceAtSquare(pieces, move.from.x, move.from.y);
+
+  if (!pieceToMove) {
+    return false;
+  }
+
+  const pieceToCapture = getPieceAtSquare(pieces, move.to.x, move.to.y);
+
+  if (pieceToCapture && pieceToCapture.color === pieceToMove.color) {
+    return false;
+  }
+
+  const yDiff = move.to.y - move.from.y;
+
+  if (pieceToMove.color === PieceColor.White) {
+    if (yDiff < 0) {
+      return false;
+    }
+  } else {
+    if (yDiff > 0) {
+      return false;
+    }
+  }
+
+  if (Math.abs(yDiff) === 1) {
+    if (move.to.x === move.from.x) {
+      return !pieceToCapture;
+    } else if (Math.abs(move.to.x - move.from.x) === 1) {
+      return !!pieceToCapture;
+    }
+  } else if (Math.abs(yDiff) === 2) {
+    if (move.to.x !== move.from.x) {
+      return false;
+    }
+
+    if (hasPieceMoved(pieceToMove, history)) {
+      return false;
+    }
+
+    if (pieceIsBlocking(pieces, move)) {
+      return false;
+    }
+
+    return true;
+  }
+
+  return false;
+};
+
+export const isValidQueenMove = (pieces: Piece[], move: Move): boolean => {
+  const xDiff = Math.abs(move.to.x - move.from.x);
+  const yDiff = Math.abs(move.to.y - move.from.y);
+
+  // check if provided move is horizontal, vertical or diagonal
+  if (!(xDiff === 0 || yDiff === 0 || Math.abs(xDiff) === Math.abs(yDiff))) {
+    return false;
+  }
+
+  const pieceToMove = getPieceAtSquare(pieces, move.from.x, move.from.y);
+
+  if (!pieceToMove) {
+    return false;
+  }
+
+  const blockingSquare = pieceIsBlocking(pieces, move);
+
+  if (!blockingSquare) {
+    return true;
+  }
+
+  if (blockingSquare.x === move.to.x && blockingSquare.y === move.to.y) {
+    const pieceToCapture = getPieceAtSquare(
+      pieces,
+      blockingSquare.x,
+      blockingSquare.y
+    );
+
+    return !(pieceToCapture && pieceToCapture.color === pieceToMove.color);
+  }
+
+  return false;
+};
+
+export const isValidKingMove = (
+  pieces: Piece[],
+  move: Move,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  history: MoveItem[]
+): boolean => {
+  const pieceToMove = getPieceAtSquare(pieces, move.from.x, move.from.y);
+
+  if (!pieceToMove) {
+    return false;
+  }
+
+  const xDiff = Math.abs(move.to.x - move.from.x);
+  const yDiff = Math.abs(move.to.y - move.from.y);
+
+  if (xDiff > 1 || yDiff > 1) {
+    return false;
+  }
+
+  const pieceToCapture = getPieceAtSquare(pieces, move.to.x, move.to.y);
+
+  if (pieceToCapture && pieceToCapture.color === pieceToMove.color) {
+    return false;
+  }
+
+  return true;
+};
+
+export const isValidRookMove = (pieces: Piece[], move: Move): boolean => {
+  // check if provided move is horizontal or vertical
+  if (move.from.x !== move.to.x && move.from.y !== move.to.y) {
+    return false;
+  }
+
+  return isValidQueenMove(pieces, move);
+};
+
+export const isValidBishopMove = (pieces: Piece[], move: Move): boolean => {
+  // check if provided move is diagonal
+  if (Math.abs(move.from.x - move.to.x) !== Math.abs(move.from.y - move.to.y)) {
+    return false;
+  }
+
+  return isValidQueenMove(pieces, move);
+};
+
+export const isValidKnightMove = (pieces: Piece[], move: Move): boolean => {
+  const pieceToMove = getPieceAtSquare(pieces, move.from.x, move.from.y);
+
+  if (!pieceToMove) {
+    return false;
+  }
+
+  const pieceToCapture = getPieceAtSquare(pieces, move.to.x, move.to.y);
+
+  if (pieceToCapture && pieceToCapture.color === pieceToMove.color) {
+    return false;
+  }
+
+  const xDiff = Math.abs(move.to.x - move.from.x);
+  const yDiff = Math.abs(move.to.y - move.from.y);
+
+  if (xDiff === 1 && yDiff === 2) {
+    return true;
+  }
+
+  if (xDiff === 2 && yDiff === 1) {
+    return true;
+  }
+
+  return false;
+};
+
+export const getValidSquaresForPiece = (
+  pieces: Piece[],
+  piece: Piece,
+  history: MoveItem[]
+): Square[] => {
+  const squares: Square[] = [];
+
+  for (let x = 0; x < 8; x++) {
+    for (let y = 0; y < 8; y++) {
+      const move: Move = {
+        from: { x: piece.x, y: piece.y },
+        to: { x, y },
+      };
+
+      if (isValidMove(pieces, move, history)) {
+        squares.push({ x, y });
+      }
+    }
+  }
+
+  return squares;
 };

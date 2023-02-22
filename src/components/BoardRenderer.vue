@@ -104,6 +104,11 @@
               r="18"
               :data-dark="!((highlight.cell.x + highlight.cell.y) % 2)"
             />
+            <path
+              v-else-if="highlight.shape === HighlightShape.CircleOutline"
+              d="M50,0C77.596,0 100,22.404 100,50C100,77.596 77.596,100 50,100C22.404,100 0,77.596 0,50C0,22.404 22.404,0 50,0ZM50,10C72.077,10 90,27.923 90,50C90,72.077 72.077,90 50,90C27.923,90 10,72.077 10,50C10,27.923 27.923,10 50,10Z"
+              :data-dark="!((highlight.cell.x + highlight.cell.y) % 2)"
+            />
           </g>
         </template>
       </g>

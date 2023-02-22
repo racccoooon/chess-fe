@@ -30,7 +30,6 @@
 import { useRoute, useRouter } from "vue-router";
 import type {
   BoardHighlightSquare,
-  Cell,
   GameStartedResponse,
   JoinGameResponse,
   Move,
@@ -39,6 +38,7 @@ import type {
   PieceMovedEvent,
   PieceSelectedEvent,
   PromotionSelectedEvent,
+  Square,
 } from "@/lib/types";
 import {
   HighlightColor,
@@ -52,7 +52,12 @@ import { get, set } from "@vueuse/core";
 import { SignalrConnection } from "@/lib/signalr";
 import { useUserStore } from "@/stores/user";
 import { getSquareName } from "@/lib/chessNotation";
-import { applyMove, invertColor } from "@/lib/chess";
+import {
+  applyMove,
+  getPieceAtSquare,
+  getValidSquaresForPiece,
+  invertColor,
+} from "@/lib/chess";
 import GameLayout from "@/components/GameLayout.vue";
 import SuperDuperModal from "@/components/modals/SuperDuperModal.vue";
 import PromoteModalContent from "@/components/modals/PromoteModalContent.vue";
@@ -87,16 +92,38 @@ const playerCanMove = computed(() => {
 
 const selectedPiece = ref<Piece | null>(null);
 
+const validSquaresForSelectedPiece = computed(() => {
+  if (!get(selectedPiece)) {
+    return [];
+  }
+
+  return getValidSquaresForPiece(
+    get(pieces),
+    get(selectedPiece)!,
+    get(moveHistory)
+  );
+});
+
 const highlightSquares = computed((): BoardHighlightSquare[] => {
   const list: BoardHighlightSquare[] = [];
 
   if (get(selectedPiece)) {
     list.push({
-      cell: { x: get(selectedPiece)!.x, y: get(selectedPiece)!.y } as Cell,
+      cell: { x: get(selectedPiece)!.x, y: get(selectedPiece)!.y } as Square,
       color: HighlightColor.Green,
       shape: HighlightShape.SquareFill,
     });
   }
+
+  get(validSquaresForSelectedPiece).forEach((square) => {
+    const isCapture =
+      getPieceAtSquare(get(pieces), square.x, square.y) !== undefined;
+    list.push({
+      cell: square,
+      color: HighlightColor.Highlight,
+      shape: isCapture ? HighlightShape.CircleOutline : HighlightShape.Dot,
+    });
+  });
 
   return list;
 });

@@ -31,6 +31,7 @@ export enum HighlightShape {
   SquareFill = "squareFill",
   SquareOutline = "squareOutline",
   Dot = "dot",
+  CircleOutline = "circleOutline",
 }
 
 export enum PieceSet {
@@ -57,13 +58,13 @@ export interface Board {
   pieces: Piece[];
 }
 
-export interface Cell {
+export interface Square {
   x: number;
   y: number;
 }
 
 export interface BoardHighlightSquare {
-  cell: Cell;
+  cell: Square;
   color: HighlightColor;
   shape: HighlightShape;
 }
@@ -83,18 +84,18 @@ export enum KingStatus {
 }
 
 export interface Move {
-  from: Cell;
-  to: Cell;
+  from: Square;
+  to: Square;
 }
 
 export interface PartialMove {
-  from: Cell | null;
-  to: Cell | null;
+  from: Square | null;
+  to: Square | null;
 }
 
 export interface MoveItem {
-  from: Cell;
-  to: Cell;
+  from: Square;
+  to: Square;
   color: PieceColor;
   type: PieceType;
   kind: MoveType;
@@ -108,7 +109,7 @@ export interface JoinGameResponse {
   board: {
     color: PieceColor;
     type: PieceType;
-    position: Cell;
+    position: Square;
   }[];
   activeColor: PieceColor;
   playerColor: PieceColor;
