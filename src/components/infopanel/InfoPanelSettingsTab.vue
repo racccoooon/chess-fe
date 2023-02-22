@@ -149,6 +149,26 @@
       </div>
       <div class="flex flex-col gap-4">
         <label class="text-gray-900 dark:text-gray-50 font-medium"
+          >Gameplay</label
+        >
+        <div class="md:w-3/4">
+          <SmallOptionsGroup
+            v-model="showLegalMoves"
+            :options="[
+              {
+                value: true,
+                label: 'Show legal moves',
+              },
+              {
+                value: false,
+                label: 'Hide legal moves',
+              },
+            ]"
+          />
+        </div>
+      </div>
+      <div class="flex flex-col gap-4">
+        <label class="text-gray-900 dark:text-gray-50 font-medium"
           >Move style</label
         >
         <div class="md:w-3/4">
@@ -255,6 +275,7 @@ const {
   clickDuration,
   notationType,
   useUnicodeIconsInNotation,
+  showLegalMoves,
   boardColor,
   boardBorder,
   pieceSet,

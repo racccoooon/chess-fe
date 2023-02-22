@@ -61,11 +61,16 @@ import {
 import GameLayout from "@/components/GameLayout.vue";
 import SuperDuperModal from "@/components/modals/SuperDuperModal.vue";
 import PromoteModalContent from "@/components/modals/PromoteModalContent.vue";
+import { useSettingsStore } from "@/stores/settings";
+import { storeToRefs } from "pinia";
 
 const router = useRouter();
 const hubConnection = new SignalrConnection();
 
 const userStore = useUserStore();
+const settingsStore = useSettingsStore();
+
+const { showLegalMoves } = storeToRefs(settingsStore);
 
 const gameId = ref(useRoute().params.gameId as string);
 
@@ -115,15 +120,17 @@ const highlightSquares = computed((): BoardHighlightSquare[] => {
     });
   }
 
-  get(validSquaresForSelectedPiece).forEach((square) => {
-    const isCapture =
-      getPieceAtSquare(get(pieces), square.x, square.y) !== undefined;
-    list.push({
-      square: square,
-      color: HighlightColor.Highlight,
-      shape: isCapture ? HighlightShape.CircleOutline : HighlightShape.Dot,
+  if (get(showLegalMoves)) {
+    get(validSquaresForSelectedPiece).forEach((square) => {
+      const isCapture =
+        getPieceAtSquare(get(pieces), square.x, square.y) !== undefined;
+      list.push({
+        square: square,
+        color: HighlightColor.Highlight,
+        shape: isCapture ? HighlightShape.CircleOutline : HighlightShape.Dot,
+      });
     });
-  });
+  }
 
   return list;
 });

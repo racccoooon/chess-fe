@@ -19,6 +19,7 @@ export const useSettingsStore = defineStore("settings", () => {
         clickDuration: ClickDuration.Medium as ClickDuration | number,
         notationType: NotationType.Algebraic,
         useUnicodeIconsInNotation: true,
+        showLegalMoves: true,
         boardColor: ChessBoardColor.Green,
         boardBorder: ChessBoardBorder.None,
         pieceSet: PieceSet.Modern,
