@@ -494,3 +494,35 @@ export const getValidSquaresForPiece = (
 
   return squares;
 };
+
+export const getPiecesThatCanMoveToSquare = (
+  pieces: Piece[],
+  square: Square,
+  history: MoveItem[]
+): Piece[] => {
+  const piecesThatCanMove: Piece[] = [];
+
+  for (const piece of pieces) {
+    const move: Move = {
+      from: { x: piece.x, y: piece.y },
+      to: { x: square.x, y: square.y },
+    };
+
+    if (isValidMove(pieces, move, history)) {
+      piecesThatCanMove.push(piece);
+    }
+  }
+
+  return piecesThatCanMove;
+};
+
+export const getHistoryUntilIndex = (
+  history: MoveItem[],
+  index: number
+): MoveItem[] => {
+  const historyUntilIndex: MoveItem[] = [...history];
+
+  historyUntilIndex.length = index;
+
+  return historyUntilIndex;
+}

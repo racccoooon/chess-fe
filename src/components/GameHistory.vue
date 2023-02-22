@@ -13,7 +13,15 @@
             :key="itemIndex"
             @click="emit('timeTravelAbsolute', groupIndex * 2 + itemIndex + 1)"
           >
-            {{ getMoveNotation(move, notationType, useUnicodeIconsInNotation) }}
+            {{
+              getMoveNotation(
+                move,
+                notationType,
+                useUnicodeIconsInNotation,
+                getBoardAtHistoryIndex(moveHistory, groupIndex * 2 + itemIndex),
+                getHistoryUntilIndex(moveHistory, groupIndex * 2 + itemIndex)
+              )
+            }}
           </button>
         </div>
       </div>
@@ -27,6 +35,7 @@ import { getMoveNotation } from "@/lib/chessNotation";
 import { computed } from "vue";
 import { storeToRefs } from "pinia";
 import { useSettingsStore } from "@/stores/settings";
+import { getBoardAtHistoryIndex, getHistoryUntilIndex } from "@/lib/chess";
 
 const props = defineProps<{
   moveHistory: MoveItem[];

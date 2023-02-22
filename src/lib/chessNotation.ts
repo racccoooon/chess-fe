@@ -1,5 +1,6 @@
-import type { MoveItem } from "@/lib/types";
+import type { MoveItem, Piece } from "@/lib/types";
 import { KingStatus, MoveType, PieceColor, PieceType } from "@/lib/types";
+import { getPiecesThatCanMoveToSquare } from "@/lib/chess";
 
 export enum NotationType {
   Algebraic = "algebraic",
@@ -88,7 +89,9 @@ export const getSquareName = (x: number, y: number) => {
 export const getMoveNotation = (
   move: MoveItem,
   notationType: NotationType,
-  useUnicodeIcons: boolean
+  useUnicodeIcons: boolean,
+  pieces?: Piece[],
+  history?: MoveItem[]
 ) => {
   if (notationType === NotationType.Spoken) {
     return getSpokenMoveNotation(move);
@@ -104,7 +107,28 @@ export const getMoveNotation = (
     idPiece = getFileName(move.from.x);
   }
 
-  // TODO: Disambiguate between moves that are the same except for the file, rank, or both
+  if (pieces && history) {
+    let pieceOnSameFile = false;
+    let pieceOnSameRank = false;
+
+    // check if there are any other pieces of same type and color that can move to the same square
+    getPiecesThatCanMoveToSquare(pieces, move.to, history).forEach((piece) => {
+      if (piece.type === move.type && piece.color === move.color) {
+        if (piece.x !== move.from.x) {
+          pieceOnSameFile = true;
+        } else if (piece.y !== move.from.y) {
+          pieceOnSameRank = true;
+        }
+      }
+    });
+
+    if (pieceOnSameFile) {
+      idPiece = getFileName(move.from.x);
+    }
+    if (pieceOnSameRank) {
+      idPiece += getRankName(move.from.y);
+    }
+  }
 
   let suffix = "";
 
