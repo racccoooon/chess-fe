@@ -3,45 +3,6 @@
     <div class="flex flex-col gap-6 pb-12">
       <div class="flex flex-col gap-4">
         <label class="text-gray-900 dark:text-gray-50 font-medium"
-          >Notation style</label
-        >
-        <div class="md:w-3/4">
-          <SmallOptionsGroup
-            v-model="notationType"
-            :options="[
-              {
-                value: NotationType.Algebraic,
-                label: 'Algebraic',
-              },
-              {
-                value: NotationType.LongAlgebraic,
-                label: 'Long algebraic',
-              },
-              {
-                value: NotationType.Spoken,
-                label: 'Spoken',
-              },
-            ]"
-          />
-        </div>
-        <div class="md:w-3/4">
-          <SmallOptionsGroup
-            v-model="useUnicodeIconsInNotation"
-            :options="[
-              {
-                value: true,
-                label: 'Use unicode icons',
-              },
-              {
-                value: false,
-                label: 'Use Letters',
-              },
-            ]"
-          />
-        </div>
-      </div>
-      <div class="flex flex-col gap-4">
-        <label class="text-gray-900 dark:text-gray-50 font-medium"
           >Chess Board</label
         >
         <div class="md:w-3/4">
@@ -186,6 +147,88 @@
           />
         </div>
       </div>
+      <div class="flex flex-col gap-4">
+        <label class="text-gray-900 dark:text-gray-50 font-medium"
+          >Move style</label
+        >
+        <div class="md:w-3/4">
+          <SmallOptionsGroup
+            v-model="preferredMoveStyle"
+            :options="[
+              {
+                value: MoveStyle.Both,
+                label: 'Both',
+              },
+              {
+                value: MoveStyle.DragAndDropOnly,
+                label: 'Drag and Drop',
+              },
+              {
+                value: MoveStyle.ClickOnly,
+                label: 'Click',
+              },
+            ]"
+          />
+        </div>
+        <div class="md:w-3/4">
+          <SmallOptionsGroup
+            v-model="clickDuration"
+            :options="[
+              {
+                value: ClickDuration.Short,
+                label: 'Short click',
+              },
+              {
+                value: ClickDuration.Medium,
+                label: 'Medium click',
+              },
+              {
+                value: ClickDuration.Long,
+                label: 'Long click',
+              },
+            ]"
+          />
+        </div>
+      </div>
+      <div class="flex flex-col gap-4">
+        <label class="text-gray-900 dark:text-gray-50 font-medium"
+          >Notation style</label
+        >
+        <div class="md:w-3/4">
+          <SmallOptionsGroup
+            v-model="notationType"
+            :options="[
+              {
+                value: NotationType.Algebraic,
+                label: 'Algebraic',
+              },
+              {
+                value: NotationType.LongAlgebraic,
+                label: 'Long algebraic',
+              },
+              {
+                value: NotationType.Spoken,
+                label: 'Spoken',
+              },
+            ]"
+          />
+        </div>
+        <div class="md:w-3/4">
+          <SmallOptionsGroup
+            v-model="useUnicodeIconsInNotation"
+            :options="[
+              {
+                value: true,
+                label: 'Use unicode icons',
+              },
+              {
+                value: false,
+                label: 'Use Letters',
+              },
+            ]"
+          />
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -198,6 +241,8 @@ import {
   ChessBoardBorder,
   PieceSet,
   PiecesDisplaySize,
+  MoveStyle,
+  ClickDuration,
 } from "@/lib/types";
 import { storeToRefs } from "pinia";
 import SmallOptionsGroup from "@/components/forms/SmallOptionsGroup.vue";
@@ -206,6 +251,8 @@ import SmallCheckBoardOptionsGroup from "@/components/forms/SmallCheckBoardOptio
 const settingsStore = useSettingsStore();
 
 const {
+  preferredMoveStyle,
+  clickDuration,
   notationType,
   useUnicodeIconsInNotation,
   boardColor,

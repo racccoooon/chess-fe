@@ -152,6 +152,18 @@ export enum ChessBoardColor {
   HighContrast = "highContrast",
 }
 
+export enum MoveStyle {
+  DragAndDropOnly = "dragAndDropOnly",
+  ClickOnly = "clickOnly",
+  Both = "both",
+}
+
+export enum ClickDuration {
+  Short = 100,
+  Medium = 200,
+  Long = 400,
+}
+
 export enum ModalType {
   None = "none",
   Promotion = "promotion",

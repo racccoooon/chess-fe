@@ -218,6 +218,7 @@ import {
   ChessBoardColor,
   HighlightColor,
   HighlightShape,
+  MoveStyle,
   PieceColor,
   PiecesDisplaySize,
   PieceType,
@@ -235,8 +236,6 @@ const props = defineProps<{
   reverse: boolean;
   isWhiteInCheck: boolean;
   isBlackInCheck: boolean;
-  allowMoveByDragging: boolean;
-  allowMoveByClicking: boolean;
   allowInteractionWithWhite: boolean;
   allowInteractionWithBlack: boolean;
   highlightSquares: BoardHighlightSquare[];
@@ -249,6 +248,8 @@ const emit = defineEmits<{
 }>();
 
 const {
+  preferredMoveStyle,
+  clickDuration,
   boardColor,
   boardBorder,
   showCoordinates,
@@ -281,6 +282,18 @@ const isDragging = ref(false);
 const mouseDownTime = ref(Date.now());
 
 const { x: mouseX, y: mouseY } = useMouse();
+
+const allowMoveByDragging = computed(() => {
+  return [MoveStyle.Both, MoveStyle.DragAndDropOnly].includes(
+    get(preferredMoveStyle)
+  );
+});
+
+const allowMoveByClicking = computed(() => {
+  return [MoveStyle.Both, MoveStyle.ClickOnly].includes(
+    get(preferredMoveStyle)
+  );
+});
 
 const fillClass = computed(() => {
   switch (get(boardColor)) {
@@ -404,19 +417,32 @@ const handleMouseLeftDown = () => {
     stopMove();
     return;
   }
-  startMove();
+
+  if (get(allowMoveByDragging)) {
+    startMove();
+  }
+
   set(mouseDownTime, Date.now());
 };
 
 const handleMouseLeftUp = () => {
-  if (Date.now() - get(mouseDownTime) < 200) {
-    if (!props.allowMoveByClicking) {
+  if (Date.now() - get(mouseDownTime) < get(clickDuration)) {
+    if (!get(allowMoveByClicking)) {
       deselect();
       return;
     }
-    set(isDragging, false);
-    return;
+
+    if (!get(allowMoveByDragging)) {
+      startMove();
+      return;
+    }
+
+    if (get(allowMoveByDragging)) {
+      set(isDragging, false);
+      return;
+    }
   }
+
   stopMove();
 };
 
@@ -430,7 +456,7 @@ const handleMouseRightDown = () => {
 const handleMouseRightUp = () => {};
 
 const startMove = () => {
-  if (!props.allowMoveByDragging && !props.allowMoveByClicking) {
+  if (!get(allowMoveByDragging) && !get(allowMoveByClicking)) {
     return;
   }
 
@@ -448,7 +474,7 @@ const startMove = () => {
 
   set(selectedPiece, get(hoveredPiece));
 
-  if (props.allowMoveByDragging) {
+  if (get(allowMoveByDragging)) {
     set(dragMouseStart, { x: get(mouseX), y: get(mouseY) });
     set(isDragging, true);
   }

@@ -4,6 +4,8 @@ import { toRefs, useStorage } from "@vueuse/core";
 import {
   ChessBoardBorder,
   ChessBoardColor,
+  ClickDuration,
+  MoveStyle,
   PiecesDisplaySize,
   PieceSet,
 } from "@/lib/types";
@@ -13,6 +15,8 @@ export const useSettingsStore = defineStore("settings", () => {
     useStorage(
       "settings",
       {
+        preferredMoveStyle: MoveStyle.Both,
+        clickDuration: ClickDuration.Medium as ClickDuration | number,
         notationType: NotationType.Algebraic,
         useUnicodeIconsInNotation: true,
         boardColor: ChessBoardColor.Green,
