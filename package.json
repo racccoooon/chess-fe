@@ -16,6 +16,7 @@
     "axios": "^1.3.2",
     "object-hash": "^3.0.0",
     "pinia": "^2.0.28",
+    "qr-code-styling": "^1.6.0-rc.1",
     "uuid": "^9.0.0",
     "vue": "^3.2.45",
     "vue-router": "^4.1.6"
