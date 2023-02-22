@@ -150,28 +150,37 @@
         </g>
       </template>
       <g>
-        <template v-for="piece in pieces" :key="objectHash(piece)">
-          <svg
-            :x="
-              objectHash(piece) === objectHash(selectedPiece)
-                ? boardXToDisplayX(piece.x) * squareAbsoluteWidth +
-                  dragMouseDeltaScaled.x
-                : boardXToDisplayX(piece.x) * squareAbsoluteWidth
-            "
-            :y="
-              objectHash(piece) === objectHash(selectedPiece)
-                ? boardYToDisplayY(piece.y) * squareAbsoluteHeight +
-                  dragMouseDeltaScaled.y
-                : boardYToDisplayY(piece.y) * squareAbsoluteHeight
-            "
-            width="100"
-            height="100"
-            :id="
-              objectHash(piece) === objectHash(selectedPiece)
-                ? 'selected-piece'
-                : ''
-            "
-          >
+        <g
+          v-for="piece in pieces"
+          :key="objectHash(piece)"
+          :transform="`
+            translate(
+              ${
+                objectHash(piece) === objectHash(selectedPiece)
+                  ? boardXToDisplayX(piece.x) * squareAbsoluteWidth +
+                    dragMouseDeltaScaled.x
+                  : boardXToDisplayX(piece.x) * squareAbsoluteWidth
+              },
+              ${
+                objectHash(piece) === objectHash(selectedPiece)
+                  ? boardYToDisplayY(piece.y) * squareAbsoluteHeight +
+                    dragMouseDeltaScaled.y
+                  : boardYToDisplayY(piece.y) * squareAbsoluteHeight
+              }
+            )
+          `"
+          :data-x="piece.x"
+          :data-y="piece.y"
+          :data-type="piece.type"
+          :data-color="piece.color"
+          :id="
+            objectHash(piece) === objectHash(selectedPiece)
+              ? 'selected-piece'
+              : ''
+          "
+          ref="pieceElements"
+        >
+          <g transform="translate(0, 0)">
             <PieceRenderer
               :x="pieceAbsoluteOffset"
               :y="pieceAbsoluteOffset"
@@ -193,8 +202,8 @@
               }"
               style="transform: translate(300px, 0)"
             />
-          </svg>
-        </template>
+          </g>
+        </g>
       </g>
       <g>
         <use href="#selected-piece" v-if="selectedPiece" />
@@ -214,6 +223,7 @@ import type {
   Vector2,
 } from "@/lib/types";
 import {
+  AnimationDuration,
   ChessBoardBorder,
   ChessBoardColor,
   HighlightColor,
@@ -225,11 +235,12 @@ import {
 } from "@/lib/types";
 import { storeToRefs } from "pinia";
 import { useSettingsStore } from "@/stores/settings";
-import { computed, ref } from "vue";
-import { get, set, useMouse } from "@vueuse/core";
+import { computed, nextTick, ref, toRef, watch } from "vue";
+import { get, set, useMouse, useRefHistory } from "@vueuse/core";
 import { getFileName, getRankName } from "@/lib/chessNotation";
 import { getPieceAtSquare, getPieceSquare } from "@/lib/chess";
 import objectHash from "object-hash";
+import { gsap } from "gsap";
 
 const props = defineProps<{
   pieces: Piece[];
@@ -255,6 +266,7 @@ const {
   showCoordinates,
   pieceSet,
   piecesDisplaySize,
+  animationDuration,
 } = storeToRefs(useSettingsStore());
 
 const squareAbsoluteWidth = 100;
@@ -273,8 +285,17 @@ const borderAbsoluteSize = computed(() => {
   }
 });
 
+// we make a "copy" of the pieces from the props so we can better watch for changes
+const pieces = toRef(props, "pieces");
+
+const { history: piecesHistory } = useRefHistory(pieces, {
+  deep: true,
+});
+
 const outerSvg = ref<SVGSVGElement>();
 const innerSvg = ref<SVGSVGElement>();
+
+const pieceElements = ref<SVGElement[]>([]);
 
 const dragMouseStart = ref<Vector2>({ x: 0, y: 0 });
 const selectedPiece = ref<Piece | null>(null);
@@ -282,6 +303,92 @@ const isDragging = ref(false);
 const mouseDownTime = ref(Date.now());
 
 const { x: mouseX, y: mouseY } = useMouse();
+
+/***
+ * watch for changes in pieces and animate them
+ */
+watch(
+  pieces,
+  async (newValue) => {
+    if (get(animationDuration) === AnimationDuration.None) {
+      return;
+    }
+
+    // TODO: this can only handle one piece moving at a time and no captures
+
+    // we need to wait for the next tick to make sure the pieceElements are updated
+    await nextTick();
+
+    // get the old value from the history
+    const oldValue = get(piecesHistory)[1].snapshot;
+
+    // find the piece that was moved
+    // we are looking for a piece in the new value that is not in the old value
+    const movedPiece = newValue.find((piece) => {
+      return !oldValue.find((oldPiece) => {
+        return objectHash(piece) === objectHash(oldPiece);
+      });
+    });
+
+    // find the piece that was removed
+    // we are looking for a piece in the old value that is not in the new value
+    const removedPiece = oldValue.find((piece) => {
+      return !newValue.find((newPiece) => {
+        return objectHash(piece) === objectHash(newPiece);
+      });
+    });
+
+    if (!movedPiece || !removedPiece) {
+      return;
+    }
+
+    // find the piece that was moved in pieceElements
+    const movedPieceElement = get(pieceElements).find((pieceElement) => {
+      return (
+        pieceElement.attributes.getNamedItem("data-x")?.value ===
+          movedPiece?.x.toString() &&
+        pieceElement.attributes.getNamedItem("data-y")?.value ===
+          movedPiece?.y.toString() &&
+        pieceElement.attributes.getNamedItem("data-type")?.value ===
+          movedPiece?.type.toString() &&
+        pieceElement.attributes.getNamedItem("data-color")?.value ===
+          movedPiece?.color.toString()
+      );
+    });
+
+    if (!movedPieceElement) {
+      return;
+    }
+
+    const diffX = movedPiece?.x - removedPiece?.x;
+    const diffY = movedPiece?.y - removedPiece?.y;
+
+    let absoluteOriginX = -diffX * squareAbsoluteWidth;
+    let absoluteOriginY = diffY * squareAbsoluteHeight;
+
+    if (props.reverse) {
+      absoluteOriginX *= -1;
+      absoluteOriginY *= -1;
+    }
+
+    const element = movedPieceElement?.children[0] as SVGElement;
+
+    gsap.fromTo(
+      element,
+      {
+        translateX: absoluteOriginX,
+        translateY: absoluteOriginY,
+      },
+      {
+        translateX: 0,
+        translateY: 0,
+        duration: get(animationDuration) / 1000,
+        ease: "power2.inOut",
+      }
+    );
+  },
+  { deep: true }
+);
 
 const allowMoveByDragging = computed(() => {
   return [MoveStyle.Both, MoveStyle.DragAndDropOnly].includes(

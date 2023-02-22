@@ -164,6 +164,13 @@ export enum ClickDuration {
   Long = 400,
 }
 
+export enum AnimationDuration {
+  None = 0,
+  Fast = 100,
+  Medium = 300,
+  Slow = 600,
+}
+
 export enum ModalType {
   None = "none",
   Promotion = "promotion",

@@ -169,6 +169,73 @@
       </div>
       <div class="flex flex-col gap-4">
         <label class="text-gray-900 dark:text-gray-50 font-medium"
+          >Notation style</label
+        >
+        <div class="md:w-3/4">
+          <SmallOptionsGroup
+            v-model="notationType"
+            :options="[
+              {
+                value: NotationType.Algebraic,
+                label: 'Algebraic',
+              },
+              {
+                value: NotationType.LongAlgebraic,
+                label: 'Long algebraic',
+              },
+              {
+                value: NotationType.Spoken,
+                label: 'Spoken',
+              },
+            ]"
+          />
+        </div>
+        <div class="md:w-3/4">
+          <SmallOptionsGroup
+            v-model="useUnicodeIconsInNotation"
+            :options="[
+              {
+                value: true,
+                label: 'Use unicode icons',
+              },
+              {
+                value: false,
+                label: 'Use Letters',
+              },
+            ]"
+          />
+        </div>
+      </div>
+      <div class="flex flex-col gap-4">
+        <label class="text-gray-900 dark:text-gray-50 font-medium"
+          >Animations</label
+        >
+        <div class="md:w-3/4">
+          <SmallOptionsGroup
+            v-model="animationDuration"
+            :options="[
+              {
+                value: AnimationDuration.None,
+                label: 'None',
+              },
+              {
+                value: AnimationDuration.Slow,
+                label: 'Slow',
+              },
+              {
+                value: AnimationDuration.Medium,
+                label: 'Medium',
+              },
+              {
+                value: AnimationDuration.Fast,
+                label: 'Fast',
+              },
+            ]"
+          />
+        </div>
+      </div>
+      <div class="flex flex-col gap-4">
+        <label class="text-gray-900 dark:text-gray-50 font-medium"
           >Move style</label
         >
         <div class="md:w-3/4">
@@ -210,45 +277,6 @@
           />
         </div>
       </div>
-      <div class="flex flex-col gap-4">
-        <label class="text-gray-900 dark:text-gray-50 font-medium"
-          >Notation style</label
-        >
-        <div class="md:w-3/4">
-          <SmallOptionsGroup
-            v-model="notationType"
-            :options="[
-              {
-                value: NotationType.Algebraic,
-                label: 'Algebraic',
-              },
-              {
-                value: NotationType.LongAlgebraic,
-                label: 'Long algebraic',
-              },
-              {
-                value: NotationType.Spoken,
-                label: 'Spoken',
-              },
-            ]"
-          />
-        </div>
-        <div class="md:w-3/4">
-          <SmallOptionsGroup
-            v-model="useUnicodeIconsInNotation"
-            :options="[
-              {
-                value: true,
-                label: 'Use unicode icons',
-              },
-              {
-                value: false,
-                label: 'Use Letters',
-              },
-            ]"
-          />
-        </div>
-      </div>
     </div>
   </div>
 </template>
@@ -263,6 +291,7 @@ import {
   PiecesDisplaySize,
   MoveStyle,
   ClickDuration,
+  AnimationDuration,
 } from "@/lib/types";
 import { storeToRefs } from "pinia";
 import SmallOptionsGroup from "@/components/forms/SmallOptionsGroup.vue";
@@ -280,6 +309,7 @@ const {
   boardBorder,
   pieceSet,
   piecesDisplaySize,
+  animationDuration,
   showCoordinates,
 } = storeToRefs(settingsStore);
 </script>

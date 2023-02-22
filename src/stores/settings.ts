@@ -2,6 +2,7 @@ import { defineStore } from "pinia";
 import { NotationType } from "@/lib/chessNotation";
 import { toRefs, useStorage } from "@vueuse/core";
 import {
+  AnimationDuration,
   ChessBoardBorder,
   ChessBoardColor,
   ClickDuration,
@@ -24,6 +25,9 @@ export const useSettingsStore = defineStore("settings", () => {
         boardBorder: ChessBoardBorder.None,
         pieceSet: PieceSet.Modern,
         piecesDisplaySize: PiecesDisplaySize.Medium,
+        animationDuration: AnimationDuration.Medium as
+          | AnimationDuration
+          | number,
         showCoordinates: true,
       },
       localStorage,
