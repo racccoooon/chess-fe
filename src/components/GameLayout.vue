@@ -21,7 +21,8 @@
           :isWhiteInCheck="isWhiteInCheck"
           :isBlackInCheck="isBlackInCheck"
           :highlight-squares="highlightSquares"
-          :allow-drag="canMove"
+          :allow-move-by-clicking="true"
+          :allow-move-by-dragging="true"
           :allow-interaction-with-white="allowInteractionWithWhite"
           :allow-interaction-with-black="allowInteractionWithBlack"
           @piece-selected="onPieceSelected"
@@ -285,7 +286,7 @@ const highlightSquares = computed((): BoardHighlightSquare[] => {
       props.activeColor // TODO: this doesnt work for time travel
     )[0];
     list.push({
-      cell: { x: king.x, y: king.y },
+      square: { x: king.x, y: king.y },
       color: HighlightColor.Red,
       shape: HighlightShape.SquareFill,
     });
@@ -293,12 +294,12 @@ const highlightSquares = computed((): BoardHighlightSquare[] => {
 
   if (get(lastMove)) {
     list.push({
-      cell: get(lastMove).from,
+      square: get(lastMove).from,
       color: HighlightColor.Yellow,
       shape: HighlightShape.SquareFill,
     });
     list.push({
-      cell: get(lastMove).to,
+      square: get(lastMove).to,
       color: HighlightColor.Yellow,
       shape: HighlightShape.SquareFill,
     });

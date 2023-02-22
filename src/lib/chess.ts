@@ -525,4 +525,8 @@ export const getHistoryUntilIndex = (
   historyUntilIndex.length = index;
 
   return historyUntilIndex;
-}
+};
+
+export const getPieceSquare = (piece: Piece): Square => {
+  return { x: piece.x, y: piece.y };
+};

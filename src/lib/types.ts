@@ -64,7 +64,7 @@ export interface Square {
 }
 
 export interface BoardHighlightSquare {
-  cell: Square;
+  square: Square;
   color: HighlightColor;
   shape: HighlightShape;
 }
@@ -155,4 +155,9 @@ export enum ChessBoardColor {
 export enum ModalType {
   None = "none",
   Promotion = "promotion",
+}
+
+export interface Vector2 {
+  x: number;
+  y: number;
 }

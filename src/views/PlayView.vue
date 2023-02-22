@@ -109,7 +109,7 @@ const highlightSquares = computed((): BoardHighlightSquare[] => {
 
   if (get(selectedPiece)) {
     list.push({
-      cell: { x: get(selectedPiece)!.x, y: get(selectedPiece)!.y } as Square,
+      square: { x: get(selectedPiece)!.x, y: get(selectedPiece)!.y } as Square,
       color: HighlightColor.Green,
       shape: HighlightShape.SquareFill,
     });
@@ -119,7 +119,7 @@ const highlightSquares = computed((): BoardHighlightSquare[] => {
     const isCapture =
       getPieceAtSquare(get(pieces), square.x, square.y) !== undefined;
     list.push({
-      cell: square,
+      square: square,
       color: HighlightColor.Highlight,
       shape: isCapture ? HighlightShape.CircleOutline : HighlightShape.Dot,
     });

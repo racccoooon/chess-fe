@@ -2,15 +2,20 @@
   <svg
     class="aspect-square select-none"
     :class="{
-      'cursor-grab': isAllowedToInteractWithHoveredPiece,
-      'cursor-pointer': !isDragging && selectedPiece !== null,
+      'cursor-grab': isAllowedToInteractWithHoveredPiece && allowMoveByDragging,
+      'cursor-pointer':
+        (!isDragging && selectedPiece !== null) ||
+        (isAllowedToInteractWithHoveredPiece && allowMoveByClicking),
       'cursor-grabbing': isDragging,
     }"
     :viewBox="`0 0 ${squareAbsoluteWidth * 8 + borderAbsoluteSize * 2} ${
       squareAbsoluteHeight * 8 + borderAbsoluteSize * 2
     }`"
-    @mousedown="handleMouseDown"
-    @mouseup="handleMouseUp"
+    @mousedown.left.prevent="handleMouseLeftDown"
+    @mouseup.left.prevent="handleMouseLeftUp"
+    @mousedown.right.prevent="handleMouseRightDown"
+    @mouseup.right.prevent="handleMouseRightUp"
+    @contextmenu.prevent
     ref="outerSvg"
   >
     <rect width="100%" height="100%" class="fill-gray-100 dark:fill-gray-800" />
@@ -69,8 +74,8 @@
           <g
             :transform="`
               translate(
-                ${boardXToDisplayX(highlight.cell.x) * squareAbsoluteWidth},
-                ${boardYToDisplayY(highlight.cell.y) * squareAbsoluteHeight}
+                ${boardXToDisplayX(highlight.square.x) * squareAbsoluteWidth},
+                ${boardYToDisplayY(highlight.square.y) * squareAbsoluteHeight}
             )`"
             :class="{
               'fill-gray-50/50 data-[dark=true]:fill-white/75':
@@ -90,24 +95,24 @@
               v-if="highlight.shape === HighlightShape.SquareFill"
               :width="squareAbsoluteWidth"
               :height="squareAbsoluteHeight"
-              :data-dark="!((highlight.cell.x + highlight.cell.y) % 2)"
+              :data-dark="!((highlight.square.x + highlight.square.y) % 2)"
             />
             <path
               v-else-if="highlight.shape === HighlightShape.SquareOutline"
               d="M100,0L100,100L0,100L0,0L100,0ZM90,10L10,10L10,90L90,90L90,10Z"
-              :data-dark="!((highlight.cell.x + highlight.cell.y) % 2)"
+              :data-dark="!((highlight.square.x + highlight.square.y) % 2)"
             />
             <circle
               v-if="highlight.shape === HighlightShape.Dot"
               cx="50"
               cy="50"
               r="18"
-              :data-dark="!((highlight.cell.x + highlight.cell.y) % 2)"
+              :data-dark="!((highlight.square.x + highlight.square.y) % 2)"
             />
             <path
               v-else-if="highlight.shape === HighlightShape.CircleOutline"
               d="M50,0C77.596,0 100,22.404 100,50C100,77.596 77.596,100 50,100C22.404,100 0,77.596 0,50C0,22.404 22.404,0 50,0ZM50,10C72.077,10 90,27.923 90,50C90,72.077 72.077,90 50,90C27.923,90 10,72.077 10,50C10,27.923 27.923,10 50,10Z"
-              :data-dark="!((highlight.cell.x + highlight.cell.y) % 2)"
+              :data-dark="!((highlight.square.x + highlight.square.y) % 2)"
             />
           </g>
         </template>
@@ -205,6 +210,8 @@ import type {
   Piece,
   PieceMovedEvent,
   PieceSelectedEvent,
+  Square,
+  Vector2,
 } from "@/lib/types";
 import {
   ChessBoardBorder,
@@ -220,7 +227,7 @@ import { useSettingsStore } from "@/stores/settings";
 import { computed, ref } from "vue";
 import { get, set, useMouse } from "@vueuse/core";
 import { getFileName, getRankName } from "@/lib/chessNotation";
-import { getPieceAtSquare } from "@/lib/chess";
+import { getPieceAtSquare, getPieceSquare } from "@/lib/chess";
 import objectHash from "object-hash";
 
 const props = defineProps<{
@@ -228,7 +235,8 @@ const props = defineProps<{
   reverse: boolean;
   isWhiteInCheck: boolean;
   isBlackInCheck: boolean;
-  allowDrag: boolean;
+  allowMoveByDragging: boolean;
+  allowMoveByClicking: boolean;
   allowInteractionWithWhite: boolean;
   allowInteractionWithBlack: boolean;
   highlightSquares: BoardHighlightSquare[];
@@ -267,43 +275,12 @@ const borderAbsoluteSize = computed(() => {
 const outerSvg = ref<SVGSVGElement>();
 const innerSvg = ref<SVGSVGElement>();
 
-const dragMouseStart = ref({ x: 0, y: 0 });
+const dragMouseStart = ref<Vector2>({ x: 0, y: 0 });
 const selectedPiece = ref<Piece | null>(null);
 const isDragging = ref(false);
+const mouseDownTime = ref(Date.now());
 
 const { x: mouseX, y: mouseY } = useMouse();
-
-const displayXToBoardX = (x: number) => {
-  if (props.reverse) {
-    return 7 - x;
-  } else {
-    return x;
-  }
-};
-
-const displayYToBoardY = (y: number) => {
-  if (props.reverse) {
-    return y;
-  } else {
-    return 7 - y;
-  }
-};
-
-const boardXToDisplayX = (x: number) => {
-  if (props.reverse) {
-    return 7 - x;
-  } else {
-    return x;
-  }
-};
-
-const boardYToDisplayY = (y: number) => {
-  if (props.reverse) {
-    return y;
-  } else {
-    return 7 - y;
-  }
-};
 
 const fillClass = computed(() => {
   switch (get(boardColor)) {
@@ -350,25 +327,63 @@ const pieceAbsoluteOffset = computed(() => {
 });
 
 const highlightSquares = computed((): BoardHighlightSquare[] => {
-  const list = [];
+  const arr = [...props.highlightSquares];
 
-  list.push(...props.highlightSquares);
-
-  if (get(hoverSquare) !== null && get(selectedPiece) !== null) {
-    list.push({
-      cell: get(hoverSquare),
-      color: HighlightColor.Highlight,
-      shape: HighlightShape.SquareOutline,
-    } as BoardHighlightSquare);
+  if (get(selectedPiece) && !get(isDragging)) {
+    arr.push({
+      square: getPieceSquare(get(selectedPiece)!),
+      color: HighlightColor.Green,
+      shape: HighlightShape.SquareFill,
+    });
   }
 
-  return list;
+  if (get(hoveredSquare) && get(selectedPiece)) {
+    arr.push({
+      square: get(hoveredSquare)!,
+      color: HighlightColor.Highlight,
+      shape: HighlightShape.SquareOutline,
+    });
+  }
+
+  return arr;
 });
 
-const mousePositionToBoardPosition = (
+const displayXToBoardX = (x: number) => {
+  if (props.reverse) {
+    return 7 - x;
+  } else {
+    return x;
+  }
+};
+
+const displayYToBoardY = (y: number) => {
+  if (props.reverse) {
+    return y;
+  } else {
+    return 7 - y;
+  }
+};
+
+const boardXToDisplayX = (x: number) => {
+  if (props.reverse) {
+    return 7 - x;
+  } else {
+    return x;
+  }
+};
+
+const boardYToDisplayY = (y: number) => {
+  if (props.reverse) {
+    return y;
+  } else {
+    return 7 - y;
+  }
+};
+
+const displayPositionToBoardPosition = (
   x: number,
   y: number
-): { x: number; y: number } | null => {
+): Square | null => {
   if (!get(innerSvg)) {
     return null;
   }
@@ -384,87 +399,87 @@ const mousePositionToBoardPosition = (
   return { x: boardX, y: boardY };
 };
 
-const handleMouseDown = () => {
-  startDrag();
+const handleMouseLeftDown = () => {
+  if (get(selectedPiece)) {
+    stopMove();
+    return;
+  }
+  startMove();
+  set(mouseDownTime, Date.now());
 };
 
-const handleMouseUp = () => {
-  stopDrag();
-};
-
-const startDrag = () => {
-  if (!props.allowDrag) {
-    return;
-  }
-
-  if (get(isDragging)) {
-    return;
-  }
-
-  // TODO: we could use the already existing computed value here
-
-  const board = mousePositionToBoardPosition(get(mouseX), get(mouseY));
-
-  if (!board) {
-    return;
-  }
-
-  if (board.x === get(selectedPiece)?.x && board.y === get(selectedPiece)?.y) {
-    deselect();
-    return;
-  }
-
-  const pieceAtSquare = getPieceAtSquare(props.pieces, board.x, board.y);
-
-  if (!pieceAtSquare) {
-    if (get(selectedPiece)) {
-      // if we already have piece selected, and we click on an empty square, stop dragging and trigger move event
-      stopDrag();
-    } else {
+const handleMouseLeftUp = () => {
+  if (Date.now() - get(mouseDownTime) < 200) {
+    if (!props.allowMoveByClicking) {
       deselect();
+      return;
     }
+    set(isDragging, false);
     return;
   }
+  stopMove();
+};
 
-  if (
-    (pieceAtSquare.color === PieceColor.White &&
-      !props.allowInteractionWithWhite) ||
-    (pieceAtSquare.color === PieceColor.Black &&
-      !props.allowInteractionWithBlack)
-  ) {
+const handleMouseRightDown = () => {
+  if (get(selectedPiece)) {
+    deselect();
     return;
-  }
-
-  set(dragMouseStart, { x: get(mouseX), y: get(mouseY) });
-  set(selectedPiece, pieceAtSquare ?? null);
-  set(isDragging, true);
-
-  if (pieceAtSquare) {
-    emit("pieceSelected", { piece: pieceAtSquare });
   }
 };
 
-const stopDrag = () => {
-  const to = mousePositionToBoardPosition(get(mouseX), get(mouseY));
+const handleMouseRightUp = () => {};
 
-  if (!to) {
+const startMove = () => {
+  if (!props.allowMoveByDragging && !props.allowMoveByClicking) {
+    return;
+  }
+
+  if (get(selectedPiece)) {
+    return;
+  }
+
+  if (!get(hoveredPiece)) {
+    return;
+  }
+
+  if (!get(isAllowedToInteractWithHoveredPiece)) {
+    return;
+  }
+
+  set(selectedPiece, get(hoveredPiece));
+
+  if (props.allowMoveByDragging) {
+    set(dragMouseStart, { x: get(mouseX), y: get(mouseY) });
+    set(isDragging, true);
+  }
+
+  emit("pieceSelected", { piece: get(hoveredPiece)! });
+};
+
+const stopMove = () => {
+  if (!get(hoveredSquare)) {
     deselect();
     return;
   }
 
-  if (!(to.x === get(selectedPiece)?.x && to.y === get(selectedPiece)?.y)) {
+  // if the hovered square is not the same as the selected piece, move the piece
+  if (
+    get(hoveredSquare)!.x !== get(selectedPiece)?.x ||
+    get(hoveredSquare)!.y !== get(selectedPiece)?.y
+  ) {
     emit("pieceMoved", {
       piece: get(selectedPiece)!,
-      to,
+      to: get(hoveredSquare)!,
     });
 
+    set(dragMouseStart, { x: 0, y: 0 });
+    set(isDragging, false);
     set(selectedPiece, null);
+
+    return;
   }
 
-  set(dragMouseStart, { x: 0, y: 0 });
-  set(isDragging, false);
-
-  // TODO: set dragPiece to null if we moved outside the original square at least once
+  deselect();
 };
 
 const deselect = () => {
@@ -474,15 +489,15 @@ const deselect = () => {
   set(isDragging, false);
 };
 
-const hoverSquare = computed(() => {
-  return mousePositionToBoardPosition(get(mouseX), get(mouseY));
+const hoveredSquare = computed(() => {
+  return displayPositionToBoardPosition(get(mouseX), get(mouseY));
 });
 
 const hoveredPiece = computed(() => {
   return getPieceAtSquare(
     props.pieces,
-    get(hoverSquare)?.x ?? -1,
-    get(hoverSquare)?.y ?? -1
+    get(hoveredSquare)?.x ?? -1,
+    get(hoveredSquare)?.y ?? -1
   );
 });
 
@@ -496,9 +511,9 @@ const isAllowedToInteractWithHoveredPiece = computed(() => {
   }
 
   return !(
-    (get(hoveredPiece)?.color === PieceColor.White &&
+    (get(hoveredPiece)!.color === PieceColor.White &&
       !props.allowInteractionWithWhite) ||
-    (get(hoveredPiece)?.color === PieceColor.Black &&
+    (get(hoveredPiece)!.color === PieceColor.Black &&
       !props.allowInteractionWithBlack)
   );
 });
