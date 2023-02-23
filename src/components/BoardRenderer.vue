@@ -195,7 +195,8 @@
                 filter:
                   ((piece.color === PieceColor.White && isWhiteInCheck) ||
                     (piece.color === PieceColor.Black && isBlackInCheck)) &&
-                  piece.type === PieceType.King
+                  piece.type === PieceType.King &&
+                  showCheck
                     ? 'drop-shadow(-4px -4px 1px rgba(239, 68, 68, 0.4)) \n' +
                       'drop-shadow(4px -4px 1px rgba(239, 68, 68, 0.4)) \n' +
                       'drop-shadow(4px 4px 1px rgba(239, 68, 68, 0.4))\n' +
@@ -269,6 +270,7 @@ const {
   pieceSet,
   piecesDisplaySize,
   animationDuration,
+  showCheck,
 } = storeToRefs(useSettingsStore());
 
 const squareAbsoluteWidth = 100;

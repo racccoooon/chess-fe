@@ -21,6 +21,8 @@ export const useSettingsStore = defineStore("settings", () => {
         notationType: NotationType.Algebraic,
         useUnicodeIconsInNotation: true,
         showLegalMoves: true,
+        showLastMove: true,
+        showCheck: true,
         boardColor: ChessBoardColor.Green,
         boardBorder: ChessBoardBorder.None,
         pieceSet: PieceSet.Modern,

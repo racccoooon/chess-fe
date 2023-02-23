@@ -79,6 +79,8 @@ import {
   isInCheck,
 } from "@/lib/chess";
 import GameInfoPanel from "@/components/GameInfoPanel.vue";
+import { useSettingsStore } from "@/stores/settings";
+import { storeToRefs } from "pinia";
 
 const props = defineProps<{
   pieces: Piece[];
@@ -110,6 +112,10 @@ const historyIndex = computed({
     set(historyIndex_, get(useClamp(value, 0, props.moveHistory.length)));
   },
 });
+
+const settingsStore = useSettingsStore();
+
+const { showLastMove, showCheck } = storeToRefs(settingsStore);
 
 watch(
   () => props.moveHistory.length,
@@ -277,7 +283,7 @@ const allowInteractionWithBlack = computed(() => {
 const highlightSquares = computed((): BoardHighlightSquare[] => {
   const list: BoardHighlightSquare[] = [];
 
-  if (get(isAnyInCheck)) {
+  if (get(isAnyInCheck) && get(showCheck)) {
     const king = getPiecesByType(
       get(pieces),
       PieceType.King,
@@ -290,7 +296,7 @@ const highlightSquares = computed((): BoardHighlightSquare[] => {
     });
   }
 
-  if (get(lastMove)) {
+  if (get(lastMove) && get(showLastMove)) {
     list.push({
       square: get(lastMove).from,
       color: HighlightColor.Yellow,

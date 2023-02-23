@@ -207,7 +207,7 @@
       </div>
       <div class="flex flex-col gap-4">
         <label class="text-gray-900 dark:text-gray-50 font-medium"
-          >Gameplay</label
+          >Highlight Squares</label
         >
         <div>
           <SmallOptionsGroup
@@ -220,6 +220,36 @@
               {
                 value: false,
                 label: 'Hide legal moves',
+              },
+            ]"
+          />
+        </div>
+        <div>
+          <SmallOptionsGroup
+            v-model="showLastMove"
+            :options="[
+              {
+                value: true,
+                label: 'Show last move',
+              },
+              {
+                value: false,
+                label: 'Hide last move',
+              },
+            ]"
+          />
+        </div>
+        <div>
+          <SmallOptionsGroup
+            v-model="showCheck"
+            :options="[
+              {
+                value: true,
+                label: 'Show check',
+              },
+              {
+                value: false,
+                label: 'Hide check',
               },
             ]"
           />
@@ -293,9 +323,15 @@
         </div>
       </div>
       <div class="flex flex-col gap-4">
-        <label class="text-gray-900 dark:text-gray-50 font-medium"
-          >Move style</label
-        >
+        <div class="flex flex-col gap-2">
+          <label class="text-gray-900 dark:text-gray-50 font-medium"
+            >Move style</label
+          >
+          <p class="text-sm text-gray-700 dark:text-gray-300">
+            If moving pieces doesn't work with a touch screen try setting this
+            to click only.
+          </p>
+        </div>
         <div>
           <SmallOptionsGroup
             v-model="preferredMoveStyle"
@@ -310,7 +346,7 @@
               },
               {
                 value: MoveStyle.ClickOnly,
-                label: 'Click',
+                label: 'Click only',
               },
             ]"
           />
@@ -366,6 +402,8 @@ const {
   notationType,
   useUnicodeIconsInNotation,
   showLegalMoves,
+  showLastMove,
+  showCheck,
   boardColor,
   boardBorder,
   pieceSet,
