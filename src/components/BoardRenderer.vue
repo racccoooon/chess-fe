@@ -21,36 +21,38 @@
     ref="outerSvg"
   >
     <rect width="100%" height="100%" class="fill-gray-100 dark:fill-gray-800" />
-    <template v-if="borderAbsoluteSize > 0 && showCoordinates">
-      <template v-for="i in 8" :key="i">
-        <text
-          :x="borderAbsoluteSize / 2"
-          :y="(i - 1) * squareAbsoluteHeight + borderAbsoluteSize + 18"
-          class="fill-gray-800 dark:fill-gray-100"
-          font-size="20"
-          font-weight="500"
-          text-anchor="middle"
-          dominant-baseline="middle"
-          v-text="getRankName(displayYToBoardY(i - 1))"
-        />
+    <g>
+      <template v-if="borderAbsoluteSize > 0 && showCoordinates">
+        <template v-for="i in 8" :key="i">
+          <text
+            :x="borderAbsoluteSize / 2"
+            :y="(i - 1) * squareAbsoluteHeight + borderAbsoluteSize + 18"
+            class="fill-gray-800 dark:fill-gray-100"
+            font-size="20"
+            font-weight="500"
+            text-anchor="middle"
+            dominant-baseline="middle"
+            v-text="getRankName(displayYToBoardY(i - 1))"
+          />
+        </template>
+        <template v-for="i in 8" :key="i">
+          <text
+            :x="i * squareAbsoluteWidth + borderAbsoluteSize - 18"
+            :y="
+              squareAbsoluteHeight * 8 +
+              borderAbsoluteSize +
+              borderAbsoluteSize / 2
+            "
+            class="fill-gray-800 dark:fill-gray-100"
+            font-size="20"
+            font-weight="500"
+            text-anchor="middle"
+            dominant-baseline="middle"
+            v-text="getFileName(displayXToBoardX(i - 1))"
+          />
+        </template>
       </template>
-      <template v-for="i in 8" :key="i">
-        <text
-          :x="i * squareAbsoluteWidth + borderAbsoluteSize - 18"
-          :y="
-            squareAbsoluteHeight * 8 +
-            borderAbsoluteSize +
-            borderAbsoluteSize / 2
-          "
-          class="fill-gray-800 dark:fill-gray-100"
-          font-size="20"
-          font-weight="500"
-          text-anchor="middle"
-          dominant-baseline="middle"
-          v-text="getFileName(displayXToBoardX(i - 1))"
-        />
-      </template>
-    </template>
+    </g>
     <svg
       :x="borderAbsoluteSize"
       :y="borderAbsoluteSize"
@@ -58,20 +60,22 @@
       :height="squareAbsoluteHeight * 8"
       ref="innerSvg"
     >
-      <template v-for="x in 8" :key="x">
-        <template v-for="y in 8" :key="y">
-          <rect
-            :x="(x - 1) * squareAbsoluteWidth"
-            :y="(y - 1) * squareAbsoluteHeight"
-            :width="squareAbsoluteWidth"
-            :height="squareAbsoluteHeight"
-            :data-dark="!!((x + y) % 2)"
-            :class="fillClass"
-            class="transition duration-300 ease-in-out"
-          />
+      <g id="background">
+        <template v-for="x in 8" :key="x">
+          <template v-for="y in 8" :key="y">
+            <rect
+              :x="(x - 1) * squareAbsoluteWidth"
+              :y="(y - 1) * squareAbsoluteHeight"
+              :width="squareAbsoluteWidth"
+              :height="squareAbsoluteHeight"
+              :data-dark="!!((x + y) % 2)"
+              :class="fillClass"
+              class="transition duration-300 ease-in-out"
+            />
+          </template>
         </template>
-      </template>
-      <g>
+      </g>
+      <g id="highlightSquares">
         <template v-for="(highlight, index) in highlightSquares" :key="index">
           <g
             :transform="`
@@ -120,7 +124,7 @@
         </template>
       </g>
       <template v-if="borderAbsoluteSize === 0 && showCoordinates">
-        <g>
+        <g id="labels">
           <template v-for="i in 8" :key="i">
             <text
               :x="12"
@@ -151,7 +155,7 @@
           </template>
         </g>
       </template>
-      <g>
+      <g id="pieces">
         <g
           v-for="piece in pieces"
           :key="objectHash(piece)"
@@ -211,6 +215,15 @@
       <g>
         <use href="#selected-piece" v-if="selectedPiece" />
       </g>
+      <g id="arrows">
+        <template v-for="(arrow, index) in arrows" :key="index">
+          <BoardArrowRenderer
+            :arrow="arrow"
+            :square-size="squareAbsoluteWidth"
+            :reverse="reverse"
+          />
+        </template>
+      </g>
     </svg>
   </svg>
 </template>
@@ -218,6 +231,7 @@
 <script setup lang="ts">
 import PieceRenderer from "@/components/pieces/PieceRenderer.vue";
 import type {
+  BoardArrow,
   BoardHighlightSquare,
   Piece,
   PieceMovedEvent,
@@ -244,6 +258,7 @@ import { getFileName, getRankName } from "@/lib/chessNotation";
 import { getPieceAtSquare, getPieceSquare } from "@/lib/chess";
 import objectHash from "object-hash";
 import { gsap } from "gsap";
+import BoardArrowRenderer from "@/components/board/BoardArrowRenderer.vue";
 
 const props = defineProps<{
   pieces: Piece[];
@@ -308,6 +323,11 @@ const mouseDownTime = ref(Date.now());
 
 const lastMoveWasDragged = ref(false);
 const lastSelectedPiece = ref<Piece | null>(null);
+
+const highlightSelectedSquare = ref<Square | null>(null);
+
+const userArrows = ref<BoardArrow[]>([]);
+const userHighlights = ref<BoardHighlightSquare[]>([]);
 
 const { x: mouseX, y: mouseY } = useMouse();
 
@@ -502,7 +522,13 @@ const highlightSquares = computed((): BoardHighlightSquare[] => {
     });
   }
 
+  arr.push(...get(userHighlights));
+
   return arr;
+});
+
+const arrows = computed(() => {
+  return get(userArrows);
 });
 
 const displayXToBoardX = (x: number) => {
@@ -557,6 +583,9 @@ const displayPositionToBoardPosition = (
 };
 
 const handleMouseLeftDown = () => {
+  set(userArrows, []);
+  set(userHighlights, []);
+
   if (get(selectedPiece)) {
     stopMove();
     return;
@@ -595,9 +624,13 @@ const handleMouseRightDown = () => {
     deselect();
     return;
   }
+
+  startHighlighting();
 };
 
-const handleMouseRightUp = () => {};
+const handleMouseRightUp = () => {
+  stopHighlighting();
+};
 
 const startMove = () => {
   if (!get(allowMoveByDragging) && !get(allowMoveByClicking)) {
@@ -660,6 +693,61 @@ const deselect = () => {
   set(dragMouseStart, { x: 0, y: 0 });
   set(selectedPiece, null);
   set(isDragging, false);
+};
+
+const startHighlighting = () => {
+  set(highlightSelectedSquare, get(hoveredSquare));
+};
+
+const stopHighlighting = () => {
+  if (
+    get(highlightSelectedSquare)?.x === get(hoveredSquare)?.x &&
+    get(highlightSelectedSquare)?.y === get(hoveredSquare)?.y
+  ) {
+    // if the user already has a highlight on the hovered square, stop
+    if (
+      get(userHighlights).find(
+        (h) =>
+          h.square.x === get(hoveredSquare)?.x &&
+          h.square.y === get(hoveredSquare)?.y
+      )
+    ) {
+      return;
+    }
+
+    set(userHighlights, [
+      ...get(userHighlights),
+      {
+        square: get(highlightSelectedSquare)!,
+        color: HighlightColor.Purple,
+        shape: HighlightShape.SquareFill,
+      },
+    ]);
+  } else {
+    // if the user already has an arrow from the selected square to the hovered square, stop
+    if (
+      get(userArrows).find(
+        (a) =>
+          a.from.x === get(highlightSelectedSquare)?.x &&
+          a.from.y === get(highlightSelectedSquare)?.y &&
+          a.to.x === get(hoveredSquare)?.x &&
+          a.to.y === get(hoveredSquare)?.y
+      )
+    ) {
+      return;
+    }
+
+    set(userArrows, [
+      ...get(userArrows),
+      {
+        from: get(highlightSelectedSquare)!,
+        to: get(hoveredSquare)!,
+        color: HighlightColor.Blue,
+      },
+    ]);
+  }
+
+  set(highlightSelectedSquare, null);
 };
 
 const hoveredSquare = computed(() => {

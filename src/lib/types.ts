@@ -69,6 +69,12 @@ export interface BoardHighlightSquare {
   shape: HighlightShape;
 }
 
+export interface BoardArrow {
+  from: Square;
+  to: Square;
+  color: HighlightColor;
+}
+
 export enum MoveType {
   NonSpecial = "nonSpecialMove",
   EnPassant = "enPassant",
