@@ -73,7 +73,7 @@
                 },
               },
             ]"
-            class="sm:grid-cols-2"
+            class="grid-cols-2"
             v-model="boardColor"
           >
             <template #preview="option">
@@ -170,7 +170,7 @@
                 label: 'Blind',
               },
             ]"
-            class="sm:grid-cols-2"
+            class="grid-cols-2"
           >
             <template #preview="option">
               <PieceRenderer
@@ -424,7 +424,7 @@
                 },
               },
             ]"
-            class="sm:grid-cols-2"
+            class="grid-cols-2"
             v-model="userArrowColor"
           >
             <template #preview="option">
@@ -481,7 +481,7 @@
                 },
               },
             ]"
-            class="sm:grid-cols-2"
+            class="grid-cols-2"
             v-model="userHighlightColor"
           >
             <template #preview="option">
@@ -538,7 +538,7 @@
                 },
               },
             ]"
-            class="sm:grid-cols-2"
+            class="grid-cols-2"
             v-model="lastMoveHighlightColor"
           >
             <template #preview="option">
@@ -595,7 +595,7 @@
                 },
               },
             ]"
-            class="sm:grid-cols-2"
+            class="grid-cols-2"
             v-model="selectedSquareHighlightColor"
           >
             <template #preview="option">
@@ -652,7 +652,7 @@
                 },
               },
             ]"
-            class="sm:grid-cols-2"
+            class="grid-cols-2"
             v-model="legalMoveHighlightColor"
           >
             <template #preview="option">
