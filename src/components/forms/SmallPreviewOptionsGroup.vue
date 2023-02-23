@@ -25,7 +25,7 @@ defineProps<{
   options: {
     label: string;
     value: any;
-    userOptions: object;
+    userOptions?: any;
   }[];
 }>();
 
