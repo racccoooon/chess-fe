@@ -51,15 +51,8 @@ import type {
   PieceMovedEvent,
   PieceSelectedEvent,
   PromotionSelectedEvent,
-  Square,
 } from "@/lib/types";
-import {
-  HighlightColor,
-  HighlightShape,
-  ModalType,
-  PieceColor,
-  PieceType,
-} from "@/lib/types";
+import { HighlightShape, ModalType, PieceColor, PieceType } from "@/lib/types";
 import { computed, onMounted, ref, watch } from "vue";
 import { get, set } from "@vueuse/core";
 import { SignalrConnection } from "@/lib/signalr";
@@ -83,7 +76,7 @@ const hubConnection = new SignalrConnection();
 const userStore = useUserStore();
 const settingsStore = useSettingsStore();
 
-const { showLegalMoves } = storeToRefs(settingsStore);
+const { showLegalMoves, legalMoveHighlightColor } = storeToRefs(settingsStore);
 
 const gameId = ref(useRoute().params.gameId as string);
 
@@ -125,21 +118,13 @@ const validSquaresForSelectedPiece = computed(() => {
 const highlightSquares = computed((): BoardHighlightSquare[] => {
   const list: BoardHighlightSquare[] = [];
 
-  if (get(selectedPiece)) {
-    list.push({
-      square: { x: get(selectedPiece)!.x, y: get(selectedPiece)!.y } as Square,
-      color: HighlightColor.Green,
-      shape: HighlightShape.SquareFill,
-    });
-  }
-
   if (get(showLegalMoves)) {
     get(validSquaresForSelectedPiece).forEach((square) => {
       const isCapture =
         getPieceAtSquare(get(pieces), square.x, square.y) !== undefined;
       list.push({
         square: square,
-        color: HighlightColor.Highlight,
+        color: get(legalMoveHighlightColor),
         shape: isCapture ? HighlightShape.CircleOutline : HighlightShape.Dot,
       });
     });

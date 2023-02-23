@@ -371,6 +371,296 @@
           />
         </div>
       </div>
+      <div class="flex flex-col gap-4">
+        <label class="text-gray-900 dark:text-gray-50 font-medium"
+          >Highlight Colors</label
+        >
+        <div class="flex flex-col gap-2">
+          <label class="text-sm font-medium text-gray-700 dark:text-gray-300"
+            >User Arrows</label
+          >
+          <SmallPreviewOptionsGroup
+            :options="[
+              {
+                value: HighlightColor.Green,
+                label: 'Green',
+                userOptions: {
+                  class: 'bg-green-300',
+                },
+              },
+              {
+                value: HighlightColor.Yellow,
+                label: 'Yellow',
+                userOptions: {
+                  class: 'bg-yellow-300',
+                },
+              },
+              {
+                value: HighlightColor.Red,
+                label: 'Red',
+                userOptions: {
+                  class: 'bg-red-400',
+                },
+              },
+              {
+                value: HighlightColor.Purple,
+                label: 'Purple',
+                userOptions: {
+                  class: 'bg-purple-300',
+                },
+              },
+              {
+                value: HighlightColor.Blue,
+                label: 'Blue',
+                userOptions: {
+                  class: 'bg-blue-300',
+                },
+              },
+              {
+                value: HighlightColor.Highlight,
+                label: 'White',
+                userOptions: {
+                  class: 'bg-gray-200',
+                },
+              },
+            ]"
+            class="sm:grid-cols-2"
+            v-model="userArrowColor"
+          >
+            <template #preview="option">
+              <div class="w-full h-full" :class="option.userOptions.class" />
+            </template>
+          </SmallPreviewOptionsGroup>
+        </div>
+        <div class="flex flex-col gap-2">
+          <label class="text-sm font-medium text-gray-700 dark:text-gray-300"
+            >User highlighted squares</label
+          >
+          <SmallPreviewOptionsGroup
+            :options="[
+              {
+                value: HighlightColor.Green,
+                label: 'Green',
+                userOptions: {
+                  class: 'bg-green-300',
+                },
+              },
+              {
+                value: HighlightColor.Yellow,
+                label: 'Yellow',
+                userOptions: {
+                  class: 'bg-yellow-300',
+                },
+              },
+              {
+                value: HighlightColor.Red,
+                label: 'Red',
+                userOptions: {
+                  class: 'bg-red-400',
+                },
+              },
+              {
+                value: HighlightColor.Purple,
+                label: 'Purple',
+                userOptions: {
+                  class: 'bg-purple-300',
+                },
+              },
+              {
+                value: HighlightColor.Blue,
+                label: 'Blue',
+                userOptions: {
+                  class: 'bg-blue-300',
+                },
+              },
+              {
+                value: HighlightColor.Highlight,
+                label: 'White',
+                userOptions: {
+                  class: 'bg-gray-200',
+                },
+              },
+            ]"
+            class="sm:grid-cols-2"
+            v-model="userHighlightColor"
+          >
+            <template #preview="option">
+              <div class="w-full h-full" :class="option.userOptions.class" />
+            </template>
+          </SmallPreviewOptionsGroup>
+        </div>
+        <div class="flex flex-col gap-2">
+          <label class="text-sm font-medium text-gray-700 dark:text-gray-300"
+            >Last Move</label
+          >
+          <SmallPreviewOptionsGroup
+            :options="[
+              {
+                value: HighlightColor.Green,
+                label: 'Green',
+                userOptions: {
+                  class: 'bg-green-300',
+                },
+              },
+              {
+                value: HighlightColor.Yellow,
+                label: 'Yellow',
+                userOptions: {
+                  class: 'bg-yellow-300',
+                },
+              },
+              {
+                value: HighlightColor.Red,
+                label: 'Red',
+                userOptions: {
+                  class: 'bg-red-400',
+                },
+              },
+              {
+                value: HighlightColor.Purple,
+                label: 'Purple',
+                userOptions: {
+                  class: 'bg-purple-300',
+                },
+              },
+              {
+                value: HighlightColor.Blue,
+                label: 'Blue',
+                userOptions: {
+                  class: 'bg-blue-300',
+                },
+              },
+              {
+                value: HighlightColor.Highlight,
+                label: 'White',
+                userOptions: {
+                  class: 'bg-gray-200',
+                },
+              },
+            ]"
+            class="sm:grid-cols-2"
+            v-model="lastMoveHighlightColor"
+          >
+            <template #preview="option">
+              <div class="w-full h-full" :class="option.userOptions.class" />
+            </template>
+          </SmallPreviewOptionsGroup>
+        </div>
+        <div class="flex flex-col gap-2">
+          <label class="text-sm font-medium text-gray-700 dark:text-gray-300"
+            >Selected Square</label
+          >
+          <SmallPreviewOptionsGroup
+            :options="[
+              {
+                value: HighlightColor.Green,
+                label: 'Green',
+                userOptions: {
+                  class: 'bg-green-300',
+                },
+              },
+              {
+                value: HighlightColor.Yellow,
+                label: 'Yellow',
+                userOptions: {
+                  class: 'bg-yellow-300',
+                },
+              },
+              {
+                value: HighlightColor.Red,
+                label: 'Red',
+                userOptions: {
+                  class: 'bg-red-400',
+                },
+              },
+              {
+                value: HighlightColor.Purple,
+                label: 'Purple',
+                userOptions: {
+                  class: 'bg-purple-300',
+                },
+              },
+              {
+                value: HighlightColor.Blue,
+                label: 'Blue',
+                userOptions: {
+                  class: 'bg-blue-300',
+                },
+              },
+              {
+                value: HighlightColor.Highlight,
+                label: 'White',
+                userOptions: {
+                  class: 'bg-gray-200',
+                },
+              },
+            ]"
+            class="sm:grid-cols-2"
+            v-model="selectedSquareHighlightColor"
+          >
+            <template #preview="option">
+              <div class="w-full h-full" :class="option.userOptions.class" />
+            </template>
+          </SmallPreviewOptionsGroup>
+        </div>
+        <div class="flex flex-col gap-2">
+          <label class="text-sm font-medium text-gray-700 dark:text-gray-300"
+            >Legal Moves</label
+          >
+          <SmallPreviewOptionsGroup
+            :options="[
+              {
+                value: HighlightColor.Green,
+                label: 'Green',
+                userOptions: {
+                  class: 'bg-green-300',
+                },
+              },
+              {
+                value: HighlightColor.Yellow,
+                label: 'Yellow',
+                userOptions: {
+                  class: 'bg-yellow-300',
+                },
+              },
+              {
+                value: HighlightColor.Red,
+                label: 'Red',
+                userOptions: {
+                  class: 'bg-red-400',
+                },
+              },
+              {
+                value: HighlightColor.Purple,
+                label: 'Purple',
+                userOptions: {
+                  class: 'bg-purple-300',
+                },
+              },
+              {
+                value: HighlightColor.Blue,
+                label: 'Blue',
+                userOptions: {
+                  class: 'bg-blue-300',
+                },
+              },
+              {
+                value: HighlightColor.Highlight,
+                label: 'White',
+                userOptions: {
+                  class: 'bg-gray-200',
+                },
+              },
+            ]"
+            class="sm:grid-cols-2"
+            v-model="legalMoveHighlightColor"
+          >
+            <template #preview="option">
+              <div class="w-full h-full" :class="option.userOptions.class" />
+            </template>
+          </SmallPreviewOptionsGroup>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -388,6 +678,7 @@ import {
   AnimationDuration,
   PieceColor,
   PieceType,
+  HighlightColor,
 } from "@/lib/types";
 import { storeToRefs } from "pinia";
 import SmallOptionsGroup from "@/components/forms/SmallOptionsGroup.vue";
@@ -410,5 +701,10 @@ const {
   piecesDisplaySize,
   animationDuration,
   showCoordinates,
+  userHighlightColor,
+  userArrowColor,
+  lastMoveHighlightColor,
+  selectedSquareHighlightColor,
+  legalMoveHighlightColor,
 } = storeToRefs(settingsStore);
 </script>

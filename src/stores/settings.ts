@@ -6,6 +6,7 @@ import {
   ChessBoardBorder,
   ChessBoardColor,
   ClickDuration,
+  HighlightColor,
   MoveStyle,
   PiecesDisplaySize,
   PieceSet,
@@ -31,6 +32,11 @@ export const useSettingsStore = defineStore("settings", () => {
           | AnimationDuration
           | number,
         showCoordinates: true,
+        lastMoveHighlightColor: HighlightColor.Yellow,
+        selectedSquareHighlightColor: HighlightColor.Green,
+        legalMoveHighlightColor: HighlightColor.Highlight,
+        userHighlightColor: HighlightColor.Red,
+        userArrowColor: HighlightColor.Green,
       },
       localStorage,
       { mergeDefaults: true }

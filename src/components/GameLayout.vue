@@ -115,7 +115,8 @@ const historyIndex = computed({
 
 const settingsStore = useSettingsStore();
 
-const { showLastMove, showCheck } = storeToRefs(settingsStore);
+const { showLastMove, showCheck, lastMoveHighlightColor } =
+  storeToRefs(settingsStore);
 
 watch(
   () => props.moveHistory.length,
@@ -299,12 +300,12 @@ const highlightSquares = computed((): BoardHighlightSquare[] => {
   if (get(lastMove) && get(showLastMove)) {
     list.push({
       square: get(lastMove).from,
-      color: HighlightColor.Yellow,
+      color: get(lastMoveHighlightColor),
       shape: HighlightShape.SquareFill,
     });
     list.push({
       square: get(lastMove).to,
-      color: HighlightColor.Yellow,
+      color: get(lastMoveHighlightColor),
       shape: HighlightShape.SquareFill,
     });
   }

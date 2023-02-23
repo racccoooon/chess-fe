@@ -286,6 +286,9 @@ const {
   piecesDisplaySize,
   animationDuration,
   showCheck,
+  userHighlightColor,
+  userArrowColor,
+  selectedSquareHighlightColor,
 } = storeToRefs(useSettingsStore());
 
 const squareAbsoluteWidth = 100;
@@ -509,7 +512,7 @@ const highlightSquares = computed((): BoardHighlightSquare[] => {
   if (get(selectedPiece) && !get(isDragging)) {
     arr.push({
       square: getPieceSquare(get(selectedPiece)!),
-      color: HighlightColor.Green,
+      color: get(selectedSquareHighlightColor),
       shape: HighlightShape.SquareFill,
     });
   }
@@ -719,7 +722,7 @@ const stopHighlighting = () => {
       ...get(userHighlights),
       {
         square: get(highlightSelectedSquare)!,
-        color: HighlightColor.Purple,
+        color: get(userHighlightColor),
         shape: HighlightShape.SquareFill,
       },
     ]);
@@ -742,7 +745,7 @@ const stopHighlighting = () => {
       {
         from: get(highlightSelectedSquare)!,
         to: get(hoveredSquare)!,
-        color: HighlightColor.Blue,
+        color: get(userArrowColor),
       },
     ]);
   }
