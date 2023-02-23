@@ -1,67 +1,116 @@
 <template>
   <div class="grow">
-    <div class="flex flex-col gap-6 pb-12">
+    <div class="flex flex-col gap-6 pb-12 w-5/6">
       <div class="flex flex-col gap-4">
         <label class="text-gray-900 dark:text-gray-50 font-medium"
           >Chess Board</label
         >
-        <div class="md:w-3/4">
-          <SmallCheckBoardOptionsGroup
-            class="sm:grid-cols-2"
-            v-model="boardColor"
+        <div>
+          <SmallPreviewOptionsGroup
             :options="[
               {
                 value: ChessBoardColor.Neutral,
                 label: 'Neutral',
-                lightClass: 'fill-gray-100',
-                darkClass: 'fill-gray-500',
+                userOptions: {
+                  lightClass: 'fill-gray-100',
+                  darkClass: 'fill-gray-500',
+                },
               },
               {
                 value: ChessBoardColor.Wood,
                 label: 'Wood',
-                lightClass: 'fill-brown-200',
-                darkClass: 'fill-brown-500',
+                userOptions: {
+                  lightClass: 'fill-brown-200',
+                  darkClass: 'fill-brown-500',
+                },
               },
               {
                 value: ChessBoardColor.Green,
                 label: 'Green',
-                lightClass: 'fill-green-100',
-                darkClass: 'fill-green-500',
+                userOptions: {
+                  lightClass: 'fill-green-100',
+                  darkClass: 'fill-green-500',
+                },
               },
               {
                 value: ChessBoardColor.Blue,
                 label: 'Blue',
-                lightClass: 'fill-blue-100',
-                darkClass: 'fill-blue-500',
+                userOptions: {
+                  lightClass: 'fill-blue-100',
+                  darkClass: 'fill-blue-500',
+                },
               },
               {
                 value: ChessBoardColor.Red,
                 label: 'Red',
-                lightClass: 'fill-red-200',
-                darkClass: 'fill-red-500',
+                userOptions: {
+                  lightClass: 'fill-red-200',
+                  darkClass: 'fill-red-500',
+                },
               },
               {
                 value: ChessBoardColor.Orange,
                 label: 'Orange',
-                lightClass: 'fill-orange-100',
-                darkClass: 'fill-orange-400',
+                userOptions: {
+                  lightClass: 'fill-orange-100',
+                  darkClass: 'fill-orange-400',
+                },
               },
               {
                 value: ChessBoardColor.Purple,
                 label: 'Purple',
-                lightClass: 'fill-purple-100',
-                darkClass: 'fill-purple-500',
+                userOptions: {
+                  lightClass: 'fill-purple-100',
+                  darkClass: 'fill-purple-500',
+                },
               },
               {
                 value: ChessBoardColor.Pink,
                 label: 'Pink',
-                lightClass: 'fill-pink-200',
-                darkClass: 'fill-pink-400',
+                userOptions: {
+                  lightClass: 'fill-pink-200',
+                  darkClass: 'fill-pink-400',
+                },
               },
             ]"
-          />
+            class="sm:grid-cols-2"
+            v-model="boardColor"
+          >
+            <template #preview="option">
+              <svg viewBox="0 0 20 20">
+                <rect
+                  width="10"
+                  height="10"
+                  x="0"
+                  y="0"
+                  :class="option.userOptions.lightClass"
+                />
+                <rect
+                  width="10"
+                  height="10"
+                  x="10"
+                  y="0"
+                  :class="option.userOptions.darkClass"
+                />
+                <rect
+                  width="10"
+                  height="10"
+                  x="00"
+                  y="10"
+                  :class="option.userOptions.darkClass"
+                />
+                <rect
+                  width="10"
+                  height="10"
+                  x="10"
+                  y="10"
+                  :class="option.userOptions.lightClass"
+                />
+              </svg>
+            </template>
+          </SmallPreviewOptionsGroup>
         </div>
-        <div class="md:w-3/4">
+        <div>
           <SmallOptionsGroup
             v-model="boardBorder"
             :options="[
@@ -80,7 +129,7 @@
             ]"
           />
         </div>
-        <div class="md:w-3/4">
+        <div>
           <SmallOptionsGroup
             v-model="showCoordinates"
             :options="[
@@ -100,8 +149,8 @@
         <label class="text-gray-900 dark:text-gray-50 font-medium"
           >Chess Pieces</label
         >
-        <div class="md:w-3/4">
-          <SmallOptionsGroup
+        <div>
+          <SmallPreviewOptionsGroup
             v-model="pieceSet"
             :options="[
               {
@@ -121,9 +170,18 @@
                 label: 'Blind',
               },
             ]"
-          />
+            class="sm:grid-cols-2"
+          >
+            <template #preview="option">
+              <PieceRenderer
+                :color="PieceColor.White"
+                :type="PieceType.Pawn"
+                :set="option.value"
+              />
+            </template>
+          </SmallPreviewOptionsGroup>
         </div>
-        <div class="md:w-3/4">
+        <div>
           <SmallOptionsGroup
             v-model="piecesDisplaySize"
             :options="[
@@ -151,7 +209,7 @@
         <label class="text-gray-900 dark:text-gray-50 font-medium"
           >Gameplay</label
         >
-        <div class="md:w-3/4">
+        <div>
           <SmallOptionsGroup
             v-model="showLegalMoves"
             :options="[
@@ -171,7 +229,7 @@
         <label class="text-gray-900 dark:text-gray-50 font-medium"
           >Notation style</label
         >
-        <div class="md:w-3/4">
+        <div>
           <SmallOptionsGroup
             v-model="notationType"
             :options="[
@@ -190,7 +248,7 @@
             ]"
           />
         </div>
-        <div class="md:w-3/4">
+        <div>
           <SmallOptionsGroup
             v-model="useUnicodeIconsInNotation"
             :options="[
@@ -210,7 +268,7 @@
         <label class="text-gray-900 dark:text-gray-50 font-medium"
           >Animations</label
         >
-        <div class="md:w-3/4">
+        <div>
           <SmallOptionsGroup
             v-model="animationDuration"
             :options="[
@@ -238,7 +296,7 @@
         <label class="text-gray-900 dark:text-gray-50 font-medium"
           >Move style</label
         >
-        <div class="md:w-3/4">
+        <div>
           <SmallOptionsGroup
             v-model="preferredMoveStyle"
             :options="[
@@ -257,7 +315,7 @@
             ]"
           />
         </div>
-        <div class="md:w-3/4">
+        <div>
           <SmallOptionsGroup
             v-model="clickDuration"
             :options="[
@@ -292,10 +350,13 @@ import {
   MoveStyle,
   ClickDuration,
   AnimationDuration,
+  PieceColor,
+  PieceType,
 } from "@/lib/types";
 import { storeToRefs } from "pinia";
 import SmallOptionsGroup from "@/components/forms/SmallOptionsGroup.vue";
-import SmallCheckBoardOptionsGroup from "@/components/forms/SmallCheckBoardOptionsGroup.vue";
+import SmallPreviewOptionsGroup from "@/components/forms/SmallPreviewOptionsGroup.vue";
+import PieceRenderer from "@/components/pieces/PieceRenderer.vue";
 
 const settingsStore = useSettingsStore();
 
