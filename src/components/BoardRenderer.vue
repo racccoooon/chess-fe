@@ -384,7 +384,7 @@ watch(
   { deep: true }
 );
 
-const animatePiece = (from: Piece, to: Piece) => {
+const animatePiece = async (from: Piece, to: Piece) => {
   // find the piece that was moved in pieceElements
   const movedPieceElement = get(pieceElements).find((pieceElement) => {
     return (
@@ -426,6 +426,7 @@ const animatePiece = (from: Piece, to: Piece) => {
       translateX: 0,
       translateY: 0,
       duration: get(animationDuration) / 1000,
+      delay: 0.2,
       ease: "power2.inOut",
     }
   );
