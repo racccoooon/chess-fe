@@ -1,5 +1,5 @@
 <template>
-  <g transform="scale(2.222222 2.222222)">
+  <g transform="scale(2.5 2.5) translate(-2.5, -2.5)">
     <PawnSvgClassic v-if="type === PieceType.Pawn" :color="color" />
     <RookSvgClassic v-else-if="type === PieceType.Rook" :color="color" />
     <KingSvgClassic v-else-if="type === PieceType.King" :color="color" />
