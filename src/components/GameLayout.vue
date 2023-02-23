@@ -283,7 +283,7 @@ const highlightSquares = computed((): BoardHighlightSquare[] => {
     const king = getPiecesByType(
       get(pieces),
       PieceType.King,
-      props.activeColor // TODO: this doesnt work for time travel
+      get(isWhiteInCheck) ? PieceColor.White : PieceColor.Black
     )[0];
     list.push({
       square: { x: king.x, y: king.y },
