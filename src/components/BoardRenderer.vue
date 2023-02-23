@@ -285,7 +285,7 @@ const borderAbsoluteSize = computed(() => {
   }
 });
 
-// we make a "copy" of the pieces from the props so we can better watch for changes
+// we make a reactive "copy" of the pieces from the props, so we can better watch for changes
 const pieces = toRef(props, "pieces");
 
 const { history: piecesHistory } = useRefHistory(pieces, {
@@ -314,7 +314,10 @@ watch(
       return;
     }
 
-    // TODO: this can only handle one piece moving at a time and no captures
+    // alright, so this is taking a lot of processing power,
+    // but it's the only way I could think of to animate the pieces
+    // without needing to tell the board renderer what move was made
+    // which wouldn't work anyway because the user can just jump to any state
 
     // we need to wait for the next tick to make sure the pieceElements are updated
     await nextTick();
@@ -322,73 +325,89 @@ watch(
     // get the old value from the history
     const oldValue = get(piecesHistory)[1].snapshot;
 
-    // find the piece that was moved
-    // we are looking for a piece in the new value that is not in the old value
-    const movedPiece = newValue.find((piece) => {
+    // find the pieces that were added
+    // we are looking for pieces in the new value that are not in the old value
+    const addedPieces: Piece[] = newValue.filter((piece) => {
       return !oldValue.find((oldPiece) => {
         return objectHash(piece) === objectHash(oldPiece);
       });
     });
 
-    // find the piece that was removed
-    // we are looking for a piece in the old value that is not in the new value
-    const removedPiece = oldValue.find((piece) => {
+    // find pieces that were removed
+    // we are looking for pieces in the old value that are not in the new value
+    const removedPieces: Piece[] = oldValue.filter((piece) => {
       return !newValue.find((newPiece) => {
         return objectHash(piece) === objectHash(newPiece);
       });
     });
 
-    if (!movedPiece || !removedPiece) {
+    if (!addedPieces || !removedPieces) {
       return;
     }
 
-    // find the piece that was moved in pieceElements
-    const movedPieceElement = get(pieceElements).find((pieceElement) => {
-      return (
-        pieceElement.attributes.getNamedItem("data-x")?.value ===
-          movedPiece?.x.toString() &&
-        pieceElement.attributes.getNamedItem("data-y")?.value ===
-          movedPiece?.y.toString() &&
-        pieceElement.attributes.getNamedItem("data-type")?.value ===
-          movedPiece?.type.toString() &&
-        pieceElement.attributes.getNamedItem("data-color")?.value ===
-          movedPiece?.color.toString()
-      );
+    // find out what piece moved from where to where
+    // this is more guessing than actually knowing what happened,
+    // but it works well enough if only 1 piece of same type and color moved
+    addedPieces.forEach((addedPiece) => {
+      removedPieces.forEach((removedPiece) => {
+        if (
+          addedPiece.type === removedPiece.type &&
+          addedPiece.color === removedPiece.color
+        ) {
+          animatePiece(removedPiece, addedPiece);
+        }
+      });
     });
-
-    if (!movedPieceElement) {
-      return;
-    }
-
-    const diffX = movedPiece?.x - removedPiece?.x;
-    const diffY = movedPiece?.y - removedPiece?.y;
-
-    let absoluteOriginX = -diffX * squareAbsoluteWidth;
-    let absoluteOriginY = diffY * squareAbsoluteHeight;
-
-    if (props.reverse) {
-      absoluteOriginX *= -1;
-      absoluteOriginY *= -1;
-    }
-
-    const element = movedPieceElement?.children[0] as SVGElement;
-
-    gsap.fromTo(
-      element,
-      {
-        translateX: absoluteOriginX,
-        translateY: absoluteOriginY,
-      },
-      {
-        translateX: 0,
-        translateY: 0,
-        duration: get(animationDuration) / 1000,
-        ease: "power2.inOut",
-      }
-    );
   },
   { deep: true }
 );
+
+const animatePiece = (from: Piece, to: Piece) => {
+  // find the piece that was moved in pieceElements
+  const movedPieceElement = get(pieceElements).find((pieceElement) => {
+    return (
+      pieceElement.attributes.getNamedItem("data-x")?.value ===
+        to.x.toString() &&
+      pieceElement.attributes.getNamedItem("data-y")?.value ===
+        to.y.toString() &&
+      pieceElement.attributes.getNamedItem("data-type")?.value ===
+        to.type.toString() &&
+      pieceElement.attributes.getNamedItem("data-color")?.value ===
+        to.color.toString()
+    );
+  });
+
+  if (!movedPieceElement) {
+    return;
+  }
+
+  const diffX = to.x - from.x;
+  const diffY = to.y - from.y;
+
+  let absoluteOriginX = -diffX * squareAbsoluteWidth;
+  let absoluteOriginY = diffY * squareAbsoluteHeight;
+
+  if (props.reverse) {
+    absoluteOriginX *= -1;
+    absoluteOriginY *= -1;
+  }
+
+  const element = movedPieceElement?.children[0] as SVGElement;
+
+  gsap.fromTo(
+    element,
+    {
+      translateX: absoluteOriginX,
+      translateY: absoluteOriginY,
+    },
+    {
+      translateX: 0,
+      translateY: 0,
+      duration: get(animationDuration) / 1000,
+      ease: "power2.inOut",
+    }
+  );
+};
 
 const allowMoveByDragging = computed(() => {
   return [MoveStyle.Both, MoveStyle.DragAndDropOnly].includes(
