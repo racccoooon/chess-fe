@@ -33,25 +33,25 @@
           @click="emit('timeTravelRelative', -Infinity)"
           class="grow"
         >
-          {{ "<<" }}
+          <SvgIcon type="mdi" :path="mdiArrowCollapseLeft" class="h-4" />
         </LargeSecondaryButton>
         <LargeSecondaryButton
           @click="emit('timeTravelRelative', -1)"
           class="grow"
         >
-          {{ "<" }}
+          <SvgIcon type="mdi" :path="mdiArrowLeft" class="h-4" />
         </LargeSecondaryButton>
         <LargeSecondaryButton
           @click="emit('timeTravelRelative', 1)"
           class="grow"
         >
-          {{ ">" }}
+          <SvgIcon type="mdi" :path="mdiArrowRight" class="h-4" />
         </LargeSecondaryButton>
         <LargeSecondaryButton
           @click="emit('timeTravelRelative', Infinity)"
           class="grow"
         >
-          {{ ">>" }}
+          <SvgIcon type="mdi" :path="mdiArrowCollapseRight" class="h-4" />
         </LargeSecondaryButton>
       </div>
     </div>
@@ -66,6 +66,14 @@ import { getChessOpening } from "@/lib/chessOpenings";
 import { set } from "@vueuse/core";
 import { ref, watch } from "vue";
 import LargeSecondaryButton from "@/components/forms/LargeSecondaryButton.vue";
+// @ts-ignore
+import SvgIcon from "@jamescoyle/vue-icon";
+import {
+  mdiArrowCollapseLeft,
+  mdiArrowLeft,
+  mdiArrowRight,
+  mdiArrowCollapseRight,
+} from "@mdi/js";
 
 const props = defineProps<{
   moveHistory: MoveItem[];
