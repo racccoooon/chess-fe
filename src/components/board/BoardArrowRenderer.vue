@@ -79,47 +79,51 @@ const arrowPoints = computed((): Vector2[] => {
   const dy = y2 - y1;
   const angle = Math.atan2(dy, dx); // angle in radians
 
+  // the start but a bit later
+  const x3 = x1 + Math.cos(angle) * 30;
+  const y3 = y1 + Math.sin(angle) * 30;
+
   // the end but a bit before
-  const x3 = x2 - Math.cos(angle) * 30;
-  const y3 = y2 - Math.sin(angle) * 30;
+  const x4 = x2 - Math.cos(angle) * 30;
+  const y4 = y2 - Math.sin(angle) * 30;
 
   // calculate bottom left and right points of arrow shaft
   const shaftBottom1 = {
-    x: x1 - Math.cos(angle - Math.PI / 2) * 10,
-    y: y1 - Math.sin(angle - Math.PI / 2) * 10,
+    x: x3 - Math.cos(angle - Math.PI / 2) * 10,
+    y: y3 - Math.sin(angle - Math.PI / 2) * 10,
   };
 
   const shaftBottom2 = {
-    x: x1 - Math.cos(angle + Math.PI / 2) * 10,
-    y: y1 - Math.sin(angle + Math.PI / 2) * 10,
+    x: x3 - Math.cos(angle + Math.PI / 2) * 10,
+    y: y3 - Math.sin(angle + Math.PI / 2) * 10,
   };
 
   // calculate top left and right points of arrow shaft
   const shaftTop1 = {
-    x: x3 + Math.cos(angle + Math.PI / 2) * 10,
-    y: y3 + Math.sin(angle + Math.PI / 2) * 10,
+    x: x4 + Math.cos(angle + Math.PI / 2) * 10,
+    y: y4 + Math.sin(angle + Math.PI / 2) * 10,
   };
 
   const shaftTop2 = {
-    x: x3 + Math.cos(angle - Math.PI / 2) * 10,
-    y: y3 + Math.sin(angle - Math.PI / 2) * 10,
+    x: x4 + Math.cos(angle - Math.PI / 2) * 10,
+    y: y4 + Math.sin(angle - Math.PI / 2) * 10,
   };
 
   // calculate top left and right points of arrow head
   const headTop1 = {
-    x: x3 + Math.cos(angle + Math.PI / 2) * 25,
-    y: y3 + Math.sin(angle + Math.PI / 2) * 25,
+    x: x4 + Math.cos(angle + Math.PI / 2) * 25,
+    y: y4 + Math.sin(angle + Math.PI / 2) * 25,
   };
 
   const headTop2 = {
-    x: x3 + Math.cos(angle - Math.PI / 2) * 25,
-    y: y3 + Math.sin(angle - Math.PI / 2) * 25,
+    x: x4 + Math.cos(angle - Math.PI / 2) * 25,
+    y: y4 + Math.sin(angle - Math.PI / 2) * 25,
   };
 
   // calculate arrow tip
   const headTip = {
-    x: x3 + Math.cos(angle) * 40,
-    y: y3 + Math.sin(angle) * 40,
+    x: x2,
+    y: y2,
   };
 
   // return points in clockwise order
