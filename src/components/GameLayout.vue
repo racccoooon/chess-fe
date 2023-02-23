@@ -21,8 +21,6 @@
           :isWhiteInCheck="isWhiteInCheck"
           :isBlackInCheck="isBlackInCheck"
           :highlight-squares="highlightSquares"
-          :allow-move-by-clicking="true"
-          :allow-move-by-dragging="true"
           :allow-interaction-with-white="allowInteractionWithWhite"
           :allow-interaction-with-black="allowInteractionWithBlack"
           @piece-selected="onPieceSelected"
