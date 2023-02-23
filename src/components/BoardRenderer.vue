@@ -321,11 +321,6 @@ watch(
       return;
     }
 
-    // alright, so this is taking a lot of processing power,
-    // but it's the only way I could think of to animate the pieces
-    // without needing to tell the board renderer what move was made
-    // which wouldn't work anyway because the user can just jump to any state
-
     // we need to wait for the next tick to make sure the pieceElements are updated
     await nextTick();
 
