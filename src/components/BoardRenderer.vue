@@ -5,7 +5,9 @@
       'cursor-grab': isAllowedToInteractWithHoveredPiece && allowMoveByDragging,
       'cursor-pointer':
         (!isDragging && selectedPiece !== null) ||
-        (isAllowedToInteractWithHoveredPiece && allowMoveByClicking),
+        (isAllowedToInteractWithHoveredPiece &&
+          allowMoveByClicking &&
+          !allowMoveByDragging),
       'cursor-grabbing': isDragging,
     }"
     :viewBox="`0 0 ${squareAbsoluteWidth * 8 + borderAbsoluteSize * 2} ${
