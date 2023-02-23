@@ -25,7 +25,7 @@
       </div>
       <div
         ref="qrCodeContainer"
-        class="w-min rounded-2xl overflow-hidden aspect-square"
+        class="w-full sm:w-1/2 rounded-lg overflow-hidden aspect-square"
       ></div>
     </div>
   </div>
@@ -69,12 +69,12 @@ const focusInput = () => {
 
 const generateQrCode = () => {
   const qrCode = new QRCodeStyling({
-    width: 200,
-    height: 200,
+    width: 400,
+    height: 400,
     data: get(invitePlayerLink),
     dotsOptions: {
       color: "#000000",
-      type: "rounded",
+      type: "square",
     },
     cornersSquareOptions: {
       type: "square",
@@ -87,15 +87,13 @@ const generateQrCode = () => {
     backgroundOptions: {
       color: "#ffffff",
     },
-    imageOptions: {
-      crossOrigin: "anonymous",
-      margin: 0,
-      hideBackgroundDots: true,
-      imageSize: 0.5,
-    },
   });
 
   qrCode.append(get(qrCodeContainer));
+
+  qrCodeContainer.value
+    ?.querySelector("canvas")
+    ?.classList.add("w-full", "h-full");
 };
 
 watch(invitePlayerLink, () => {
