@@ -304,6 +304,9 @@ const selectedPiece = ref<Piece | null>(null);
 const isDragging = ref(false);
 const mouseDownTime = ref(Date.now());
 
+const lastMoveWasDragged = ref(false);
+const lastSelectedPiece = ref<Piece | null>(null);
+
 const { x: mouseX, y: mouseY } = useMouse();
 
 /***
@@ -353,13 +356,28 @@ watch(
     addedPieces.forEach((addedPiece) => {
       removedPieces.forEach((removedPiece) => {
         if (
-          addedPiece.type === removedPiece.type &&
-          addedPiece.color === removedPiece.color
+          addedPiece.type !== removedPiece.type ||
+          addedPiece.color !== removedPiece.color
         ) {
-          animatePiece(removedPiece, addedPiece);
+          return;
         }
+
+        // if the piece was just dragged, don't animate it
+        if (
+          get(lastSelectedPiece)?.x === addedPiece.x &&
+          get(lastSelectedPiece)?.y === addedPiece.y &&
+          get(lastMoveWasDragged)
+        ) {
+          return;
+        }
+
+        animatePiece(removedPiece, addedPiece);
       });
     });
+
+    // reset the last move
+    set(lastMoveWasDragged, false);
+    set(lastSelectedPiece, null);
   },
   { deep: true }
 );
@@ -625,6 +643,9 @@ const stopMove = () => {
       piece: get(selectedPiece)!,
       to: get(hoveredSquare)!,
     });
+
+    set(lastSelectedPiece, get(selectedPiece));
+    set(lastMoveWasDragged, get(allowMoveByDragging) && get(isDragging));
 
     set(dragMouseStart, { x: 0, y: 0 });
     set(isDragging, false);
