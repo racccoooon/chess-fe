@@ -1,6 +1,6 @@
 <template>
   <div class="grow">
-    <div class="flex flex-col gap-6 pb-12 w-5/6">
+    <div class="flex flex-col gap-6 pb-12 md:w-5/6">
       <div class="flex flex-col gap-4">
         <label class="text-gray-900 dark:text-gray-50 font-medium"
           >Chess Board</label
