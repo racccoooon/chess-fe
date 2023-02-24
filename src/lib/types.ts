@@ -12,6 +12,12 @@ export enum PieceColor {
   Black = "black",
 }
 
+export enum PlayerColor {
+  White = "white",
+  Black = "black",
+  Both = "both",
+}
+
 export enum GameStartColor {
   White = "white",
   Black = "black",
