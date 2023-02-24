@@ -36,7 +36,7 @@
                 value: ChessBoardColor.Blue,
                 label: 'Blue',
                 userOptions: {
-                  lightClass: 'fill-blue-100',
+                  lightClass: 'fill-blue-200',
                   darkClass: 'fill-blue-500',
                 },
               },

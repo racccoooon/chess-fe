@@ -471,7 +471,7 @@ const fillClass = computed(() => {
     case ChessBoardColor.Green:
       return "fill-green-100 data-[dark=true]:fill-green-500";
     case ChessBoardColor.Blue:
-      return "fill-blue-100 data-[dark=true]:fill-blue-500";
+      return "fill-blue-200 data-[dark=true]:fill-blue-500";
     case ChessBoardColor.Red:
       return "fill-red-200 data-[dark=true]:fill-red-500";
     case ChessBoardColor.Orange:
