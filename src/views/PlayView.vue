@@ -54,7 +54,7 @@ import type {
 } from "@/lib/types";
 import { HighlightShape, ModalType, PieceColor, PieceType } from "@/lib/types";
 import { computed, onMounted, ref, watch } from "vue";
-import { get, set } from "@vueuse/core";
+import { get, set, syncRef } from "@vueuse/core";
 import { SignalrConnection } from "@/lib/signalr";
 import { useUserStore } from "@/stores/user";
 import { getSquareName } from "@/lib/chessNotation";
@@ -77,6 +77,8 @@ const userStore = useUserStore();
 const settingsStore = useSettingsStore();
 
 const { showLegalMoves, legalMoveHighlightColor } = storeToRefs(settingsStore);
+
+const { name: userName } = storeToRefs(userStore);
 
 const gameId = ref(useRoute().params.gameId as string);
 
@@ -180,9 +182,9 @@ const initialize = async () => {
     set(playerColor, e.playerColor as PieceColor);
 
     if (e.playerColor === PieceColor.White) {
-      set(whitePlayerName, userStore.name);
+      syncRef(userName, whitePlayerName);
     } else {
-      set(blackPlayerName, userStore.name);
+      syncRef(userName, blackPlayerName);
     }
 
     // set opponent if they already joined before us

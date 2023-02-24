@@ -3,6 +3,17 @@
     <div class="flex flex-col gap-6 pb-12 md:w-5/6">
       <div class="flex flex-col gap-4">
         <label class="text-gray-900 dark:text-gray-50 font-medium"
+          >Your Name</label
+        >
+        <div>
+          <input
+            class="w-full px-6 py-4 text-gray-900 dark:text-gray-50 bg-gray-200 dark:bg-gray-700 rounded-xl"
+            v-model="userName"
+          />
+        </div>
+      </div>
+      <div class="flex flex-col gap-4">
+        <label class="text-gray-900 dark:text-gray-50 font-medium"
           >Chess Board</label
         >
         <div>
@@ -707,8 +718,11 @@ import { storeToRefs } from "pinia";
 import SmallOptionsGroup from "@/components/forms/SmallOptionsGroup.vue";
 import SmallPreviewOptionsGroup from "@/components/forms/SmallPreviewOptionsGroup.vue";
 import PieceRenderer from "@/components/pieces/PieceRenderer.vue";
+import { useUserStore } from "@/stores/user";
 
 const settingsStore = useSettingsStore();
+
+const userStore = useUserStore();
 
 const {
   preferredMoveStyle,
@@ -731,4 +745,6 @@ const {
   legalMoveHighlightColor,
   alwaysKeepUserHighlights,
 } = storeToRefs(settingsStore);
+
+const { name: userName } = storeToRefs(userStore);
 </script>
