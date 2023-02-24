@@ -703,18 +703,38 @@ const startHighlighting = () => {
 };
 
 const stopHighlighting = () => {
+  if (!get(hoveredSquare)) {
+    set(highlightSelectedSquare, null);
+    return;
+  }
+
+  if (!get(highlightSelectedSquare)) {
+    set(highlightSelectedSquare, null);
+    return;
+  }
+
   if (
-    get(highlightSelectedSquare)?.x === get(hoveredSquare)?.x &&
-    get(highlightSelectedSquare)?.y === get(hoveredSquare)?.y
+    get(highlightSelectedSquare)!.x === get(hoveredSquare)!.x &&
+    get(highlightSelectedSquare)!.y === get(hoveredSquare)!.y
   ) {
-    // if the user already has a highlight on the hovered square, stop
+    // if the user already has a highlight on the hovered square, remove it
     if (
       get(userHighlights).find(
         (h) =>
-          h.square.x === get(hoveredSquare)?.x &&
-          h.square.y === get(hoveredSquare)?.y
+          h.square.x === get(hoveredSquare)!.x &&
+          h.square.y === get(hoveredSquare)!.y
       )
     ) {
+      set(
+        userHighlights,
+        get(userHighlights).filter(
+          (h) =>
+            !(
+              h.square.x === get(hoveredSquare)!.x &&
+              h.square.y === get(hoveredSquare)!.y
+            )
+        )
+      );
       return;
     }
 
@@ -727,16 +747,26 @@ const stopHighlighting = () => {
       },
     ]);
   } else {
-    // if the user already has an arrow from the selected square to the hovered square, stop
+    // if the user already has an arrow from the selected square to the hovered square, remove it
     if (
       get(userArrows).find(
         (a) =>
-          a.from.x === get(highlightSelectedSquare)?.x &&
-          a.from.y === get(highlightSelectedSquare)?.y &&
-          a.to.x === get(hoveredSquare)?.x &&
-          a.to.y === get(hoveredSquare)?.y
+          a.from.x === get(highlightSelectedSquare)!.x &&
+          a.from.y === get(highlightSelectedSquare)!.y &&
+          a.to.x === get(hoveredSquare)!.x &&
+          a.to.y === get(hoveredSquare)!.y
       )
     ) {
+      set(
+        userArrows,
+        get(userArrows).filter(
+          (a) =>
+            a.from.x !== get(highlightSelectedSquare)!.x ||
+            a.from.y !== get(highlightSelectedSquare)!.y ||
+            a.to.x !== get(hoveredSquare)!.x ||
+            a.to.y !== get(hoveredSquare)!.y
+        )
+      );
       return;
     }
 
