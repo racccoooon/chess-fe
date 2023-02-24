@@ -531,7 +531,24 @@ const highlightSquares = computed((): BoardHighlightSquare[] => {
 });
 
 const arrows = computed(() => {
-  return get(userArrows);
+  const arr = [...get(userArrows)];
+
+  if (
+    get(highlightSelectedSquare) &&
+    get(hoveredSquare) &&
+    !(
+      get(highlightSelectedSquare)!.x === get(hoveredSquare)!.x &&
+      get(highlightSelectedSquare)!.y === get(hoveredSquare)!.y
+    )
+  ) {
+    arr.push({
+      from: get(highlightSelectedSquare)!,
+      to: get(hoveredSquare)!,
+      color: get(selectedSquareHighlightColor),
+    });
+  }
+
+  return arr;
 });
 
 const displayXToBoardX = (x: number) => {
@@ -736,16 +753,16 @@ const stopHighlighting = () => {
         )
       );
       return;
+    } else {
+      set(userHighlights, [
+        ...get(userHighlights),
+        {
+          square: get(highlightSelectedSquare)!,
+          color: get(userHighlightColor),
+          shape: HighlightShape.SquareFill,
+        },
+      ]);
     }
-
-    set(userHighlights, [
-      ...get(userHighlights),
-      {
-        square: get(highlightSelectedSquare)!,
-        color: get(userHighlightColor),
-        shape: HighlightShape.SquareFill,
-      },
-    ]);
   } else {
     // if the user already has an arrow from the selected square to the hovered square, remove it
     if (
@@ -767,17 +784,16 @@ const stopHighlighting = () => {
             a.to.y !== get(hoveredSquare)!.y
         )
       );
-      return;
+    } else {
+      set(userArrows, [
+        ...get(userArrows),
+        {
+          from: get(highlightSelectedSquare)!,
+          to: get(hoveredSquare)!,
+          color: get(userArrowColor),
+        },
+      ]);
     }
-
-    set(userArrows, [
-      ...get(userArrows),
-      {
-        from: get(highlightSelectedSquare)!,
-        to: get(hoveredSquare)!,
-        color: get(userArrowColor),
-      },
-    ]);
   }
 
   set(highlightSelectedSquare, null);
