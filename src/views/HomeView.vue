@@ -5,6 +5,18 @@
         <RaccoonChessLogo class="w-64" />
       </div>
       <CreateGameCard />
+      <div
+        class="p-6 md:p-12 lg:p-16 bg-gray-100 dark:bg-gray-800 md:rounded-3xl"
+      >
+        <div class="flex flex-col gap-8 lg:gap-12">
+          <LargeSecondaryButton class="w-full gap-2">
+            Open Analysis board <SvgIcon type="mdi" :path="mdiArrowRight" />
+          </LargeSecondaryButton>
+          <div class="mx-auto w-full lg:w-2/3 rounded-xl overflow-hidden">
+            <FreeBoard />
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -12,4 +24,9 @@
 <script setup lang="ts">
 import RaccoonChessLogo from "@/components/icons/RaccoonChessLogo.vue";
 import CreateGameCard from "@/components/CreateGameCard.vue";
+import FreeBoard from "@/components/FreeBoard.vue";
+// @ts-ignore
+import SvgIcon from "@jamescoyle/vue-icon";
+import { mdiArrowRight } from "@mdi/js";
+import LargeSecondaryButton from "@/components/forms/LargeSecondaryButton.vue";
 </script>

@@ -253,7 +253,13 @@ import {
 import { storeToRefs } from "pinia";
 import { useSettingsStore } from "@/stores/settings";
 import { computed, nextTick, ref, toRef, watch } from "vue";
-import { get, set, useMouse, useRefHistory } from "@vueuse/core";
+import {
+  get,
+  set,
+  useMouse,
+  useRefHistory,
+  useWindowScroll,
+} from "@vueuse/core";
 import { getFileName, getRankName } from "@/lib/chessNotation";
 import { getPieceAtSquare, getPieceSquare } from "@/lib/chess";
 import objectHash from "object-hash";
@@ -334,6 +340,7 @@ const userArrows = ref<BoardArrow[]>([]);
 const userHighlights = ref<BoardHighlightSquare[]>([]);
 
 const { x: mouseX, y: mouseY } = useMouse();
+const { y: windowScrollY } = useWindowScroll();
 
 /***
  * watch for changes in pieces and animate them
@@ -806,7 +813,10 @@ const stopHighlighting = () => {
 };
 
 const hoveredSquare = computed(() => {
-  return displayPositionToBoardPosition(get(mouseX), get(mouseY));
+  return displayPositionToBoardPosition(
+    get(mouseX),
+    get(mouseY) - get(windowScrollY)
+  );
 });
 
 const hoveredPiece = computed(() => {
