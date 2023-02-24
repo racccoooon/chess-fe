@@ -444,7 +444,6 @@ const animatePiece = (from: Piece, to: Piece) => {
       translateX: 0,
       translateY: 0,
       duration: get(animationDuration) / 1000,
-      delay: 0.1,
       ease: "power2.inOut",
     }
   );
