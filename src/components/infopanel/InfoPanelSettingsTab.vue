@@ -373,6 +373,29 @@
       </div>
       <div class="flex flex-col gap-4">
         <label class="text-gray-900 dark:text-gray-50 font-medium"
+          >Miscellaneous</label
+        >
+        <div class="flex flex-col gap-2">
+          <label class="text-sm font-medium text-gray-700 dark:text-gray-300"
+            >User arrows and highlights</label
+          >
+          <SmallOptionsGroup
+            v-model="alwaysKeepUserHighlights"
+            :options="[
+              {
+                value: false,
+                label: 'Always keep',
+              },
+              {
+                value: true,
+                label: 'Remove after board change',
+              },
+            ]"
+          />
+        </div>
+      </div>
+      <div class="flex flex-col gap-4">
+        <label class="text-gray-900 dark:text-gray-50 font-medium"
           >Highlight Colors</label
         >
         <div class="flex flex-col gap-2">
@@ -706,5 +729,6 @@ const {
   lastMoveHighlightColor,
   selectedSquareHighlightColor,
   legalMoveHighlightColor,
+  alwaysKeepUserHighlights,
 } = storeToRefs(settingsStore);
 </script>

@@ -289,6 +289,7 @@ const {
   userHighlightColor,
   userArrowColor,
   selectedSquareHighlightColor,
+  alwaysKeepUserHighlights,
 } = storeToRefs(useSettingsStore());
 
 const squareAbsoluteWidth = 100;
@@ -340,6 +341,12 @@ const { x: mouseX, y: mouseY } = useMouse();
 watch(
   pieces,
   async (newValue) => {
+    if (get(alwaysKeepUserHighlights)) {
+      // reset the user arrows and highlights
+      set(userArrows, []);
+      set(userHighlights, []);
+    }
+
     if (get(animationDuration) === AnimationDuration.None) {
       return;
     }
