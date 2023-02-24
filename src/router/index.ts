@@ -13,6 +13,11 @@ const router = createRouter({
       name: "play",
       component: () => import("../views/PlayView.vue"),
     },
+    {
+      path: "/board",
+      name: "sandbox-board",
+      component: () => import("../views/SandboxBoardView.vue"),
+    },
   ],
 });
 

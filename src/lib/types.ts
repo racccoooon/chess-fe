@@ -124,7 +124,7 @@ export interface JoinGameResponse {
     position: Square;
   }[];
   activeColor: PieceColor;
-  playerColor: PieceColor;
+  playerColor: PlayerColor;
   opponentName: string;
 }
 
@@ -192,4 +192,11 @@ export enum ModalType {
 export interface Vector2 {
   x: number;
   y: number;
+}
+
+export enum GameInfoTab {
+  Game = "game",
+  Analysis = "analysis",
+  Invite = "invite",
+  Settings = "settings",
 }

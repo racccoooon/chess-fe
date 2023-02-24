@@ -11,6 +11,7 @@
     :white-player-name="whitePlayerName"
     :black-player-name="blackPlayerName"
     :highlight-squares="highlightSquares"
+    :panel-tabs="[GameInfoTab.Game, GameInfoTab.Invite, GameInfoTab.Settings]"
     @piece-selected="onPieceSelected"
     @piece-deselected="onPieceDeselected"
     @piece-moved="onPieceMoved"
@@ -52,7 +53,14 @@ import type {
   PieceSelectedEvent,
   PromotionSelectedEvent,
 } from "@/lib/types";
-import { HighlightShape, ModalType, PieceColor, PieceType } from "@/lib/types";
+import {
+  GameInfoTab,
+  HighlightShape,
+  ModalType,
+  PieceColor,
+  PieceType,
+  PlayerColor,
+} from "@/lib/types";
 import { computed, onMounted, ref, watch } from "vue";
 import { get, set, syncRef } from "@vueuse/core";
 import { SignalrConnection } from "@/lib/signalr";
@@ -60,6 +68,7 @@ import { useUserStore } from "@/stores/user";
 import { getSquareName } from "@/lib/chessNotation";
 import {
   applyMove,
+  comparePieceAndPlayerColor,
   getPieceAtSquare,
   getValidSquaresForPiece,
   invertColor,
@@ -87,10 +96,10 @@ const pieces = ref<Piece[]>([]);
 const whitePlayerName = ref("");
 const blackPlayerName = ref("");
 
-const playerColor = ref(PieceColor.White);
+const playerColor = ref(PlayerColor.White);
 
 const reverseBoard = computed(() => {
-  return get(playerColor) === PieceColor.Black;
+  return get(playerColor) === PlayerColor.Black;
 });
 
 const moveHistory = ref<MoveItem[]>([]);
@@ -100,7 +109,10 @@ const gameHasStarted = ref(false);
 const activeColor = ref<PieceColor>(PieceColor.White);
 
 const playerCanMove = computed(() => {
-  return get(activeColor) === get(playerColor) && get(gameHasStarted);
+  return (
+    comparePieceAndPlayerColor(get(activeColor), get(playerColor)) &&
+    get(gameHasStarted)
+  );
 });
 
 const selectedPiece = ref<Piece | null>(null);
@@ -179,16 +191,16 @@ const initialize = async () => {
     });
 
     // set player color
-    set(playerColor, e.playerColor as PieceColor);
+    set(playerColor, e.playerColor as PlayerColor);
 
-    if (e.playerColor === PieceColor.White) {
+    if (e.playerColor === PlayerColor.White) {
       syncRef(userName, whitePlayerName);
     } else {
       syncRef(userName, blackPlayerName);
     }
 
     // set opponent if they already joined before us
-    if (e.playerColor === PieceColor.White) {
+    if (e.playerColor === PlayerColor.White) {
       set(blackPlayerName, e.opponentName || "Opponent");
     } else {
       set(whitePlayerName, e.opponentName || "Opponent");
@@ -259,7 +271,7 @@ const onPromotionSelected = async (e: PromotionSelectedEvent) => {
 const onPieceSelected = (e: PieceSelectedEvent) => {
   const piece = e.piece;
 
-  if (piece.color !== get(playerColor)) {
+  if (!comparePieceAndPlayerColor(piece.color, get(playerColor))) {
     return;
   }
 
@@ -282,7 +294,7 @@ const onPieceMoved = async (e: PieceMovedEvent) => {
 
   console.log(`piece moved to ${getSquareName(to.x, to.y)}`, piece);
 
-  if (piece?.color !== get(playerColor)) {
+  if (!comparePieceAndPlayerColor(piece?.color, get(playerColor))) {
     return;
   }
 

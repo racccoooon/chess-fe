@@ -1,5 +1,11 @@
-import { KingStatus, MoveType, PieceColor, PieceType } from "@/lib/types";
 import type { Move, MoveItem, Piece, Square } from "@/lib/types";
+import {
+  KingStatus,
+  MoveType,
+  PieceColor,
+  PieceType,
+  PlayerColor,
+} from "@/lib/types";
 import { getSquareName } from "@/lib/chessNotation";
 
 export const invertColor = (color: PieceColor) => {
@@ -529,4 +535,23 @@ export const getHistoryUntilIndex = (
 
 export const getPieceSquare = (piece: Piece): Square => {
   return { x: piece.x, y: piece.y };
+};
+
+export const comparePieceAndPlayerColor = (
+  pieceColor: PieceColor,
+  playerColor: PlayerColor
+) => {
+  if (playerColor === PlayerColor.Both) {
+    return true;
+  }
+
+  if (pieceColor === PieceColor.Black && playerColor === PlayerColor.Black) {
+    return true;
+  }
+
+  if (pieceColor === PieceColor.White && playerColor === PlayerColor.White) {
+    return true;
+  }
+
+  return false;
 };

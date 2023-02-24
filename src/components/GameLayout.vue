@@ -45,6 +45,7 @@
         :move-history="moveHistory"
         :active-color="activeColor"
         :history-index="historyIndex"
+        :tabs="panelTabs"
         @time-travel-relative="historyIndex += $event"
         @time-travel-absolute="historyIndex = $event"
       />
@@ -63,15 +64,18 @@ import type {
   PieceSelectedEvent,
 } from "@/lib/types";
 import {
+  GameInfoTab,
   HighlightColor,
   HighlightShape,
   PieceColor,
   PieceType,
+  PlayerColor,
 } from "@/lib/types";
 import { computed, ref, watch } from "vue";
 import { get, set, whenever } from "@vueuse/core";
 import { useClamp } from "@vueuse/math";
 import {
+  comparePieceAndPlayerColor,
   getBoardAtHistoryIndex,
   getCapturedPieces,
   getMaterialValueByColor,
@@ -89,11 +93,12 @@ const props = defineProps<{
   activeColor: PieceColor;
   isPlayer: boolean;
   canMove: boolean;
-  playerColor: PieceColor;
+  playerColor: PlayerColor;
   gameHasStarted: boolean;
   whitePlayerName: string;
   blackPlayerName: string;
   highlightSquares: BoardHighlightSquare[];
+  panelTabs: GameInfoTab[];
 }>();
 
 const emit = defineEmits<{
@@ -267,7 +272,8 @@ const bottomPlayerCapturedPieces = computed(() => {
 const allowInteractionWithWhite = computed(() => {
   return (
     props.canMove &&
-    props.playerColor === PieceColor.White &&
+    props.activeColor === PieceColor.White &&
+    comparePieceAndPlayerColor(PieceColor.White, props.playerColor) &&
     !get(isTimeTraveling)
   );
 });
@@ -275,7 +281,8 @@ const allowInteractionWithWhite = computed(() => {
 const allowInteractionWithBlack = computed(() => {
   return (
     props.canMove &&
-    props.playerColor === PieceColor.Black &&
+    props.activeColor === PieceColor.Black &&
+    comparePieceAndPlayerColor(PieceColor.Black, props.playerColor) &&
     !get(isTimeTraveling)
   );
 });

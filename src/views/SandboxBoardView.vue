@@ -1,12 +1,17 @@
 <template>
-  <BoardRenderer
+  <GameLayout
     :pieces="pieces"
-    :reverse="false"
+    :move-history="moveHistory"
+    :reverse-board="false"
+    :active-color="activeColor"
+    :player-color="PlayerColor.Both"
+    :is-player="true"
+    :can-move="true"
+    :game-has-started="true"
+    :white-player-name="'White'"
+    :black-player-name="'Black'"
     :highlight-squares="highlightSquares"
-    :is-white-in-check="false"
-    :is-black-in-check="false"
-    :allow-interaction-with-white="true"
-    :allow-interaction-with-black="true"
+    :panel-tabs="[GameInfoTab.Analysis, GameInfoTab.Settings]"
     @piece-selected="onPieceSelected"
     @piece-deselected="onPieceDeselected"
     @piece-moved="onPieceMoved"
@@ -14,17 +19,23 @@
 </template>
 
 <script setup lang="ts">
-import BoardRenderer from "@/components/BoardRenderer.vue";
-import { HighlightShape, KingStatus, MoveType } from "@/lib/types";
+import GameLayout from "@/components/GameLayout.vue";
+import { computed, ref } from "vue";
+import {
+  HighlightShape,
+  GameInfoTab,
+  KingStatus,
+  MoveType,
+  PieceColor,
+  PlayerColor,
+} from "@/lib/types";
 import type {
   BoardHighlightSquare,
-  MoveItem,
   Piece,
+  MoveItem,
   PieceMovedEvent,
   PieceSelectedEvent,
 } from "@/lib/types";
-import { get, set } from "@vueuse/core";
-import { computed, ref } from "vue";
 import {
   applyMove,
   getInitialBoard,
@@ -32,6 +43,7 @@ import {
   getPieceSquare,
   getValidSquaresForPiece,
 } from "@/lib/chess";
+import { get, set } from "@vueuse/core";
 import { useSettingsStore } from "@/stores/settings";
 import { storeToRefs } from "pinia";
 
@@ -41,7 +53,15 @@ const { showLegalMoves, legalMoveHighlightColor } = storeToRefs(settingsStore);
 
 const pieces = ref<Piece[]>(getInitialBoard());
 
+const moveHistory = ref<MoveItem[]>([]);
+
 const selectedPiece = ref<Piece | null>(null);
+
+const activeColor = computed(() => {
+  return moveHistory.value.length % 2 === 0
+    ? PieceColor.White
+    : PieceColor.Black;
+});
 
 const validSquaresForSelectedPiece = computed(() => {
   if (!get(selectedPiece)) {
@@ -97,5 +117,7 @@ const onPieceMoved = (e: PieceMovedEvent) => {
 
   set(pieces, applyMove(get(pieces), move));
   set(selectedPiece, null);
+
+  get(moveHistory).push(move);
 };
 </script>

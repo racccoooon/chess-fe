@@ -9,9 +9,11 @@
         class="p-6 md:p-12 lg:p-16 bg-gray-100 dark:bg-gray-800 md:rounded-3xl"
       >
         <div class="flex flex-col gap-8 lg:gap-12">
-          <LargeSecondaryButton class="w-full gap-2">
-            Open Analysis board <SvgIcon type="mdi" :path="mdiArrowRight" />
-          </LargeSecondaryButton>
+          <RouterLink :to="{ name: 'sandbox-board' }">
+            <LargeSecondaryButton class="w-full gap-2">
+              Open sandbox board <SvgIcon type="mdi" :path="mdiArrowRight" />
+            </LargeSecondaryButton>
+          </RouterLink>
           <div class="mx-auto w-full lg:w-2/3 rounded-xl overflow-hidden">
             <FreeBoard />
           </div>
