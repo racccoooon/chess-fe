@@ -8,20 +8,34 @@
     :is-player="true"
     :can-move="true"
     :game-has-started="true"
-    :white-player-name="'White'"
-    :black-player-name="'Black'"
+    v-model:white-player-name="whitePlayerName"
+    v-model:black-player-name="blackPlayerName"
     :highlight-squares="highlightSquares"
-    :panel-tabs="[GameInfoTab.Analysis, GameInfoTab.Settings]"
+    :panel-tabs="[
+      GameInfoTab.Analysis,
+      GameInfoTab.GameSetup,
+      GameInfoTab.Settings,
+    ]"
     @piece-selected="onPieceSelected"
     @piece-deselected="onPieceDeselected"
     @piece-moved="onPieceMoved"
-  />
-  <input
-    type="text"
-    v-model="moveNotation"
-    class="px-6 py-4 text-gray-900 dark:text-gray-50 bg-gray-200 dark:bg-gray-700 rounded-xl"
-  />
-  <button @click="loadFromNotation">load</button>
+    @import-game="onImportGame"
+  >
+    <template #board-overlay>
+      <SuperDuperModal v-if="importError">
+        <div class="flex flex-col gap-4">
+          <h2 class="font-bold text-lg">Failed to import</h2>
+          <p>{{ importErrorMessage }}</p>
+          <button
+            @click="importError = false"
+            class="p-2 bg-gray-200 dark:bg-gray-700 rounded-xl"
+          >
+            ok
+          </button>
+        </div>
+      </SuperDuperModal>
+    </template>
+  </GameLayout>
 </template>
 
 <script setup lang="ts">
@@ -41,9 +55,11 @@ import type {
   MoveItem,
   PieceMovedEvent,
   PieceSelectedEvent,
+  ImportGameEvent,
 } from "@/lib/types";
 import {
   applyMove,
+  fenToPieces,
   getInitialBoard,
   getPieceAtSquare,
   getPieceSquare,
@@ -53,6 +69,7 @@ import { get, set } from "@vueuse/core";
 import { useSettingsStore } from "@/stores/settings";
 import { storeToRefs } from "pinia";
 import { notationToMoves } from "@/lib/chessNotation";
+import SuperDuperModal from "@/components/modals/SuperDuperModal.vue";
 
 const settingsStore = useSettingsStore();
 
@@ -64,26 +81,35 @@ const moveHistory = ref<MoveItem[]>([]);
 
 const selectedPiece = ref<Piece | null>(null);
 
-const moveNotation = ref("");
-
 const activeColor = computed(() => {
   return moveHistory.value.length % 2 === 0
     ? PieceColor.White
     : PieceColor.Black;
 });
 
-const loadFromNotation = () => {
-  const res = notationToMoves(
-    get(moveNotation),
-    getInitialBoard(),
-    (rPieces, rMoves) => {
+const whitePlayerName = ref("White");
+const blackPlayerName = ref("Black");
+
+const importError = ref(false);
+const importErrorMessage = ref("");
+
+const onImportGame = (e: ImportGameEvent) => {
+  const { san, fen } = e;
+
+  try {
+    const res = notationToMoves(san, fenToPieces(fen), (rPieces, rMoves) => {
       set(pieces, rPieces);
       set(moveHistory, rMoves);
-    }
-  );
+    });
 
-  set(pieces, res.pieces);
-  set(moveHistory, res.moves);
+    set(pieces, res.pieces);
+    set(moveHistory, res.moves);
+  } catch (e: any) {
+    set(importError, true);
+    set(importErrorMessage, e.message as string);
+  }
+
+  // i dont like try catch blocks either
 };
 
 const validSquaresForSelectedPiece = computed(() => {

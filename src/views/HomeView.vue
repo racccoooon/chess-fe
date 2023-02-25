@@ -10,7 +10,7 @@
       >
         <div class="flex flex-col gap-8 lg:gap-12">
           <RouterLink :to="{ name: 'sandbox-board' }">
-            <LargeSecondaryButton class="w-full gap-2">
+            <LargeSecondaryButton class="w-full">
               Open sandbox board <SvgIcon type="mdi" :path="mdiArrowRight" />
             </LargeSecondaryButton>
           </RouterLink>

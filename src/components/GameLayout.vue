@@ -45,9 +45,14 @@
         :move-history="moveHistory"
         :active-color="activeColor"
         :history-index="historyIndex"
+        :white-player-name="whitePlayerName"
+        @update:white-player-name="emit('update:whitePlayerName', $event)"
+        :black-player-name="blackPlayerName"
+        @update:black-player-name="emit('update:blackPlayerName', $event)"
         :tabs="panelTabs"
         @time-travel-relative="historyIndex += $event"
         @time-travel-absolute="historyIndex = $event"
+        @import-game="emit('importGame', $event)"
       />
     </div>
   </div>
@@ -62,6 +67,7 @@ import type {
   Piece,
   PieceMovedEvent,
   PieceSelectedEvent,
+  ImportGameEvent,
 } from "@/lib/types";
 import {
   GameInfoTab,
@@ -105,6 +111,9 @@ const emit = defineEmits<{
   (event: "pieceSelected", payload: PieceSelectedEvent): void;
   (event: "pieceDeselected"): void;
   (event: "pieceMoved", payload: PieceMovedEvent): void;
+  (event: "importGame", payload: ImportGameEvent): void;
+  (event: "update:whitePlayerName", payload: string): void;
+  (event: "update:blackPlayerName", payload: string): void;
 }>();
 
 const historyIndex_ = ref(props.moveHistory.length);

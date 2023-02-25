@@ -1,7 +1,7 @@
 <template>
   <div class="p-6 md:p-12 lg:p-16 bg-gray-100 dark:bg-gray-800 md:rounded-3xl">
     <div class="flex flex-col gap-8 lg:gap-12">
-      <LargePrimaryButton class="w-full gap-2" @click="createGame">
+      <LargePrimaryButton class="w-full" @click="createGame">
         Start Playing <SvgIcon type="mdi" :path="mdiArrowRight" />
       </LargePrimaryButton>
       <div class="flex flex-col gap-6">

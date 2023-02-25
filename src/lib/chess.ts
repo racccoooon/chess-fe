@@ -162,8 +162,10 @@ export const fenToPieces = (fen: string): Piece[] => {
   return pieces;
 };
 
+export const defaultFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
+
 export const getInitialBoard = (): Piece[] => {
-  return fenToPieces("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
+  return fenToPieces(defaultFen);
 };
 
 export const applyMove = (pieces: Piece[], move: MoveItem) => {

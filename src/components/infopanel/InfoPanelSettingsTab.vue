@@ -1,6 +1,6 @@
 <template>
   <div class="grow">
-    <CompactFormWrapper>
+    <CompactFormWrapper class="md:w-5/6">
       <CompactFormSection>
         <template #label>Your Name</template>
         <CompactFormInputElement>

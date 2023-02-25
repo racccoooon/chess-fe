@@ -146,6 +146,11 @@ export interface PromotionSelectedEvent {
   type: PieceType;
 }
 
+export interface ImportGameEvent {
+  san: string;
+  fen: string;
+}
+
 export enum ChessBoardBorder {
   None = "none",
   Thin = "thin",
@@ -197,6 +202,7 @@ export interface Vector2 {
 export enum GameInfoTab {
   Game = "game",
   Analysis = "analysis",
+  GameSetup = "gameSetup",
   Invite = "invite",
   Settings = "settings",
 }

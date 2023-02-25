@@ -6,36 +6,13 @@
       class="p-2 flex flex-row items-center border-b-2 border-gray-200 dark:border-gray-700 overflow-x-auto overflow-y-hidden"
     >
       <button
-        v-if="tabs.includes(GameInfoTab.Game)"
-        @click="activeTab = GameInfoTab.Game"
-        :aria-selected="activeTab === GameInfoTab.Game"
+        v-for="tab in tabs"
+        :key="tab"
+        @click="activeTab = tab"
+        :aria-selected="activeTab === tab"
         class="px-6 py-2 text-gray-500 dark:text-gray-300 aria-selected:text-gray-900 aria-selected:dark:text-gray-50 aria-selected:bg-gray-200 aria-selected:dark:bg-gray-700 text-md font-medium rounded-full transition-all ease-in-out"
       >
-        Game
-      </button>
-      <button
-        v-if="tabs.includes(GameInfoTab.Analysis)"
-        @click="activeTab = GameInfoTab.Analysis"
-        :aria-selected="activeTab === GameInfoTab.Analysis"
-        class="px-6 py-2 text-gray-500 dark:text-gray-300 aria-selected:text-gray-900 aria-selected:dark:text-gray-50 aria-selected:bg-gray-200 aria-selected:dark:bg-gray-700 text-md font-medium rounded-full transition-all ease-in-out"
-      >
-        Analysis
-      </button>
-      <button
-        v-if="tabs.includes(GameInfoTab.Invite)"
-        @click="activeTab = GameInfoTab.Invite"
-        :aria-selected="activeTab === GameInfoTab.Invite"
-        class="px-6 py-2 text-gray-500 dark:text-gray-300 aria-selected:text-gray-900 aria-selected:dark:text-gray-50 aria-selected:bg-gray-200 aria-selected:dark:bg-gray-700 text-md font-medium rounded-full transition-all ease-in-out"
-      >
-        Invite
-      </button>
-      <button
-        v-if="tabs.includes(GameInfoTab.Settings)"
-        @click="activeTab = GameInfoTab.Settings"
-        :aria-selected="activeTab === GameInfoTab.Settings"
-        class="px-6 py-2 text-gray-500 dark:text-gray-300 aria-selected:text-gray-900 aria-selected:dark:text-gray-50 aria-selected:bg-gray-200 aria-selected:dark:bg-gray-700 text-md font-medium rounded-full transition-all ease-in-out"
-      >
-        Settings
+        {{ tabNames[tab] }}
       </button>
     </div>
     <div class="flex-1 flex p-8 overflow-y-auto">
@@ -50,6 +27,15 @@
         :history-index="historyIndex"
         @time-travel-relative="emit('timeTravelRelative', $event)"
         @time-travel-absolute="emit('timeTravelAbsolute', $event)"
+      />
+      <InfoPanelGameSetupTab
+        v-else-if="activeTab === GameInfoTab.GameSetup"
+        @import-game="emit('importGame', $event)"
+        :move-history="moveHistory"
+        :white-player-name="whitePlayerName"
+        @update:white-player-name="emit('update:whitePlayerName', $event)"
+        :black-player-name="blackPlayerName"
+        @update:black-player-name="emit('update:blackPlayerName', $event)"
       />
       <InfoPanelInviteTab v-else-if="activeTab === GameInfoTab.Invite" />
       <InfoPanelSettingsTab v-else-if="activeTab === GameInfoTab.Settings" />
@@ -66,6 +52,8 @@ import InfoPanelSettingsTab from "@/components/infopanel/InfoPanelSettingsTab.vu
 import InfoPanelInviteTab from "@/components/infopanel/InfoPanelInviteTab.vue";
 import { set, watchOnce } from "@vueuse/core";
 import { GameInfoTab } from "@/lib/types";
+import type { ImportGameEvent } from "@/lib/types";
+import InfoPanelGameSetupTab from "@/components/infopanel/InfoPanelGameSetupTab.vue";
 
 const props = defineProps<{
   moveHistory: MoveItem[];
@@ -73,12 +61,17 @@ const props = defineProps<{
   isPlayer: boolean;
   gameHasStarted: boolean;
   historyIndex: number;
+  whitePlayerName: string;
+  blackPlayerName: string;
   tabs: GameInfoTab[];
 }>();
 
 const emit = defineEmits<{
   (event: "timeTravelRelative", payload: number): void;
   (event: "timeTravelAbsolute", payload: number): void;
+  (event: "importGame", payload: ImportGameEvent): void;
+  (event: "update:whitePlayerName", payload: string): void;
+  (event: "update:blackPlayerName", payload: string): void;
 }>();
 
 const activeTab = ref<GameInfoTab>(GameInfoTab.Invite);
@@ -99,4 +92,12 @@ watchOnce(
     set(activeTab, GameInfoTab.Game);
   }
 );
+
+const tabNames: Record<GameInfoTab, string> = {
+  [GameInfoTab.Game]: "Game",
+  [GameInfoTab.Analysis]: "Analysis",
+  [GameInfoTab.GameSetup]: "Setup",
+  [GameInfoTab.Invite]: "Invite",
+  [GameInfoTab.Settings]: "Settings",
+};
 </script>

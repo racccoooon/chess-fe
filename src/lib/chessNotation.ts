@@ -405,9 +405,17 @@ export const notationToMoves = (
   let activeColor = PieceColor.White;
   let pieces = [...startingPieces];
 
+  let notationArray = notation.split(" ");
+
+  // remove turn numbers
   const turnNumberRegex = /[0-9]+\./;
-  const notationArray = notation.split(" ").filter((item) => {
+  notationArray = notationArray.filter((item) => {
     return !turnNumberRegex.test(item);
+  });
+
+  // remove empty items
+  notationArray = notationArray.filter((item) => {
+    return item !== "";
   });
 
   notationArray.forEach((notation) => {
@@ -417,8 +425,6 @@ export const notationToMoves = (
     activeColor = invertColor(activeColor);
     if (onProgress) onProgress(pieces, moves);
   });
-
-  console.log(pieces, moves);
 
   return { pieces, moves };
 };
