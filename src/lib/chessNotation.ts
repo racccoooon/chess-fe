@@ -4,6 +4,7 @@ import {
   applyMove,
   getHistoryUntilIndex,
   getInitialBoard,
+  getPieceAtSquare,
   getPieceSquare,
   getPiecesThatCanMoveToSquare,
   invertColor,
@@ -314,12 +315,6 @@ export const notationToMove = (
     return move;
   }
 
-  // check if move is en passant
-  if (notation.includes("e.p.")) {
-    move.kind = MoveType.EnPassant;
-    move.captures = true;
-  }
-
   // check if move is promotion
   if (notation.includes("=")) {
     move.kind = MoveType.Promotion;
@@ -420,6 +415,28 @@ export const notationToMove = (
     move.from = getPieceSquare(possiblePieces[0]);
   }
 
+  // check if move is en passant
+  if (notation.includes("e.p.")) {
+    move.kind = MoveType.EnPassant;
+    move.captures = true;
+  }
+
+  const pieceToCaptureEnPassant = getPieceAtSquare(
+    pieces,
+    move.to.x,
+    move.from.y
+  );
+
+  if (
+    move.kind === MoveType.NonSpecial &&
+    move.captures &&
+    pieceToCaptureEnPassant !== undefined &&
+    pieceToCaptureEnPassant.type === PieceType.Pawn &&
+    pieceToCaptureEnPassant.color !== activeColor
+  ) {
+    move.kind = MoveType.EnPassant;
+  }
+
   return move;
 };
 
@@ -440,9 +457,9 @@ export const notationToMoves = (
     return !turnNumberRegex.test(item);
   });
 
-  // remove empty items
+  // remove empty items and e.p.
   notationArray = notationArray.filter((item) => {
-    return item !== "";
+    return item !== "" && item !== "e.p.";
   });
 
   notationArray.forEach((notation) => {

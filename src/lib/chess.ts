@@ -155,7 +155,7 @@ export const pieceToChar = (piece: Piece): string => {
     case PieceType.King:
       return piece.color === PieceColor.Black ? "k" : "K";
   }
-}
+};
 
 export const fenToPieces = (fen: string): Piece[] => {
   const pieces: Piece[] = [];
@@ -383,6 +383,17 @@ export const isValidPawnMove = (
   }
 
   if (Math.abs(yDiff) === 1) {
+    // check for en passant
+    const lastMove = history[history.length - 1];
+    if (
+      lastMove.type === PieceType.Pawn &&
+      Math.abs(lastMove.to.y - lastMove.from.y) === 2
+    ) {
+      if (lastMove.to.x === move.to.x && lastMove.to.y === move.from.y) {
+        return true;
+      }
+    }
+
     if (move.to.x === move.from.x) {
       return !pieceToCapture;
     } else if (Math.abs(move.to.x - move.from.x) === 1) {
