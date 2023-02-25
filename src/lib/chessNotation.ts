@@ -370,40 +370,54 @@ export const notationToMove = (
 
   if (possiblePieces.length > 1) {
     // if there are multiple pieces that can move to the square, we need to find the correct one
-    // first we need to find the piece that is moving from the correct file
+    // we can do this by finding the file and or rank in the notation
 
-    const fromFileRegex = /[a-h]/;
-    const fromFile = notation.match(fromFileRegex);
-    if (fromFile) {
-      const x = getXFromFileName(fromFile[0]);
-      possiblePieces = possiblePieces.filter((piece) => {
-        return getPieceSquare(piece).x === x;
-      });
+    let x: number | null = null;
+    let y: number | null = null;
 
-      if (possiblePieces.length === 1) {
-        move.from = getPieceSquare(possiblePieces[0]);
-      } else if (possiblePieces.length > 1) {
-        // if there are still multiple pieces that can move to the square
-        // we need to find the piece that is moving from the correct rank
+    const position = move.type === PieceType.Pawn ? 0 : 1;
 
-        const fromRankRegex = /[1-8]/;
-        const fromRank = notation.match(fromRankRegex);
-        if (fromRank) {
-          const y = getYFromRankName(fromRank[0]);
-          possiblePieces = possiblePieces.filter((piece) => {
-            return getPieceSquare(piece).y === y;
-          });
-
-          if (possiblePieces.length === 1) {
-            move.from = getPieceSquare(possiblePieces[0]);
-          } else {
-            throw new Error(
-              `Multiple pieces can move to this square ${notation}`
-            );
-          }
-        }
-      }
+    // check if the notation contains a file
+    if (notation[position].match(/[a-h]/)) {
+      x = getXFromFileName(notation[position]);
     }
+
+    // check if the notation contains a rank
+    if (notation[position].match(/[1-8]/)) {
+      y = getYFromRankName(notation[position]);
+    }
+
+    // check if the notation contains both a file and a rank
+    if (
+      notation[position].match(/[a-h]/) &&
+      notation[position + 1].match(/[1-8]/)
+    ) {
+      x = getXFromFileName(notation[position]);
+      y = getYFromRankName(notation[position + 1]);
+    }
+
+    console.log(notation, x, y, possiblePieces);
+
+    possiblePieces = possiblePieces.filter((piece) => {
+      let match = true;
+      if (x !== null) {
+        match = match && getPieceSquare(piece).x === x;
+      }
+      if (y !== null) {
+        match = match && getPieceSquare(piece).y === y;
+      }
+      return match;
+    });
+
+    if (possiblePieces.length === 0) {
+      throw new Error(`No piece can move to this square ${notation}`);
+    }
+
+    if (possiblePieces.length > 1) {
+      throw new Error(`Multiple pieces can move to this square ${notation}`);
+    }
+
+    move.from = getPieceSquare(possiblePieces[0]);
   }
 
   return move;
