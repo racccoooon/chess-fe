@@ -1,6 +1,11 @@
-import type { MoveItem, Piece } from "@/lib/types";
+import type { MoveItem, Piece, Square } from "@/lib/types";
 import { KingStatus, MoveType, PieceColor, PieceType } from "@/lib/types";
-import { getPiecesThatCanMoveToSquare } from "@/lib/chess";
+import {
+  applyMove,
+  getPieceSquare,
+  getPiecesThatCanMoveToSquare,
+  invertColor,
+} from "@/lib/chess";
 
 export enum NotationType {
   Algebraic = "algebraic",
@@ -8,82 +13,82 @@ export enum NotationType {
   Spoken = "spoken",
 }
 
-export const getStandardPieceNotation = (type: PieceType) => {
-  switch (type) {
-    case PieceType.Pawn:
-      return "";
-    case PieceType.Rook:
-      return "R";
-    case PieceType.Knight:
-      return "N";
-    case PieceType.Bishop:
-      return "B";
-    case PieceType.Queen:
-      return "Q";
-    case PieceType.King:
-      return "K";
-  }
+export const pieceStandardChar: Record<PieceType, string> = {
+  [PieceType.Pawn]: "",
+  [PieceType.Rook]: "R",
+  [PieceType.Knight]: "N",
+  [PieceType.Bishop]: "B",
+  [PieceType.Queen]: "Q",
+  [PieceType.King]: "K",
 };
 
-export const getUnicodePieceNotation = (
-  type: PieceType,
-  pieceColor: PieceColor
-) => {
-  switch (type) {
-    case PieceType.Pawn:
-      return "";
-    case PieceType.Rook:
-      return pieceColor === PieceColor.White ? "♜" : "♖";
-    case PieceType.Knight:
-      return pieceColor === PieceColor.White ? "♞" : "♘";
-    case PieceType.Bishop:
-      return pieceColor === PieceColor.White ? "♝" : "♗";
-    case PieceType.Queen:
-      return pieceColor === PieceColor.White ? "♛" : "♕";
-    case PieceType.King:
-      return pieceColor === PieceColor.White ? "♚" : "♔";
+export const pieceUnicodeChar: Record<PieceType, string> = {
+  [PieceType.Pawn]: "",
+  [PieceType.Rook]: "♜",
+  [PieceType.Knight]: "♞",
+  [PieceType.Bishop]: "♝",
+  [PieceType.Queen]: "♛",
+  [PieceType.King]: "♚",
+};
+
+export const pieceName: Record<PieceType, string> = {
+  [PieceType.Pawn]: "pawn",
+  [PieceType.Rook]: "rook",
+  [PieceType.Knight]: "knight",
+  [PieceType.Bishop]: "bishop",
+  [PieceType.Queen]: "queen",
+  [PieceType.King]: "king",
+};
+
+export const getPieceNotation = (type: PieceType, useUnicodeIcons: boolean) => {
+  if (useUnicodeIcons) {
+    return pieceUnicodeChar[type];
+  } else {
+    return pieceStandardChar[type];
   }
 };
 
 export const getPieceName = (type: PieceType) => {
-  switch (type) {
-    case PieceType.Pawn:
-      return "pawn";
-    case PieceType.Rook:
-      return "rook";
-    case PieceType.Knight:
-      return "knight";
-    case PieceType.Bishop:
-      return "bishop";
-    case PieceType.Queen:
-      return "queen";
-    case PieceType.King:
-      return "king";
-  }
+  return pieceName[type];
 };
 
-export const getPieceNotation = (
-  type: PieceType,
-  useUnicodeIcons: boolean,
-  pieceColor: PieceColor
-) => {
-  if (useUnicodeIcons) {
-    return getUnicodePieceNotation(type, pieceColor);
-  } else {
-    return getStandardPieceNotation(type);
+export const notationToPieceType = (notation: string): PieceType => {
+  const type = Object.keys(pieceStandardChar).find(
+    (key) => pieceStandardChar[key as PieceType] === notation
+  );
+
+  if (type) {
+    return type as PieceType;
   }
+
+  return PieceType.Pawn;
 };
 
-export const getFileName = (x: number) => {
+export const getFileName = (x: number): string => {
   return String.fromCharCode(97 + x);
 };
 
-export const getRankName = (y: number) => {
-  return y + 1;
+export const getRankName = (y: number): string => {
+  return `${y + 1}`;
 };
 
-export const getSquareName = (x: number, y: number) => {
+export const getSquareName = (x: number, y: number): string => {
   return `${getFileName(x)}${getRankName(y)}`;
+};
+
+export const getXFromFileName = (fileName: string): number => {
+  return fileName.charCodeAt(0) - 97;
+};
+
+export const getYFromRankName = (rankName: string): number => {
+  return parseInt(rankName) - 1;
+};
+
+export const getSquareFromName = (name: string): Square => {
+  return {
+    x: getXFromFileName(name[0]),
+    y: getYFromRankName(name[1]),
+  };
 };
 
 export const getMoveNotation = (
@@ -99,7 +104,7 @@ export const getMoveNotation = (
 
   const from = getSquareName(move.from.x, move.from.y);
   const to = getSquareName(move.to.x, move.to.y);
-  const piece = getPieceNotation(move.type, useUnicodeIcons, move.color);
+  const piece = getPieceNotation(move.type, useUnicodeIcons);
 
   let idPiece = "";
 
@@ -133,11 +138,7 @@ export const getMoveNotation = (
   let suffix = "";
 
   if (move.kind === MoveType.Promotion && move.promoteToType) {
-    suffix = `=${getPieceNotation(
-      move.promoteToType,
-      useUnicodeIcons,
-      move.color
-    )}`;
+    suffix = `=${getPieceNotation(move.promoteToType, useUnicodeIcons)}`;
   }
 
   if (move.status === KingStatus.IsCheck) {
@@ -266,4 +267,158 @@ export const getGameNotation = (
   });
 
   return gameNotation.join(" ");
+};
+
+export const notationToMove = (
+  notation: string,
+  activeColor: PieceColor,
+  pieces: Piece[],
+  history: MoveItem[]
+) => {
+  const move: MoveItem = {
+    from: { x: -1, y: -1 },
+    to: { x: -1, y: -1 },
+    type: PieceType.Pawn,
+    color: activeColor,
+    captures: false,
+    kind: MoveType.NonSpecial,
+    status: KingStatus.IsNoCheck,
+    promoteToType: null,
+  };
+
+  // check if move is castling
+  if (notation === "O-O") {
+    move.kind = MoveType.Castling;
+    move.from = { x: 4, y: activeColor === PieceColor.White ? 0 : 7 };
+    move.to = { x: 6, y: activeColor === PieceColor.White ? 0 : 7 };
+    return move;
+  } else if (notation === "O-O-O") {
+    move.kind = MoveType.Castling;
+    move.from = { x: 4, y: activeColor === PieceColor.White ? 0 : 7 };
+    move.to = { x: 2, y: activeColor === PieceColor.White ? 0 : 7 };
+    return move;
+  }
+
+  // check if move is en passant
+  if (notation.includes("e.p.")) {
+    move.kind = MoveType.EnPassant;
+    move.captures = true;
+  }
+
+  // check if move is promotion
+  if (notation.includes("=")) {
+    move.kind = MoveType.Promotion;
+    move.promoteToType = notationToPieceType(notation.split("=")[1]);
+  }
+
+  // check if move is check or checkmate
+  if (notation.includes("#")) {
+    move.status = KingStatus.IsCheckmate;
+  } else if (notation.includes("+")) {
+    move.status = KingStatus.IsCheck;
+  }
+
+  // check if move is capture
+  if (notation.includes("x")) {
+    move.captures = true;
+  }
+
+  // find piece type
+  const pieceTypeRegex = /[RNBQK]/;
+  if (pieceTypeRegex.test(notation[0])) {
+    move.type = notationToPieceType(notation[0]);
+  } else {
+    move.type = PieceType.Pawn;
+  }
+
+  // find to square
+  const toSquareRegex = /[a-h][1-8]/;
+  const toSquare = notation.match(toSquareRegex);
+  if (toSquare) {
+    move.to = getSquareFromName(toSquare[0]);
+  }
+
+  // find from square
+  let possiblePieces = getPiecesThatCanMoveToSquare(pieces, move.to, history);
+
+  possiblePieces = possiblePieces.filter((piece) => {
+    return piece.color === activeColor && piece.type === move.type;
+  });
+
+  if (possiblePieces.length === 0) {
+    console.log(move, possiblePieces, activeColor);
+    throw new Error(`No piece can move to this square ${notation}`);
+  }
+
+  if (possiblePieces.length === 1) {
+    move.from = getPieceSquare(possiblePieces[0]);
+  }
+
+  if (possiblePieces.length > 1) {
+    // if there are multiple pieces that can move to the square, we need to find the correct one
+    // first we need to find the piece that is moving from the correct file
+
+    const fromFileRegex = /[a-h]/;
+    const fromFile = notation.match(fromFileRegex);
+    if (fromFile) {
+      const x = getXFromFileName(fromFile[0]);
+      possiblePieces = possiblePieces.filter((piece) => {
+        return getPieceSquare(piece).x === x;
+      });
+
+      if (possiblePieces.length === 1) {
+        move.from = getPieceSquare(possiblePieces[0]);
+      } else if (possiblePieces.length > 1) {
+        // if there are still multiple pieces that can move to the square
+        // we need to find the piece that is moving from the correct rank
+
+        const fromRankRegex = /[1-8]/;
+        const fromRank = notation.match(fromRankRegex);
+        if (fromRank) {
+          const y = getYFromRankName(fromRank[0]);
+          possiblePieces = possiblePieces.filter((piece) => {
+            return getPieceSquare(piece).y === y;
+          });
+
+          if (possiblePieces.length === 1) {
+            move.from = getPieceSquare(possiblePieces[0]);
+          } else {
+            console.log(move, possiblePieces, activeColor);
+            throw new Error(
+              `Multiple pieces can move to this square ${notation}`
+            );
+          }
+        }
+      }
+    }
+  }
+
+  return move;
+};
+
+export const notationToMoves = (
+  notation: string,
+  startingPieces: Piece[],
+  onProgress?: (pieces: Piece[], moves: MoveItem[]) => void
+) => {
+  const moves: MoveItem[] = [];
+  let activeColor = PieceColor.White;
+  let pieces = [...startingPieces];
+
+  const turnNumberRegex = /[0-9]+\./;
+  const notationArray = notation.split(" ").filter((item) => {
+    return !turnNumberRegex.test(item);
+  });
+
+  notationArray.forEach((notation) => {
+    const move = notationToMove(notation, activeColor, pieces, moves);
+    moves.push(move);
+    pieces = applyMove(pieces, move);
+    activeColor = invertColor(activeColor);
+    if (onProgress) onProgress(pieces, moves);
+  });
+
+  console.log(pieces, moves);
+
+  return { pieces, moves };
 };

@@ -16,6 +16,12 @@
     @piece-deselected="onPieceDeselected"
     @piece-moved="onPieceMoved"
   />
+  <input
+    type="text"
+    v-model="moveNotation"
+    class="px-6 py-4 text-gray-900 dark:text-gray-50 bg-gray-200 dark:bg-gray-700 rounded-xl"
+  />
+  <button @click="loadFromNotation">load</button>
 </template>
 
 <script setup lang="ts">
@@ -46,6 +52,7 @@ import {
 import { get, set } from "@vueuse/core";
 import { useSettingsStore } from "@/stores/settings";
 import { storeToRefs } from "pinia";
+import { notationToMoves } from "@/lib/chessNotation";
 
 const settingsStore = useSettingsStore();
 
@@ -57,18 +64,38 @@ const moveHistory = ref<MoveItem[]>([]);
 
 const selectedPiece = ref<Piece | null>(null);
 
+const moveNotation = ref("");
+
 const activeColor = computed(() => {
   return moveHistory.value.length % 2 === 0
     ? PieceColor.White
     : PieceColor.Black;
 });
 
+const loadFromNotation = () => {
+  const res = notationToMoves(
+    get(moveNotation),
+    getInitialBoard(),
+    (rPieces, rMoves) => {
+      set(pieces, rPieces);
+      set(moveHistory, rMoves);
+    }
+  );
+
+  set(pieces, res.pieces);
+  set(moveHistory, res.moves);
+};
+
 const validSquaresForSelectedPiece = computed(() => {
   if (!get(selectedPiece)) {
     return [];
   }
 
-  return getValidSquaresForPiece(get(pieces), get(selectedPiece)!, []);
+  return getValidSquaresForPiece(
+    get(pieces),
+    get(selectedPiece)!,
+    get(moveHistory)
+  );
 });
 
 const highlightSquares = computed((): BoardHighlightSquare[] => {
