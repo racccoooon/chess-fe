@@ -368,7 +368,12 @@ watch(
     // we are looking for pieces in the new value that are not in the old value
     const addedPieces: Piece[] = newValue.filter((piece) => {
       return !oldValue.find((oldPiece) => {
-        return objectHash(piece) === objectHash(oldPiece);
+        return (
+          piece.type === oldPiece.type &&
+          piece.color === oldPiece.color &&
+          piece.x === oldPiece.x &&
+          piece.y === oldPiece.y
+        );
       });
     });
 
@@ -376,7 +381,12 @@ watch(
     // we are looking for pieces in the old value that are not in the new value
     const removedPieces: Piece[] = oldValue.filter((piece) => {
       return !newValue.find((newPiece) => {
-        return objectHash(piece) === objectHash(newPiece);
+        return (
+          piece.type === newPiece.type &&
+          piece.color === newPiece.color &&
+          piece.x === newPiece.x &&
+          piece.y === newPiece.y
+        );
       });
     });
 

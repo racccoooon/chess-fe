@@ -175,6 +175,27 @@ export const getMoveNotation = (
 
     return `${piece}${from}-${to}${suffix}`;
   }
+
+  return "";
+};
+
+export const asyncGetMoveNotation = async (
+  move: MoveItem,
+  notationType: NotationType,
+  useUnicodeIcons: boolean,
+  pieces?: Piece[],
+  history?: MoveItem[]
+) => {
+  return new Promise<string>((resolve) => {
+    const res = getMoveNotation(
+      move,
+      notationType,
+      useUnicodeIcons,
+      pieces,
+      history
+    );
+    resolve(res);
+  });
 };
 
 export const getSpokenMoveNotation = (move: MoveItem) => {

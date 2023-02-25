@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-wrap gap-2 overflow-y-auto">
-    <div v-for="(moveGroup, groupIndex) in groupedMoves" :key="groupIndex">
+    <div v-for="(moveGroup, groupIndex) in gameNotation" :key="groupIndex">
       <div class="flex flex-row items-center gap-2">
         <span class="text-gray-500 dark:text-gray-300"
           >{{ groupIndex + 1 }}.</span
@@ -13,15 +13,7 @@
             :key="itemIndex"
             @click="emit('timeTravelAbsolute', groupIndex * 2 + itemIndex + 1)"
           >
-            {{
-              getMoveNotation(
-                move,
-                notationType,
-                useUnicodeIconsInNotation,
-                getBoardAtHistoryIndex(moveHistory, groupIndex * 2 + itemIndex),
-                getHistoryUntilIndex(moveHistory, groupIndex * 2 + itemIndex)
-              )
-            }}
+            {{ move }}
           </button>
         </div>
       </div>
@@ -31,11 +23,12 @@
 
 <script setup lang="ts">
 import type { MoveItem } from "@/lib/types";
-import { getMoveNotation } from "@/lib/chessNotation";
+import { asyncGetMoveNotation } from "@/lib/chessNotation";
 import { computed } from "vue";
 import { storeToRefs } from "pinia";
 import { useSettingsStore } from "@/stores/settings";
 import { getBoardAtHistoryIndex, getHistoryUntilIndex } from "@/lib/chess";
+import { computedAsync, get } from "@vueuse/core";
 
 const props = defineProps<{
   moveHistory: MoveItem[];
@@ -62,6 +55,36 @@ const groupedMoves = computed(() => {
 
   return groupedMoves;
 });
+
+const gameNotation = computedAsync(
+  async () => {
+    const arr: string[][] = [];
+
+    for (let i = 0; i < get(groupedMoves).length; i++) {
+      const moveGroup = get(groupedMoves)[i];
+
+      arr[i] = [];
+
+      for (let j = 0; j < moveGroup.length; j++) {
+        const move = moveGroup[j];
+
+        const notation = await asyncGetMoveNotation(
+          move,
+          get(notationType),
+          get(useUnicodeIconsInNotation),
+          getBoardAtHistoryIndex(props.moveHistory, i * 2 + j),
+          getHistoryUntilIndex(props.moveHistory, i * 2 + j)
+        );
+
+        arr[i].push(notation);
+      }
+    }
+
+    return arr;
+  },
+  [],
+  { lazy: true }
+);
 
 const { notationType, useUnicodeIconsInNotation } = storeToRefs(
   useSettingsStore()
