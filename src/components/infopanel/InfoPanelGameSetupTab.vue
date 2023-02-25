@@ -5,7 +5,7 @@
         <template #label>White Player Name</template>
         <CompactFormInputElement>
           <LargeTextInput
-            :model-value="whitePlayerName"
+            :model-value="whitePlayerName || 'White'"
             @update:model-value="emit('update:whitePlayerName', $event)"
           />
         </CompactFormInputElement>
@@ -14,7 +14,7 @@
         <template #label>Black Player Name</template>
         <CompactFormInputElement>
           <LargeTextInput
-            :model-value="blackPlayerName"
+            :model-value="blackPlayerName || 'Black'"
             @update:model-value="emit('update:blackPlayerName', $event)"
           />
         </CompactFormInputElement>
