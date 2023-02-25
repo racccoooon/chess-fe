@@ -37,7 +37,12 @@
         :black-player-name="blackPlayerName"
         @update:black-player-name="emit('update:blackPlayerName', $event)"
       />
-      <InfoPanelInviteTab v-else-if="activeTab === GameInfoTab.Invite" />
+      <InfoPanelShareTab
+        v-else-if="activeTab === GameInfoTab.Share"
+        :move-history="moveHistory"
+        :white-player-name="whitePlayerName"
+        :black-player-name="blackPlayerName"
+      />
       <InfoPanelSettingsTab v-else-if="activeTab === GameInfoTab.Settings" />
     </div>
   </div>
@@ -49,7 +54,7 @@ import type { PieceColor } from "@/lib/types";
 import { ref } from "vue";
 import InfoPanelGameTab from "@/components/infopanel/InfoPanelGameTab.vue";
 import InfoPanelSettingsTab from "@/components/infopanel/InfoPanelSettingsTab.vue";
-import InfoPanelInviteTab from "@/components/infopanel/InfoPanelInviteTab.vue";
+import InfoPanelShareTab from "@/components/infopanel/InfoPanelShareTab.vue";
 import { set, watchOnce } from "@vueuse/core";
 import { GameInfoTab } from "@/lib/types";
 import type { ImportGameEvent } from "@/lib/types";
@@ -74,9 +79,9 @@ const emit = defineEmits<{
   (event: "update:blackPlayerName", payload: string): void;
 }>();
 
-const activeTab = ref<GameInfoTab>(GameInfoTab.Invite);
+const activeTab = ref<GameInfoTab>(GameInfoTab.Share);
 
-if (!props.tabs.includes(GameInfoTab.Invite)) {
+if (!props.tabs.includes(GameInfoTab.Share)) {
   if (props.tabs.includes(GameInfoTab.Game)) {
     set(activeTab, GameInfoTab.Game);
   } else if (props.tabs.includes(GameInfoTab.Analysis)) {
@@ -97,7 +102,7 @@ const tabNames: Record<GameInfoTab, string> = {
   [GameInfoTab.Game]: "Game",
   [GameInfoTab.Analysis]: "Analysis",
   [GameInfoTab.GameSetup]: "Setup",
-  [GameInfoTab.Invite]: "Invite",
+  [GameInfoTab.Share]: "Share",
   [GameInfoTab.Settings]: "Settings",
 };
 </script>

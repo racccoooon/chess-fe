@@ -95,8 +95,8 @@ const activeColor = computed(() => {
     : PieceColor.Black;
 });
 
-const whitePlayerName = ref((query.wp as string) || "White");
-const blackPlayerName = ref((query.bp as string) || "Black");
+const whitePlayerName = ref((query.white as string) || "White");
+const blackPlayerName = ref((query.black as string) || "Black");
 
 const importError = ref(false);
 const importErrorMessage = ref("");
@@ -122,8 +122,8 @@ const onImportGame = (e: ImportGameEvent) => {
   // i dont like try catch blocks either
 };
 
-if (query.san) {
-  const san = (query.san as string).split("/").join(" ");
+if (query.moves) {
+  const san = (query.moves as string).split("/").join(" ");
 
   onImportGame({
     san,
@@ -135,11 +135,11 @@ const updateQuery = () => {
   let query: any = {};
 
   if (get(whitePlayerName) !== "White") {
-    query.wp = get(whitePlayerName);
+    query.white = get(whitePlayerName);
   }
 
   if (get(blackPlayerName) !== "Black") {
-    query.bp = get(blackPlayerName);
+    query.black = get(blackPlayerName);
   }
 
   if (get(setupFen) !== defaultFen) {
@@ -154,7 +154,7 @@ const updateQuery = () => {
       fenToPieces(get(setupFen))
     );
 
-    query.san = notation.split(" ").join("/");
+    query.moves = notation.split(" ").join("/");
   }
 
   router.replace({ query });

@@ -203,6 +203,6 @@ export enum GameInfoTab {
   Game = "game",
   Analysis = "analysis",
   GameSetup = "gameSetup",
-  Invite = "invite",
+  Share = "share",
   Settings = "settings",
 }

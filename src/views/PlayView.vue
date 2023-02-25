@@ -11,7 +11,7 @@
     :white-player-name="whitePlayerName"
     :black-player-name="blackPlayerName"
     :highlight-squares="highlightSquares"
-    :panel-tabs="[GameInfoTab.Game, GameInfoTab.Invite, GameInfoTab.Settings]"
+    :panel-tabs="[GameInfoTab.Game, GameInfoTab.Share, GameInfoTab.Settings]"
     @piece-selected="onPieceSelected"
     @piece-deselected="onPieceDeselected"
     @piece-moved="onPieceMoved"
