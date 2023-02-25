@@ -1,22 +1,15 @@
 <template>
   <div class="grow">
-    <div class="flex flex-col gap-6 pb-12 md:w-5/6">
-      <div class="flex flex-col gap-4">
-        <label class="text-gray-900 dark:text-gray-50 font-medium"
-          >Your Name</label
-        >
-        <div>
-          <input
-            class="w-full px-6 py-4 text-gray-900 dark:text-gray-50 bg-gray-200 dark:bg-gray-700 rounded-xl"
-            v-model="userName"
-          />
-        </div>
-      </div>
-      <div class="flex flex-col gap-4">
-        <label class="text-gray-900 dark:text-gray-50 font-medium"
-          >Chess Board</label
-        >
-        <div>
+    <CompactFormWrapper>
+      <CompactFormSection>
+        <template #label>Your Name</template>
+        <CompactFormInputElement>
+          <LargeTextInput v-model="userName" />
+        </CompactFormInputElement>
+      </CompactFormSection>
+      <CompactFormSection>
+        <template #label>Chess Board</template>
+        <CompactFormInputElement>
           <SmallPreviewOptionsGroup
             :options="[
               {
@@ -120,8 +113,8 @@
               </svg>
             </template>
           </SmallPreviewOptionsGroup>
-        </div>
-        <div>
+        </CompactFormInputElement>
+        <CompactFormInputElement>
           <SmallOptionsGroup
             v-model="boardBorder"
             :options="[
@@ -139,8 +132,8 @@
               },
             ]"
           />
-        </div>
-        <div>
+        </CompactFormInputElement>
+        <CompactFormInputElement>
           <SmallOptionsGroup
             v-model="showCoordinates"
             :options="[
@@ -154,13 +147,11 @@
               },
             ]"
           />
-        </div>
-      </div>
-      <div class="flex flex-col gap-4">
-        <label class="text-gray-900 dark:text-gray-50 font-medium"
-          >Chess Pieces</label
-        >
-        <div>
+        </CompactFormInputElement>
+      </CompactFormSection>
+      <CompactFormSection>
+        <template #label>Chess Pieces</template>
+        <CompactFormInputElement>
           <SmallPreviewOptionsGroup
             v-model="pieceSet"
             :options="[
@@ -191,8 +182,8 @@
               />
             </template>
           </SmallPreviewOptionsGroup>
-        </div>
-        <div>
+        </CompactFormInputElement>
+        <CompactFormInputElement>
           <SmallOptionsGroup
             v-model="piecesDisplaySize"
             :options="[
@@ -214,13 +205,11 @@
               },
             ]"
           />
-        </div>
-      </div>
-      <div class="flex flex-col gap-4">
-        <label class="text-gray-900 dark:text-gray-50 font-medium"
-          >Highlight Squares</label
-        >
-        <div>
+        </CompactFormInputElement>
+      </CompactFormSection>
+      <CompactFormSection>
+        <template #label>Highlight Squares</template>
+        <CompactFormInputElement>
           <SmallOptionsGroup
             v-model="showLegalMoves"
             :options="[
@@ -234,8 +223,8 @@
               },
             ]"
           />
-        </div>
-        <div>
+        </CompactFormInputElement>
+        <CompactFormInputElement>
           <SmallOptionsGroup
             v-model="showLastMove"
             :options="[
@@ -249,8 +238,8 @@
               },
             ]"
           />
-        </div>
-        <div>
+        </CompactFormInputElement>
+        <CompactFormInputElement>
           <SmallOptionsGroup
             v-model="showCheck"
             :options="[
@@ -264,13 +253,11 @@
               },
             ]"
           />
-        </div>
-      </div>
-      <div class="flex flex-col gap-4">
-        <label class="text-gray-900 dark:text-gray-50 font-medium"
-          >Notation style</label
-        >
-        <div>
+        </CompactFormInputElement>
+      </CompactFormSection>
+      <CompactFormSection>
+        <template #label>Notation</template>
+        <CompactFormInputElement>
           <SmallOptionsGroup
             v-model="notationType"
             :options="[
@@ -288,8 +275,8 @@
               },
             ]"
           />
-        </div>
-        <div>
+        </CompactFormInputElement>
+        <CompactFormInputElement>
           <SmallOptionsGroup
             v-model="useUnicodeIconsInNotation"
             :options="[
@@ -303,13 +290,11 @@
               },
             ]"
           />
-        </div>
-      </div>
-      <div class="flex flex-col gap-4">
-        <label class="text-gray-900 dark:text-gray-50 font-medium"
-          >Animations</label
-        >
-        <div>
+        </CompactFormInputElement>
+      </CompactFormSection>
+      <CompactFormSection>
+        <template #label>Animations</template>
+        <CompactFormInputElement>
           <SmallOptionsGroup
             v-model="animationDuration"
             :options="[
@@ -331,19 +316,15 @@
               },
             ]"
           />
-        </div>
-      </div>
-      <div class="flex flex-col gap-4">
-        <div class="flex flex-col gap-2">
-          <label class="text-gray-900 dark:text-gray-50 font-medium"
-            >Move style</label
-          >
-          <p class="text-sm text-gray-700 dark:text-gray-300">
-            If moving pieces doesn't work with a touch screen try setting this
-            to click only.
-          </p>
-        </div>
-        <div>
+        </CompactFormInputElement>
+      </CompactFormSection>
+      <CompactFormSection>
+        <template #label>Move style</template>
+        <template #description>
+          If moving pieces doesn't work with a touch screen try setting this to
+          click only.
+        </template>
+        <CompactFormInputElement>
           <SmallOptionsGroup
             v-model="preferredMoveStyle"
             :options="[
@@ -361,8 +342,8 @@
               },
             ]"
           />
-        </div>
-        <div>
+        </CompactFormInputElement>
+        <CompactFormInputElement>
           <SmallOptionsGroup
             v-model="clickDuration"
             :options="[
@@ -380,16 +361,12 @@
               },
             ]"
           />
-        </div>
-      </div>
-      <div class="flex flex-col gap-4">
-        <label class="text-gray-900 dark:text-gray-50 font-medium"
-          >Miscellaneous</label
-        >
-        <div class="flex flex-col gap-2">
-          <label class="text-sm font-medium text-gray-700 dark:text-gray-300"
-            >User arrows and highlights</label
-          >
+        </CompactFormInputElement>
+      </CompactFormSection>
+      <CompactFormSection>
+        <template #label>Miscellaneous</template>
+        <CompactFormInputElement>
+          <template #label>User arrows and highlights</template>
           <SmallOptionsGroup
             v-model="alwaysKeepUserHighlights"
             :options="[
@@ -403,16 +380,12 @@
               },
             ]"
           />
-        </div>
-      </div>
-      <div class="flex flex-col gap-4">
-        <label class="text-gray-900 dark:text-gray-50 font-medium"
-          >Highlight Colors</label
-        >
-        <div class="flex flex-col gap-2">
-          <label class="text-sm font-medium text-gray-700 dark:text-gray-300"
-            >User Arrows</label
-          >
+        </CompactFormInputElement>
+      </CompactFormSection>
+      <CompactFormSection>
+        <template #label>Highlight Colors</template>
+        <CompactFormInputElement>
+          <template #label>User Arrows</template>
           <SmallPreviewOptionsGroup
             :options="[
               {
@@ -465,11 +438,9 @@
               <div class="w-full h-full" :class="option.userOptions.class" />
             </template>
           </SmallPreviewOptionsGroup>
-        </div>
-        <div class="flex flex-col gap-2">
-          <label class="text-sm font-medium text-gray-700 dark:text-gray-300"
-            >User highlighted squares</label
-          >
+        </CompactFormInputElement>
+        <CompactFormInputElement>
+          <template #label>User highlighted squares</template>
           <SmallPreviewOptionsGroup
             :options="[
               {
@@ -522,11 +493,9 @@
               <div class="w-full h-full" :class="option.userOptions.class" />
             </template>
           </SmallPreviewOptionsGroup>
-        </div>
-        <div class="flex flex-col gap-2">
-          <label class="text-sm font-medium text-gray-700 dark:text-gray-300"
-            >Last Move</label
-          >
+        </CompactFormInputElement>
+        <CompactFormInputElement>
+          <template #label>Last Move</template>
           <SmallPreviewOptionsGroup
             :options="[
               {
@@ -579,11 +548,9 @@
               <div class="w-full h-full" :class="option.userOptions.class" />
             </template>
           </SmallPreviewOptionsGroup>
-        </div>
-        <div class="flex flex-col gap-2">
-          <label class="text-sm font-medium text-gray-700 dark:text-gray-300"
-            >Selected Square</label
-          >
+        </CompactFormInputElement>
+        <CompactFormInputElement>
+          <template #label>Selected Square</template>
           <SmallPreviewOptionsGroup
             :options="[
               {
@@ -636,11 +603,9 @@
               <div class="w-full h-full" :class="option.userOptions.class" />
             </template>
           </SmallPreviewOptionsGroup>
-        </div>
-        <div class="flex flex-col gap-2">
-          <label class="text-sm font-medium text-gray-700 dark:text-gray-300"
-            >Legal Moves</label
-          >
+        </CompactFormInputElement>
+        <CompactFormInputElement>
+          <template #label>Legal Moves</template>
           <SmallPreviewOptionsGroup
             :options="[
               {
@@ -693,9 +658,9 @@
               <div class="w-full h-full" :class="option.userOptions.class" />
             </template>
           </SmallPreviewOptionsGroup>
-        </div>
-      </div>
-    </div>
+        </CompactFormInputElement>
+      </CompactFormSection>
+    </CompactFormWrapper>
   </div>
 </template>
 
@@ -719,6 +684,10 @@ import SmallOptionsGroup from "@/components/forms/SmallOptionsGroup.vue";
 import SmallPreviewOptionsGroup from "@/components/forms/SmallPreviewOptionsGroup.vue";
 import PieceRenderer from "@/components/pieces/PieceRenderer.vue";
 import { useUserStore } from "@/stores/user";
+import LargeTextInput from "@/components/forms/LargeTextInput.vue";
+import CompactFormWrapper from "@/components/forms/CompactFormWrapper.vue";
+import CompactFormSection from "@/components/forms/CompactFormSection.vue";
+import CompactFormInputElement from "@/components/forms/CompactFormInputElement.vue";
 
 const settingsStore = useSettingsStore();
 
