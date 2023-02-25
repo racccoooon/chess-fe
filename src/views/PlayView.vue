@@ -52,6 +52,7 @@ import type {
   PieceMovedEvent,
   PieceSelectedEvent,
   PromotionSelectedEvent,
+  Square,
 } from "@/lib/types";
 import {
   GameInfoTab,
@@ -62,7 +63,7 @@ import {
   PlayerColor,
 } from "@/lib/types";
 import { computed, onMounted, ref, watch } from "vue";
-import { get, set, syncRef } from "@vueuse/core";
+import { get, set, syncRef, useMemoize, whenever } from "@vueuse/core";
 import { SignalrConnection } from "@/lib/signalr";
 import { useUserStore } from "@/stores/user";
 import { getSquareName } from "@/lib/chessNotation";
@@ -70,6 +71,7 @@ import {
   applyMove,
   comparePieceAndPlayerColor,
   getPieceAtSquare,
+  getPieceSquare,
   getValidSquaresForPiece,
   invertColor,
 } from "@/lib/chess";
@@ -78,6 +80,7 @@ import SuperDuperModal from "@/components/modals/SuperDuperModal.vue";
 import PromoteModalContent from "@/components/modals/PromoteModalContent.vue";
 import { useSettingsStore } from "@/stores/settings";
 import { storeToRefs } from "pinia";
+import { getValidMoves } from "@/lib/api";
 
 const router = useRouter();
 const hubConnection = new SignalrConnection();
@@ -87,7 +90,7 @@ const settingsStore = useSettingsStore();
 
 const { showLegalMoves, legalMoveHighlightColor } = storeToRefs(settingsStore);
 
-const { name: userName } = storeToRefs(userStore);
+const { name: userName, token: userToken } = storeToRefs(userStore);
 
 const gameId = ref(useRoute().params.gameId as string);
 
@@ -117,9 +120,65 @@ const playerCanMove = computed(() => {
 
 const selectedPiece = ref<Piece | null>(null);
 
+const validMoves = ref<{ from: Square; to: Square[] }[]>([]);
+
+/***
+ * Query the server for valid moves for a piece and cache the result
+ */
+const getValidMovesFromServer = useMemoize(async (piece: Piece) => {
+  return await getValidMoves(
+    get(gameId),
+    get(userToken),
+    getPieceSquare(piece)
+  );
+});
+
+/**
+ * When the selected piece changes, query the server for valid moves
+ */
+whenever(selectedPiece, async () => {
+  if (!get(selectedPiece)) {
+    return;
+  }
+
+  const validSquares = await getValidMovesFromServer(get(selectedPiece)!);
+
+  const square = getPieceSquare(get(selectedPiece)!);
+
+  const moves = get(validMoves).find(
+    (e) => e.from.x == square.x && e.from.y == square.y
+  );
+
+  if (moves) {
+    moves.to = validSquares;
+  } else {
+    get(validMoves).push({
+      from: getPieceSquare(get(selectedPiece)!),
+      to: validSquares,
+    });
+  }
+});
+
+/***
+ * When the pieces change, clear the valid moves cache
+ */
+watch(pieces, () => {
+  getValidMovesFromServer.clear();
+});
+
 const validSquaresForSelectedPiece = computed(() => {
   if (!get(selectedPiece)) {
     return [];
+  }
+
+  const square = getPieceSquare(get(selectedPiece)!);
+
+  const moves = get(validMoves).find(
+    (e) => e.from.x == square.x && e.from.y == square.y
+  );
+
+  if (moves) {
+    return moves.to;
   }
 
   return getValidSquaresForPiece(
@@ -228,7 +287,7 @@ const initialize = async () => {
   });
 
   // join the game
-  await hubConnection.joinGame(get(gameId), userStore.token, userStore.name);
+  await hubConnection.joinGame(get(gameId), get(userToken), get(userName));
 };
 
 const resolveMove = (move: MoveItem) => {
