@@ -69,7 +69,7 @@
 <script setup lang="ts">
 import GameHistory from "@/components/GameHistory.vue";
 import type { MoveItem } from "@/lib/types";
-import { PieceColor } from "@/lib/types";
+import type { PieceColor } from "@/lib/types";
 import { getChessOpening } from "@/lib/chessOpenings";
 import { asyncComputed, useIntervalFn } from "@vueuse/core";
 // @ts-ignore
