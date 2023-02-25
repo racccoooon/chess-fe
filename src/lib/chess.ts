@@ -140,6 +140,23 @@ export const charToPiece = (
   }
 };
 
+export const pieceToChar = (piece: Piece): string => {
+  switch (piece.type) {
+    case PieceType.Pawn:
+      return piece.color === PieceColor.Black ? "p" : "P";
+    case PieceType.Knight:
+      return piece.color === PieceColor.Black ? "n" : "N";
+    case PieceType.Bishop:
+      return piece.color === PieceColor.Black ? "b" : "B";
+    case PieceType.Rook:
+      return piece.color === PieceColor.Black ? "r" : "R";
+    case PieceType.Queen:
+      return piece.color === PieceColor.Black ? "q" : "Q";
+    case PieceType.King:
+      return piece.color === PieceColor.Black ? "k" : "K";
+  }
+}
+
 export const fenToPieces = (fen: string): Piece[] => {
   const pieces: Piece[] = [];
   const rows = fen.split("/");
@@ -160,6 +177,23 @@ export const fenToPieces = (fen: string): Piece[] => {
     y--;
   }
   return pieces;
+};
+
+export const piecesToFen = (pieces: Piece[]): string => {
+  const rows: string[] = [];
+  for (let y = 7; y >= 0; y--) {
+    let row = "";
+    for (let x = 0; x < 8; x++) {
+      const piece = getPieceAtSquare(pieces, x, y);
+      if (piece) {
+        row += pieceToChar(piece);
+      } else {
+        row += "1";
+      }
+    }
+    rows.push(row);
+  }
+  return rows.join("/");
 };
 
 export const defaultFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";

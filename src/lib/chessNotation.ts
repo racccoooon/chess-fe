@@ -2,6 +2,8 @@ import type { MoveItem, Piece, Square } from "@/lib/types";
 import { KingStatus, MoveType, PieceColor, PieceType } from "@/lib/types";
 import {
   applyMove,
+  getHistoryUntilIndex,
+  getInitialBoard,
   getPieceSquare,
   getPiecesThatCanMoveToSquare,
   invertColor,
@@ -252,18 +254,31 @@ export const getSpokenMoveNotation = (move: MoveItem) => {
 
 export const getGameNotation = (
   moves: MoveItem[],
-  notationType: NotationType
+  notationType: NotationType,
+  includeMoveNumbers: boolean = true,
+  startPieces?: Piece[]
 ) => {
+  let pieces = [...(startPieces || getInitialBoard())];
   const gameNotation: string[] = [];
   let moveNumber = 1;
 
   moves.forEach((move, index) => {
-    if (index % 2 === 0) {
+    if (index % 2 === 0 && includeMoveNumbers) {
       gameNotation.push(`${moveNumber}.`);
       moveNumber++;
     }
 
-    gameNotation.push(getMoveNotation(move, notationType, false) as string);
+    const notation = getMoveNotation(
+      move,
+      notationType,
+      false,
+      pieces,
+      getHistoryUntilIndex(moves, index)
+    );
+
+    gameNotation.push(notation);
+
+    pieces = applyMove(pieces, move);
   });
 
   return gameNotation.join(" ");
@@ -346,7 +361,6 @@ export const notationToMove = (
   });
 
   if (possiblePieces.length === 0) {
-    console.log(move, possiblePieces, activeColor);
     throw new Error(`No piece can move to this square ${notation}`);
   }
 
@@ -383,7 +397,6 @@ export const notationToMove = (
           if (possiblePieces.length === 1) {
             move.from = getPieceSquare(possiblePieces[0]);
           } else {
-            console.log(move, possiblePieces, activeColor);
             throw new Error(
               `Multiple pieces can move to this square ${notation}`
             );

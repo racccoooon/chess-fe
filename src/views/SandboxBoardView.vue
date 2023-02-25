@@ -41,54 +41,62 @@
 <script setup lang="ts">
 import GameLayout from "@/components/GameLayout.vue";
 import { computed, ref } from "vue";
+import type {
+  BoardHighlightSquare,
+  ImportGameEvent,
+  MoveItem,
+  Piece,
+  PieceMovedEvent,
+  PieceSelectedEvent,
+} from "@/lib/types";
 import {
-  HighlightShape,
   GameInfoTab,
+  HighlightShape,
   KingStatus,
   MoveType,
   PieceColor,
   PlayerColor,
 } from "@/lib/types";
-import type {
-  BoardHighlightSquare,
-  Piece,
-  MoveItem,
-  PieceMovedEvent,
-  PieceSelectedEvent,
-  ImportGameEvent,
-} from "@/lib/types";
 import {
   applyMove,
+  defaultFen,
   fenToPieces,
-  getInitialBoard,
   getPieceAtSquare,
   getPieceSquare,
   getValidSquaresForPiece,
 } from "@/lib/chess";
-import { get, set } from "@vueuse/core";
+import { get, set, watchDebounced } from "@vueuse/core";
 import { useSettingsStore } from "@/stores/settings";
 import { storeToRefs } from "pinia";
-import { notationToMoves } from "@/lib/chessNotation";
+import {
+  getGameNotation,
+  notationToMoves,
+  NotationType,
+} from "@/lib/chessNotation";
 import SuperDuperModal from "@/components/modals/SuperDuperModal.vue";
+import { useRoute, useRouter } from "vue-router";
 
-const settingsStore = useSettingsStore();
+const { showLegalMoves, legalMoveHighlightColor } = storeToRefs(
+  useSettingsStore()
+);
 
-const { showLegalMoves, legalMoveHighlightColor } = storeToRefs(settingsStore);
+const router = useRouter();
+const query = useRoute().query;
 
-const pieces = ref<Piece[]>(getInitialBoard());
+const setupFen = ref((query.fen as string) || defaultFen);
 
+const pieces = ref<Piece[]>(fenToPieces(get(setupFen)));
 const moveHistory = ref<MoveItem[]>([]);
 
 const selectedPiece = ref<Piece | null>(null);
-
 const activeColor = computed(() => {
   return moveHistory.value.length % 2 === 0
     ? PieceColor.White
     : PieceColor.Black;
 });
 
-const whitePlayerName = ref("White");
-const blackPlayerName = ref("Black");
+const whitePlayerName = ref((query.wp as string) || "White");
+const blackPlayerName = ref((query.bp as string) || "Black");
 
 const importError = ref(false);
 const importErrorMessage = ref("");
@@ -104,6 +112,8 @@ const onImportGame = (e: ImportGameEvent) => {
 
     set(pieces, res.pieces);
     set(moveHistory, res.moves);
+
+    set(setupFen, fen);
   } catch (e: any) {
     set(importError, true);
     set(importErrorMessage, e.message as string);
@@ -111,6 +121,52 @@ const onImportGame = (e: ImportGameEvent) => {
 
   // i dont like try catch blocks either
 };
+
+if (query.san) {
+  const san = (query.san as string).split("/").join(" ");
+
+  onImportGame({
+    san,
+    fen: get(setupFen),
+  });
+}
+
+const updateQuery = () => {
+  let query: any = {};
+
+  if (get(whitePlayerName) !== "White") {
+    query.wp = get(whitePlayerName);
+  }
+
+  if (get(blackPlayerName) !== "Black") {
+    query.bp = get(blackPlayerName);
+  }
+
+  if (get(setupFen) !== defaultFen) {
+    query.fen = get(setupFen);
+  }
+
+  if (get(moveHistory).length !== 0) {
+    const notation = getGameNotation(
+      get(moveHistory),
+      NotationType.Algebraic,
+      false,
+      fenToPieces(get(setupFen))
+    );
+
+    query.san = notation.split(" ").join("/");
+  }
+
+  router.replace({ query });
+};
+
+watchDebounced(
+  [pieces, moveHistory, whitePlayerName, blackPlayerName],
+  () => {
+    updateQuery();
+  },
+  { deep: true, debounce: 500, maxWait: 1000 }
+);
 
 const validSquaresForSelectedPiece = computed(() => {
   if (!get(selectedPiece)) {
