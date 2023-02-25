@@ -28,9 +28,11 @@
         <CompactFormInputElement>
           <div class="flex flex-row gap-2">
             <LargeTextInput v-model="fenInput" />
-            <LargeSecondaryButton @click="fenInput = setupFen || defaultFen">
+            <LargeFlatSecondaryButton
+              @click="fenInput = setupFen || defaultFen"
+            >
               <SvgIcon type="mdi" :path="mdiUndoVariant" size="22" />
-            </LargeSecondaryButton>
+            </LargeFlatSecondaryButton>
           </div>
         </CompactFormInputElement>
       </CompactFormSection>
@@ -42,9 +44,9 @@
         <CompactFormInputElement>
           <div class="flex flex-row gap-2">
             <LargeTextInput v-model="notationInput" />
-            <LargeSecondaryButton @click="notationInput = notation">
+            <LargeFlatSecondaryButton @click="notationInput = notation">
               <SvgIcon type="mdi" :path="mdiUndoVariant" size="22" />
-            </LargeSecondaryButton>
+            </LargeFlatSecondaryButton>
           </div>
         </CompactFormInputElement>
       </CompactFormSection>
@@ -67,10 +69,10 @@ import { getGameNotation, NotationType } from "@/lib/chessNotation";
 // @ts-ignore
 import SvgIcon from "@jamescoyle/vue-icon";
 import { mdiUndoVariant, mdiImport } from "@mdi/js";
-import LargeSecondaryButton from "@/components/forms/LargeSecondaryButton.vue";
 import { get, syncRefs } from "@vueuse/core";
 import LargePrimaryButton from "@/components/forms/LargePrimaryButton.vue";
 import { defaultFen } from "@/lib/chess";
+import LargeFlatSecondaryButton from "@/components/forms/LargeFlatSecondaryButton.vue";
 
 const props = defineProps<{
   setupFen?: string;

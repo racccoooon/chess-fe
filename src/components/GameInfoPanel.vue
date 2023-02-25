@@ -17,13 +17,19 @@
     </div>
     <div class="flex-1 flex p-8 overflow-y-auto">
       <InfoPanelGameTab
-        v-if="
-          activeTab === GameInfoTab.Game || activeTab === GameInfoTab.Analysis
-        "
+        v-if="activeTab === GameInfoTab.Game"
         :is-player="isPlayer"
         :move-history="moveHistory"
         :active-color="activeColor"
         :game-has-started="gameHasStarted"
+        :history-index="historyIndex"
+        @time-travel-relative="emit('timeTravelRelative', $event)"
+        @time-travel-absolute="emit('timeTravelAbsolute', $event)"
+      />
+      <InfoPanelAnalysisTab
+        v-else-if="activeTab === GameInfoTab.Analysis"
+        :move-history="moveHistory"
+        :active-color="activeColor"
         :history-index="historyIndex"
         @time-travel-relative="emit('timeTravelRelative', $event)"
         @time-travel-absolute="emit('timeTravelAbsolute', $event)"
@@ -59,6 +65,7 @@ import { set, watchOnce } from "@vueuse/core";
 import { GameInfoTab } from "@/lib/types";
 import type { ImportGameEvent } from "@/lib/types";
 import InfoPanelGameSetupTab from "@/components/infopanel/InfoPanelGameSetupTab.vue";
+import InfoPanelAnalysisTab from "@/components/infopanel/InfoPanelAnalysisTab.vue";
 
 const props = defineProps<{
   moveHistory: MoveItem[];
