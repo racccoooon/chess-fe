@@ -150,9 +150,9 @@ export const getMoveNotation = (
     suffix += "#";
   }
 
-  if (move.kind === MoveType.EnPassant && suffix.length === 0) {
-    suffix += " e.p.";
-  }
+  //if (move.kind === MoveType.EnPassant && suffix.length === 0) {
+  //  suffix += " e.p.";
+  //}
 
   // if move is castling return O-O or O-O-O notation
   // we can ignore everything else because it is not possible to perform a castle that results in a check
