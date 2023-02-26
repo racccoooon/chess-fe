@@ -16,6 +16,7 @@
       GameInfoTab.GameSetup,
       GameInfoTab.Settings,
     ]"
+    :setup-fen="setupFen"
     @piece-selected="onPieceSelected"
     @piece-deselected="onPieceDeselected"
     @piece-moved="onPieceMoved"

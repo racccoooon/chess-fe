@@ -71,7 +71,7 @@ import SvgIcon from "@jamescoyle/vue-icon";
 import { mdiUndoVariant, mdiImport } from "@mdi/js";
 import { get, syncRefs } from "@vueuse/core";
 import LargePrimaryButton from "@/components/forms/LargePrimaryButton.vue";
-import { defaultFen } from "@/lib/chess";
+import { defaultFen, fenToPieces } from "@/lib/chess";
 import LargeFlatSecondaryButton from "@/components/forms/LargeFlatSecondaryButton.vue";
 
 const props = defineProps<{
@@ -92,7 +92,12 @@ const notationInput = ref<string>("");
 
 const notation = computed(() => {
   if (!props.moveHistory) return "";
-  return getGameNotation(props.moveHistory, NotationType.Algebraic);
+  return getGameNotation(
+    props.moveHistory,
+    NotationType.Algebraic,
+    true,
+    fenToPieces(props.setupFen || defaultFen)
+  );
 });
 
 syncRefs(() => props.setupFen || defaultFen, fenInput);

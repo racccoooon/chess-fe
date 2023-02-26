@@ -50,6 +50,7 @@
         @update:white-player-name="emit('update:whitePlayerName', $event)"
         :black-player-name="blackPlayerName"
         @update:black-player-name="emit('update:blackPlayerName', $event)"
+        :setup-fen="setupFen"
         :tabs="panelTabs"
         @time-travel-relative="historyIndex += $event"
         @time-travel-absolute="historyIndex = $event"
@@ -106,6 +107,7 @@ const props = defineProps<{
   whitePlayerName: string;
   blackPlayerName: string;
   highlightSquares: BoardHighlightSquare[];
+  setupFen: string;
   panelTabs: GameInfoTab[];
 }>();
 

@@ -42,6 +42,7 @@
         @update:white-player-name="emit('update:whitePlayerName', $event)"
         :black-player-name="blackPlayerName"
         @update:black-player-name="emit('update:blackPlayerName', $event)"
+        :setup-fen="setupFen"
       />
       <InfoPanelShareTab
         v-else-if="activeTab === GameInfoTab.Share"
@@ -75,6 +76,7 @@ const props = defineProps<{
   historyIndex: number;
   whitePlayerName: string;
   blackPlayerName: string;
+  setupFen: string;
   tabs: GameInfoTab[];
 }>();
 
