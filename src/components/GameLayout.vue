@@ -1,4 +1,5 @@
 <template>
+  <FloatingHomeNavButton />
   <div
     class="sm:m-12 xl:my-0 xl:h-screen flex flex-col xl:flex-row gap-6 xl:gap-16 justify-center items-center"
   >
@@ -91,6 +92,7 @@ import {
 import GameInfoPanel from "@/components/GameInfoPanel.vue";
 import { useSettingsStore } from "@/stores/settings";
 import { storeToRefs } from "pinia";
+import FloatingHomeNavButton from "@/components/FloatingHomeNavButton.vue";
 
 const props = defineProps<{
   pieces: Piece[];
