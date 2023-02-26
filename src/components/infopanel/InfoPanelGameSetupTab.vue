@@ -28,9 +28,7 @@
         <CompactFormInputElement>
           <div class="flex flex-row gap-2">
             <LargeTextInput v-model="fenInput" />
-            <LargeFlatSecondaryButton
-              @click="fenInput = setupFen || defaultFen"
-            >
+            <LargeFlatSecondaryButton @click="fenInput = defaultFen">
               <SvgIcon type="mdi" :path="mdiUndoVariant" size="22" />
             </LargeFlatSecondaryButton>
           </div>
@@ -44,7 +42,7 @@
         <CompactFormInputElement>
           <div class="flex flex-row gap-2">
             <LargeTextInput v-model="notationInput" />
-            <LargeFlatSecondaryButton @click="notationInput = notation">
+            <LargeFlatSecondaryButton @click="notationInput = ''">
               <SvgIcon type="mdi" :path="mdiUndoVariant" size="22" />
             </LargeFlatSecondaryButton>
           </div>
