@@ -428,6 +428,7 @@ export const notationToMove = (
   );
 
   if (
+    move.type === PieceType.Pawn &&
     move.kind === MoveType.NonSpecial &&
     move.captures &&
     pieceToCaptureEnPassant !== undefined &&
