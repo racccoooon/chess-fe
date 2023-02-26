@@ -50,7 +50,7 @@
         @update:white-player-name="emit('update:whitePlayerName', $event)"
         :black-player-name="blackPlayerName"
         @update:black-player-name="emit('update:blackPlayerName', $event)"
-        :setup-fen="setupFen"
+        :setup-fen="setupFen || defaultFen"
         :tabs="panelTabs"
         @time-travel-relative="historyIndex += $event"
         @time-travel-absolute="historyIndex = $event"
@@ -84,6 +84,8 @@ import { get, set, whenever } from "@vueuse/core";
 import { useClamp } from "@vueuse/math";
 import {
   comparePieceAndPlayerColor,
+  defaultFen,
+  fenToPieces,
   getBoardAtHistoryIndex,
   getCapturedPieces,
   getMaterialValueByColor,
@@ -107,7 +109,7 @@ const props = defineProps<{
   whitePlayerName: string;
   blackPlayerName: string;
   highlightSquares: BoardHighlightSquare[];
-  setupFen: string;
+  setupFen?: string;
   panelTabs: GameInfoTab[];
 }>();
 
@@ -172,7 +174,11 @@ const pieces = computed(() => {
     return props.pieces;
   }
 
-  return getBoardAtHistoryIndex(props.moveHistory, get(historyIndex));
+  return getBoardAtHistoryIndex(
+    props.moveHistory,
+    get(historyIndex),
+    fenToPieces(props.setupFen || defaultFen)
+  );
 });
 
 // computed values for checking if the player is in check
