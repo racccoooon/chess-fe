@@ -18,6 +18,7 @@
       GameInfoTab.Settings,
     ]"
     :setup-fen="setupFen"
+    @continue-from-history-index="onContinueFromHistoryIndex"
     @piece-selected="onPieceSelected"
     @piece-deselected="onPieceDeselected"
     @piece-moved="onPieceMoved"
@@ -67,6 +68,8 @@ import {
   applyMove,
   defaultFen,
   fenToPieces,
+  getBoardAtHistoryIndex,
+  getHistoryUntilIndex,
   getPieceAtSquare,
   getPieceSquare,
   getValidSquaresForPiece,
@@ -137,6 +140,18 @@ if (query.moves) {
     fen: get(setupFen),
   });
 }
+
+const onContinueFromHistoryIndex = (index: number) => {
+  const newPieces = getBoardAtHistoryIndex(
+    get(moveHistory),
+    index,
+    fenToPieces(get(setupFen))
+  );
+  const newMoveHistory = getHistoryUntilIndex(get(moveHistory), index);
+
+  set(pieces, newPieces);
+  set(moveHistory, newMoveHistory);
+};
 
 const updateQuery = () => {
   let query: any = {};

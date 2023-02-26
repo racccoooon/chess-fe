@@ -259,9 +259,9 @@ export const applyMove = (pieces: Piece[], move: MoveItem) => {
 export const getBoardAtHistoryIndex = (
   history: MoveItem[],
   index: number,
-  pieces: Piece[] = getInitialBoard()
+  initialPieces: Piece[] = getInitialBoard()
 ): Piece[] => {
-  let board = [...pieces]
+  let board = [...initialPieces];
 
   for (let i = 0; i < index; i++) {
     board = applyMove(board, history[i]);

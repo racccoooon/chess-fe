@@ -60,6 +60,7 @@
         :tabs="panelTabs"
         @time-travel-relative="historyIndex += $event"
         @time-travel-absolute="historyIndex = $event"
+        @continue-from-history-index="emit('continueFromHistoryIndex', $event)"
         @import-game="emit('importGame', $event)"
         v-model:pointer-mode="pointerMode"
         v-model:paint-piece-color="paintPieceColor"
@@ -126,6 +127,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
+  (event: "continueFromHistoryIndex", payload: number): void;
   (event: "pieceSelected", payload: PieceSelectedEvent): void;
   (event: "pieceDeselected"): void;
   (event: "pieceMoved", payload: PieceMovedEvent): void;

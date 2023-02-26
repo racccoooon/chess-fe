@@ -33,6 +33,7 @@
         :history-index="historyIndex"
         @time-travel-relative="emit('timeTravelRelative', $event)"
         @time-travel-absolute="emit('timeTravelAbsolute', $event)"
+        @continue-from-history-index="emit('continueFromHistoryIndex', $event)"
       />
       <InfoPanelEditTab
         v-else-if="activeTab === GameInfoTab.Edit"
@@ -96,6 +97,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   (event: "timeTravelRelative", payload: number): void;
   (event: "timeTravelAbsolute", payload: number): void;
+  (event: "continueFromHistoryIndex", payload: number): void;
   (event: "importGame", payload: ImportGameEvent): void;
   (event: "update:whitePlayerName", payload: string): void;
   (event: "update:blackPlayerName", payload: string): void;

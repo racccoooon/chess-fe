@@ -12,6 +12,43 @@
         :history-index="historyIndex"
         @time-travel-absolute="emit('timeTravelAbsolute', $event)"
       />
+      <div>
+        <TinyFlatSecondaryButton
+          @click="
+            emit('continueFromHistoryIndex', 0);
+            pause();
+          "
+          v-if="historyIndex === 0 && moveHistory.length > 0"
+        >
+          <SvgIcon type="mdi" :path="mdiTrashCanOutline" class="h-4" />
+          <span>Undo all moves</span>
+        </TinyFlatSecondaryButton>
+        <TinyFlatSecondaryButton
+          @click="
+            emit('continueFromHistoryIndex', historyIndex - 1);
+            pause();
+          "
+          v-else-if="
+            historyIndex === moveHistory.length && moveHistory.length > 0
+          "
+        >
+          <SvgIcon type="mdi" :path="mdiUndoVariant" class="h-4" />
+          <span>Undo last move</span>
+        </TinyFlatSecondaryButton>
+        <TinyFlatSecondaryButton
+          @click="
+            emit('continueFromHistoryIndex', historyIndex);
+            pause();
+          "
+          v-else-if="historyIndex > 0 && moveHistory.length > 0"
+        >
+          <SvgIcon type="mdi" :path="mdiUndoVariant" class="h-4" />
+          <span>
+            Continue from move {{ Math.round(historyIndex / 2)
+            }}{{ historyIndex % 2 !== 0 ? "." : "..." }}
+          </span>
+        </TinyFlatSecondaryButton>
+      </div>
     </div>
     <div class="flex flex-col gap-4">
       <div class="flex flex-wrap sm:flex-nowrap gap-2">
@@ -75,6 +112,8 @@ import { asyncComputed, useIntervalFn } from "@vueuse/core";
 // @ts-ignore
 import SvgIcon from "@jamescoyle/vue-icon";
 import {
+  mdiTrashCanOutline,
+  mdiUndoVariant,
   mdiArrowCollapseLeft,
   mdiArrowLeft,
   mdiPlay,
@@ -83,6 +122,7 @@ import {
   mdiArrowCollapseRight,
 } from "@mdi/js";
 import SmallFlatSecondaryButton from "@/components/forms/SmallFlatSecondaryButton.vue";
+import TinyFlatSecondaryButton from "@/components/forms/TinyFlatSecondaryButton.vue";
 
 const props = defineProps<{
   moveHistory: MoveItem[];
@@ -93,6 +133,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   (event: "timeTravelRelative", payload: number): void;
   (event: "timeTravelAbsolute", payload: number): void;
+  (event: "continueFromHistoryIndex", payload: number): void;
 }>();
 
 const { pause, resume, isActive } = useIntervalFn(
