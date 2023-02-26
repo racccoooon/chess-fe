@@ -17,6 +17,7 @@
           <slot name="board-overlay" />
         </div>
         <BoardRenderer
+          ref="boardRenderer"
           :pieces="pieces"
           :reverse="reverseBoard"
           :isWhiteInCheck="isWhiteInCheck"
@@ -24,9 +25,14 @@
           :highlight-squares="highlightSquares"
           :allow-interaction-with-white="allowInteractionWithWhite"
           :allow-interaction-with-black="allowInteractionWithBlack"
+          :pointer-mode="pointerMode"
+          :paint-piece-color="paintPieceColor"
+          :paint-piece-type="paintPieceType"
           @piece-selected="onPieceSelected"
           @piece-deselected="onPieceDeselected"
           @piece-moved="onPieceMoved"
+          @piece-painted="emit('piecePainted', $event)"
+          @piece-erased="emit('pieceErased', $event)"
           class="h-full"
         />
       </div>
@@ -55,6 +61,9 @@
         @time-travel-relative="historyIndex += $event"
         @time-travel-absolute="historyIndex = $event"
         @import-game="emit('importGame', $event)"
+        v-model:pointer-mode="pointerMode"
+        v-model:paint-piece-color="paintPieceColor"
+        v-model:paint-piece-type="paintPieceType"
       />
     </div>
   </div>
@@ -69,9 +78,12 @@ import type {
   Piece,
   PieceMovedEvent,
   PieceSelectedEvent,
+  PieceErasedEvent,
+  PiecePaintedEvent,
   ImportGameEvent,
 } from "@/lib/types";
 import {
+  BoardPointerMode,
   GameInfoTab,
   HighlightColor,
   HighlightShape,
@@ -120,7 +132,11 @@ const emit = defineEmits<{
   (event: "importGame", payload: ImportGameEvent): void;
   (event: "update:whitePlayerName", payload: string): void;
   (event: "update:blackPlayerName", payload: string): void;
+  (event: "piecePainted", payload: PiecePaintedEvent): void;
+  (event: "pieceErased", payload: PieceErasedEvent): void;
 }>();
+
+const boardRenderer = ref();
 
 const historyIndex_ = ref(props.moveHistory.length);
 
@@ -180,6 +196,10 @@ const pieces = computed(() => {
     fenToPieces(props.setupFen || defaultFen)
   );
 });
+
+const pointerMode = ref<BoardPointerMode>(BoardPointerMode.Move);
+const paintPieceType = ref<PieceType>(PieceType.Pawn);
+const paintPieceColor = ref<PieceColor>(PieceColor.White);
 
 // computed values for checking if the player is in check
 const isWhiteInCheck = computed(() => {
@@ -355,4 +375,8 @@ const onPieceMoved = (e: PieceMovedEvent) => {
   if (get(isTimeTraveling)) return;
   emit("pieceMoved", { piece: e.piece, to: e.to });
 };
+
+defineExpose({
+  boardRenderer,
+});
 </script>

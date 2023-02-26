@@ -151,6 +151,16 @@ export interface ImportGameEvent {
   fen: string;
 }
 
+export interface PiecePaintedEvent {
+  square: Square;
+  color: PieceColor;
+  type: PieceType;
+}
+
+export interface PieceErasedEvent {
+  square: Square;
+}
+
 export enum ChessBoardBorder {
   None = "none",
   Thin = "thin",
@@ -202,7 +212,15 @@ export interface Vector2 {
 export enum GameInfoTab {
   Game = "game",
   Analysis = "analysis",
+  Edit = "edit",
   GameSetup = "gameSetup",
   Share = "share",
   Settings = "settings",
+}
+
+export enum BoardPointerMode {
+  None = "none",
+  Move = "move",
+  Paint = "paint",
+  Erase = "erase",
 }

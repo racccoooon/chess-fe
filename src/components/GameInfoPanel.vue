@@ -34,6 +34,15 @@
         @time-travel-relative="emit('timeTravelRelative', $event)"
         @time-travel-absolute="emit('timeTravelAbsolute', $event)"
       />
+      <InfoPanelEditTab
+        v-else-if="activeTab === GameInfoTab.Edit"
+        :pointer-mode="pointerMode"
+        @update:pointer-mode="emit('update:pointerMode', $event)"
+        :paint-piece-color="paintPieceColor"
+        @update:paint-piece-color="emit('update:paintPieceColor', $event)"
+        :paint-piece-type="paintPieceType"
+        @update:paint-piece-type="emit('update:paintPieceType', $event)"
+      />
       <InfoPanelGameSetupTab
         v-else-if="activeTab === GameInfoTab.GameSetup"
         @import-game="emit('importGame', $event)"
@@ -58,15 +67,16 @@
 <script setup lang="ts">
 import type { MoveItem } from "@/lib/types";
 import type { PieceColor } from "@/lib/types";
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import InfoPanelGameTab from "@/components/infopanel/InfoPanelGameTab.vue";
 import InfoPanelSettingsTab from "@/components/infopanel/InfoPanelSettingsTab.vue";
 import InfoPanelShareTab from "@/components/infopanel/InfoPanelShareTab.vue";
 import { set, watchOnce } from "@vueuse/core";
-import { GameInfoTab } from "@/lib/types";
+import { BoardPointerMode, GameInfoTab, PieceType } from "@/lib/types";
 import type { ImportGameEvent } from "@/lib/types";
 import InfoPanelGameSetupTab from "@/components/infopanel/InfoPanelGameSetupTab.vue";
 import InfoPanelAnalysisTab from "@/components/infopanel/InfoPanelAnalysisTab.vue";
+import InfoPanelEditTab from "@/components/infopanel/InfoPanelEditTab.vue";
 
 const props = defineProps<{
   moveHistory: MoveItem[];
@@ -77,6 +87,9 @@ const props = defineProps<{
   whitePlayerName: string;
   blackPlayerName: string;
   setupFen: string;
+  pointerMode: BoardPointerMode;
+  paintPieceType: PieceType;
+  paintPieceColor: PieceColor;
   tabs: GameInfoTab[];
 }>();
 
@@ -86,6 +99,9 @@ const emit = defineEmits<{
   (event: "importGame", payload: ImportGameEvent): void;
   (event: "update:whitePlayerName", payload: string): void;
   (event: "update:blackPlayerName", payload: string): void;
+  (event: "update:pointerMode", payload: BoardPointerMode): void;
+  (event: "update:paintPieceType", payload: PieceType): void;
+  (event: "update:paintPieceColor", payload: PieceColor): void;
 }>();
 
 const activeTab = ref<GameInfoTab>(GameInfoTab.Share);
@@ -110,8 +126,13 @@ watchOnce(
 const tabNames: Record<GameInfoTab, string> = {
   [GameInfoTab.Game]: "Game",
   [GameInfoTab.Analysis]: "Analysis",
+  [GameInfoTab.Edit]: "Edit",
   [GameInfoTab.GameSetup]: "Setup",
   [GameInfoTab.Share]: "Share",
   [GameInfoTab.Settings]: "Settings",
 };
+
+watch(activeTab, () => {
+  emit("update:pointerMode", BoardPointerMode.Move);
+});
 </script>

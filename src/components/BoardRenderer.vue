@@ -7,7 +7,9 @@
         (!isDragging && selectedPiece !== null) ||
         (isAllowedToInteractWithHoveredPiece &&
           allowMoveByClicking &&
-          !allowMoveByDragging),
+          !allowMoveByDragging) ||
+        pointerMode === BoardPointerMode.Paint ||
+        pointerMode === BoardPointerMode.Erase,
       'cursor-grabbing': isDragging,
     }"
     :viewBox="`0 0 ${squareAbsoluteWidth * 8 + borderAbsoluteSize * 2} ${
@@ -233,13 +235,16 @@ import type {
   BoardArrow,
   BoardHighlightSquare,
   Piece,
+  PieceErasedEvent,
   PieceMovedEvent,
+  PiecePaintedEvent,
   PieceSelectedEvent,
   Square,
   Vector2,
 } from "@/lib/types";
 import {
   AnimationDuration,
+  BoardPointerMode,
   ChessBoardBorder,
   ChessBoardColor,
   HighlightColor,
@@ -273,12 +278,17 @@ const props = defineProps<{
   allowInteractionWithWhite: boolean;
   allowInteractionWithBlack: boolean;
   highlightSquares: BoardHighlightSquare[];
+  pointerMode: BoardPointerMode;
+  paintPieceType: PieceType;
+  paintPieceColor: PieceColor;
 }>();
 
 const emit = defineEmits<{
   (event: "pieceSelected", payload: PieceSelectedEvent): void;
   (event: "pieceDeselected"): void;
   (event: "pieceMoved", payload: PieceMovedEvent): void;
+  (event: "piecePainted", payload: PiecePaintedEvent): void;
+  (event: "pieceErased", payload: PieceErasedEvent): void;
 }>();
 
 const {
@@ -633,7 +643,7 @@ const handleMouseLeftDown = () => {
     return;
   }
 
-  if (get(allowMoveByDragging)) {
+  if (get(allowMoveByDragging) && props.pointerMode === BoardPointerMode.Move) {
     startMove();
   }
 
@@ -641,13 +651,26 @@ const handleMouseLeftDown = () => {
 };
 
 const handleMouseLeftUp = () => {
+  if (props.pointerMode === BoardPointerMode.Paint) {
+    paintPiece();
+    return;
+  }
+
+  if (props.pointerMode === BoardPointerMode.Erase) {
+    erasePiece();
+    return;
+  }
+
   if (Date.now() - get(mouseDownTime) < get(clickDuration)) {
     if (!get(allowMoveByClicking)) {
       deselect();
       return;
     }
 
-    if (!get(allowMoveByDragging)) {
+    if (
+      !get(allowMoveByDragging) &&
+      props.pointerMode === BoardPointerMode.Move
+    ) {
       startMove();
       return;
     }
@@ -667,11 +690,40 @@ const handleMouseRightDown = () => {
     return;
   }
 
-  startHighlighting();
+  if (props.pointerMode === BoardPointerMode.Move) {
+    startHighlighting();
+  }
 };
 
 const handleMouseRightUp = () => {
+  if (props.pointerMode === BoardPointerMode.Paint) {
+    erasePiece();
+    return;
+  }
+
   stopHighlighting();
+};
+
+const paintPiece = () => {
+  if (!get(hoveredSquare)) {
+    return;
+  }
+
+  emit("piecePainted", {
+    type: props.paintPieceType!,
+    color: props.paintPieceColor!,
+    square: get(hoveredSquare)!,
+  });
+};
+
+const erasePiece = () => {
+  if (!get(hoveredSquare)) {
+    return;
+  }
+
+  emit("pieceErased", {
+    square: get(hoveredSquare)!,
+  });
 };
 
 const startMove = () => {
@@ -872,5 +924,10 @@ const dragMouseDeltaScaled = computed(() => {
     x: get(dragMouseDelta).x * scale,
     y: get(dragMouseDelta).y * scale,
   };
+});
+
+defineExpose({
+  hoveredSquare,
+  selectedPiece,
 });
 </script>

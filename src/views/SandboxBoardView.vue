@@ -13,6 +13,7 @@
     :highlight-squares="highlightSquares"
     :panel-tabs="[
       GameInfoTab.Analysis,
+      GameInfoTab.Edit,
       GameInfoTab.GameSetup,
       GameInfoTab.Settings,
     ]"
@@ -21,6 +22,8 @@
     @piece-deselected="onPieceDeselected"
     @piece-moved="onPieceMoved"
     @import-game="onImportGame"
+    @piece-painted="onPiecePainted"
+    @piece-erased="onPieceErased"
   >
     <template #board-overlay>
       <SuperDuperModal v-if="importError">
@@ -47,7 +50,9 @@ import type {
   ImportGameEvent,
   MoveItem,
   Piece,
+  PieceErasedEvent,
   PieceMovedEvent,
+  PiecePaintedEvent,
   PieceSelectedEvent,
 } from "@/lib/types";
 import {
@@ -65,6 +70,7 @@ import {
   getPieceAtSquare,
   getPieceSquare,
   getValidSquaresForPiece,
+  piecesToFen,
 } from "@/lib/chess";
 import { get, set, watchDebounced } from "@vueuse/core";
 import { useSettingsStore } from "@/stores/settings";
@@ -229,5 +235,39 @@ const onPieceMoved = (e: PieceMovedEvent) => {
   set(selectedPiece, null);
 
   get(moveHistory).push(move);
+};
+
+const onPiecePainted = (e: PiecePaintedEvent) => {
+  const { square, type, color } = e;
+
+  const existingPiece = getPieceAtSquare(get(pieces), square.x, square.y);
+
+  if (existingPiece) {
+    existingPiece.type = type;
+    existingPiece.color = color;
+  } else {
+    get(pieces).push({
+      type: type,
+      color: color,
+      x: square.x,
+      y: square.y,
+    });
+  }
+
+  set(moveHistory, []);
+  set(setupFen, piecesToFen(get(pieces)));
+};
+
+const onPieceErased = (e: PieceErasedEvent) => {
+  const { square } = e;
+
+  const existingPiece = getPieceAtSquare(get(pieces), square.x, square.y);
+
+  if (existingPiece) {
+    get(pieces).splice(get(pieces).indexOf(existingPiece), 1);
+  }
+
+  set(moveHistory, []);
+  set(setupFen, piecesToFen(get(pieces)));
 };
 </script>

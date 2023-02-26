@@ -10,12 +10,22 @@
     @piece-selected="onPieceSelected"
     @piece-deselected="onPieceDeselected"
     @piece-moved="onPieceMoved"
+    :pointer-mode="BoardPointerMode.Move"
+    :paint-piece-color="PieceColor.White"
+    :paint-piece-type="PieceType.Pawn"
   />
 </template>
 
 <script setup lang="ts">
 import BoardRenderer from "@/components/BoardRenderer.vue";
-import { HighlightShape, KingStatus, MoveType } from "@/lib/types";
+import {
+  BoardPointerMode,
+  HighlightShape,
+  KingStatus,
+  MoveType,
+  PieceColor,
+  PieceType,
+} from "@/lib/types";
 import type {
   BoardHighlightSquare,
   MoveItem,
