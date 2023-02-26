@@ -1,6 +1,6 @@
 <template>
   <svg
-    class="aspect-square select-none"
+    class="board aspect-square select-none"
     :class="{
       'cursor-grab': isAllowedToInteractWithHoveredPiece && allowMoveByDragging,
       'cursor-pointer':
@@ -931,3 +931,14 @@ defineExpose({
   selectedPiece,
 });
 </script>
+
+<style>
+svg.board {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+</style>
