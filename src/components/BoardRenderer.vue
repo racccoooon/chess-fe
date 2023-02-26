@@ -576,7 +576,7 @@ const arrows = computed(() => {
     arr.push({
       from: get(highlightSelectedSquare)!,
       to: get(hoveredSquare)!,
-      color: get(selectedSquareHighlightColor),
+      color: get(userArrowColor),
     });
   }
 
