@@ -207,7 +207,6 @@
                       'drop-shadow(-4px 4px 1px rgba(239, 68, 68, 0.4))'
                     : '',
               }"
-              style="transform: translate(300px, 0)"
             />
           </g>
         </g>
