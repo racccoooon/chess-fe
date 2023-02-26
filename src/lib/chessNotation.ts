@@ -391,8 +391,6 @@ export const notationToMove = (
       y = getYFromRankName(notation[position + 1]);
     }
 
-    console.log(notation, x, y, possiblePieces);
-
     possiblePieces = possiblePieces.filter((piece) => {
       let match = true;
       if (x !== null) {
