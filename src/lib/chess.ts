@@ -386,6 +386,7 @@ export const isValidPawnMove = (
     // check for en passant
     const lastMove = history[history.length - 1];
     if (
+      lastMove &&
       lastMove.type === PieceType.Pawn &&
       Math.abs(lastMove.to.y - lastMove.from.y) === 2
     ) {
