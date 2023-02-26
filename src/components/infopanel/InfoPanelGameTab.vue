@@ -20,14 +20,16 @@
         </h2>
       </template>
     </div>
-    <div class="flex flex-row justify-between">
+    <div
+      class="flex flex-row flex-wrap sm:flex-nowrap justify-between gap-4 sm:gap-2"
+    >
       <div
         :data-color="activeColor"
-        class="flex items-center px-4 data-[color=white]:bg-gray-200 data-[color=black]:bg-gray-900 data-[color=white]:text-gray-900 data-[color=black]:text-gray-50 font-medium rounded-xl transition-colors ease-in-out"
+        class="flex items-center px-4 h-12 w-full sm:w-auto data-[color=white]:bg-gray-200 data-[color=black]:bg-gray-900 data-[color=white]:text-gray-900 data-[color=black]:text-gray-50 font-medium rounded-xl transition-colors ease-in-out"
       >
         {{ activeColor === PieceColor.White ? "White" : "Black" }}'s move
       </div>
-      <div class="flex flex-row gap-2">
+      <div class="flex flex-row gap-2 w-full sm:w-auto">
         <SmallFlatSecondaryButton
           @click="emit('timeTravelRelative', -Infinity)"
           class="grow"
