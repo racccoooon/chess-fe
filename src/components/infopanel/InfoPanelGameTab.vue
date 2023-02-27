@@ -11,6 +11,7 @@
         <GameHistory
           :moveHistory="moveHistory"
           :history-index="historyIndex"
+          :setup-fen="setupFen"
           @time-travel-absolute="emit('timeTravelAbsolute', $event)"
         />
       </template>
@@ -81,6 +82,7 @@ const props = defineProps<{
   isPlayer: boolean;
   gameHasStarted: boolean;
   historyIndex: number;
+  setupFen?: string;
 }>();
 
 const emit = defineEmits<{

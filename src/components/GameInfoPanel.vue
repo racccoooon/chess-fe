@@ -23,6 +23,7 @@
         :active-color="activeColor"
         :game-has-started="gameHasStarted"
         :history-index="historyIndex"
+        :setup-fen="setupFen"
         @time-travel-relative="emit('timeTravelRelative', $event)"
         @time-travel-absolute="emit('timeTravelAbsolute', $event)"
       />
@@ -31,6 +32,7 @@
         :move-history="moveHistory"
         :active-color="activeColor"
         :history-index="historyIndex"
+        :setup-fen="setupFen"
         @time-travel-relative="emit('timeTravelRelative', $event)"
         @time-travel-absolute="emit('timeTravelAbsolute', $event)"
         @continue-from-history-index="emit('continueFromHistoryIndex', $event)"

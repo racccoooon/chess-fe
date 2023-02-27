@@ -23,68 +23,54 @@
 
 <script setup lang="ts">
 import type { MoveItem } from "@/lib/types";
-import { asyncGetMoveNotation } from "@/lib/chessNotation";
+import { getMoveNotation } from "@/lib/chessNotation";
 import { computed } from "vue";
 import { storeToRefs } from "pinia";
 import { useSettingsStore } from "@/stores/settings";
-import { getBoardAtHistoryIndex, getHistoryUntilIndex } from "@/lib/chess";
-import { computedAsync, get } from "@vueuse/core";
+import {
+  applyMove,
+  defaultFen,
+  fenToPieces,
+  getHistoryUntilIndex,
+} from "@/lib/chess";
+import { get } from "@vueuse/core";
 
 const props = defineProps<{
   moveHistory: MoveItem[];
   historyIndex?: number;
+  setupFen?: string;
 }>();
 
 const emit = defineEmits<{
   (event: "timeTravelAbsolute", payload: number): void;
 }>();
 
-const groupedMoves = computed(() => {
-  let groupedMoves: MoveItem[][] = [];
-  let currentMoveGroup: MoveItem[] = [];
+const gameNotation = computed(() => {
+  let pieces = [...fenToPieces(props.setupFen || defaultFen)];
+  const gameNotation: string[] = [];
 
-  for (let i = 0; i < props.moveHistory.length; i++) {
-    currentMoveGroup.push(props.moveHistory[i]);
+  props.moveHistory.forEach((move, index) => {
+    const notation = getMoveNotation(
+      move,
+      get(notationType),
+      get(useUnicodeIconsInNotation),
+      pieces,
+      getHistoryUntilIndex(props.moveHistory, index)
+    );
 
-    if (i % 2 === 0) {
-      groupedMoves.push(currentMoveGroup);
-    } else if (i % 2 === 1) {
-      currentMoveGroup = [];
-    }
+    gameNotation.push(notation);
+
+    pieces = applyMove(pieces, move);
+  });
+
+  const arr: string[][] = [];
+
+  for (let i = 0; i < gameNotation.length; i += 2) {
+    arr.push([gameNotation[i], gameNotation[i + 1]]);
   }
 
-  return groupedMoves;
+  return arr;
 });
-
-const gameNotation = computedAsync(
-  async () => {
-    const arr: string[][] = [];
-
-    for (let i = 0; i < get(groupedMoves).length; i++) {
-      const moveGroup = get(groupedMoves)[i];
-
-      arr[i] = [];
-
-      for (let j = 0; j < moveGroup.length; j++) {
-        const move = moveGroup[j];
-
-        const notation = await asyncGetMoveNotation(
-          move,
-          get(notationType),
-          get(useUnicodeIconsInNotation),
-          getBoardAtHistoryIndex(props.moveHistory, i * 2 + j),
-          getHistoryUntilIndex(props.moveHistory, i * 2 + j)
-        );
-
-        arr[i].push(notation);
-      }
-    }
-
-    return arr;
-  },
-  [],
-  { lazy: true }
-);
 
 const { notationType, useUnicodeIconsInNotation } = storeToRefs(
   useSettingsStore()
