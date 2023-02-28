@@ -37,7 +37,6 @@ export const useSettingsStore = defineStore("settings", () => {
         legalMoveHighlightColor: HighlightColor.Highlight,
         userHighlightColor: HighlightColor.Red,
         userArrowColor: HighlightColor.Green,
-        alwaysKeepUserHighlights: false,
       },
       localStorage,
       { mergeDefaults: true }

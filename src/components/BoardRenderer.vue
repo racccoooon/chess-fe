@@ -304,7 +304,6 @@ const {
   userHighlightColor,
   userArrowColor,
   selectedSquareHighlightColor,
-  alwaysKeepUserHighlights,
 } = storeToRefs(useSettingsStore());
 
 const squareAbsoluteWidth = 100;
@@ -348,8 +347,36 @@ const highlightSelectedSquare = ref<Square | null>(null);
 const userArrows = ref<BoardArrow[]>([]);
 const userHighlights = ref<BoardHighlightSquare[]>([]);
 
+const userHighlightsByBoardPosition = ref<
+  Record<string, { arrows: BoardArrow[]; squares: BoardHighlightSquare[] }>
+>({});
+
 const { x: mouseX, y: mouseY } = useMouse();
 const { y: windowScrollY } = useWindowScroll();
+
+watch(
+  pieces,
+  (newValue, oldValue) => {
+    const newHash = objectHash(newValue);
+    const oldHash = objectHash(oldValue);
+
+    get(userHighlightsByBoardPosition)[oldHash] = {
+      arrows: get(userArrows),
+      squares: get(userHighlights),
+    };
+
+    set(userArrows, []);
+    set(userHighlights, []);
+
+    const storedHighlights = get(userHighlightsByBoardPosition)[newHash];
+
+    if (storedHighlights) {
+      set(userArrows, storedHighlights.arrows);
+      set(userHighlights, storedHighlights.squares);
+    }
+  },
+  { deep: true }
+);
 
 /***
  * watch for changes in pieces and animate them
@@ -357,12 +384,6 @@ const { y: windowScrollY } = useWindowScroll();
 watch(
   pieces,
   async (newValue) => {
-    if (get(alwaysKeepUserHighlights)) {
-      // reset the user arrows and highlights
-      set(userArrows, []);
-      set(userHighlights, []);
-    }
-
     if (get(animationDuration) === AnimationDuration.None) {
       return;
     }

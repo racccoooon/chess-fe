@@ -364,25 +364,6 @@
         </CompactFormInputElement>
       </CompactFormSection>
       <CompactFormSection>
-        <template #label>Miscellaneous</template>
-        <CompactFormInputElement>
-          <template #label>User arrows and highlights</template>
-          <SmallOptionsGroup
-            v-model="alwaysKeepUserHighlights"
-            :options="[
-              {
-                value: false,
-                label: 'Always keep',
-              },
-              {
-                value: true,
-                label: 'Remove after board change',
-              },
-            ]"
-          />
-        </CompactFormInputElement>
-      </CompactFormSection>
-      <CompactFormSection>
         <template #label>Highlight Colors</template>
         <CompactFormInputElement>
           <template #label>User Arrows</template>
@@ -712,7 +693,6 @@ const {
   lastMoveHighlightColor,
   selectedSquareHighlightColor,
   legalMoveHighlightColor,
-  alwaysKeepUserHighlights,
 } = storeToRefs(settingsStore);
 
 const { name: userName } = storeToRefs(userStore);
