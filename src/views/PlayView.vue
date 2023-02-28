@@ -5,7 +5,6 @@
     :reverse-board="reverseBoard"
     :active-color="activeColor"
     :is-player="true"
-    :can-move="playerCanMove"
     :player-color="playerColor"
     :game-has-started="gameHasStarted"
     :white-player-name="whitePlayerName"
@@ -334,13 +333,10 @@ const onPieceSelected = (e: PieceSelectedEvent) => {
     return;
   }
 
-  console.log("piece selected", piece);
-
   set(selectedPiece, piece);
 };
 
 const onPieceDeselected = () => {
-  console.log("piece deselected");
   set(selectedPiece, null);
 };
 

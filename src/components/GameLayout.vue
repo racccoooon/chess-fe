@@ -116,7 +116,6 @@ const props = defineProps<{
   reverseBoard: boolean;
   activeColor: PieceColor;
   isPlayer: boolean;
-  canMove: boolean;
   playerColor: PlayerColor;
   gameHasStarted: boolean;
   whitePlayerName: string;
@@ -312,8 +311,6 @@ const bottomPlayerCapturedPieces = computed(() => {
 
 const allowInteractionWithWhite = computed(() => {
   return (
-    props.canMove &&
-    props.activeColor === PieceColor.White &&
     comparePieceAndPlayerColor(PieceColor.White, props.playerColor) &&
     !get(isTimeTraveling)
   );
@@ -321,8 +318,6 @@ const allowInteractionWithWhite = computed(() => {
 
 const allowInteractionWithBlack = computed(() => {
   return (
-    props.canMove &&
-    props.activeColor === PieceColor.Black &&
     comparePieceAndPlayerColor(PieceColor.Black, props.playerColor) &&
     !get(isTimeTraveling)
   );

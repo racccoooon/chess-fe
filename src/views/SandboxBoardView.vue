@@ -235,6 +235,8 @@ const onPieceMoved = (e: PieceMovedEvent) => {
 
   if (!piece) return;
 
+  if (piece.color !== get(activeColor)) return;
+
   const move = {
     from: getPieceSquare(piece),
     to: to,
