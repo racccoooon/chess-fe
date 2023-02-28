@@ -1,5 +1,5 @@
 <template>
-  <div class="grow flex flex-col gap-12">
+  <div class="grow flex flex-col gap-12 h-min">
     <div class="flex flex-col gap-6">
       <h2 class="text-gray-900 dark:text-gray-50 font-medium text-xl">
         Send this link to your opponent

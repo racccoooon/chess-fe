@@ -1,5 +1,5 @@
 <template>
-  <div class="grow flex flex-col">
+  <div class="grow flex flex-col h-min">
     <CompactFormWrapper>
       <CompactFormSection>
         <div

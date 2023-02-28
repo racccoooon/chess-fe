@@ -1,5 +1,5 @@
 <template>
-  <div class="grow flex flex-col gap-8 justify-between">
+  <div class="grow flex flex-col gap-8 justify-between h-min">
     <div class="flex flex-col gap-6">
       <template v-if="gameHasStarted">
         <div

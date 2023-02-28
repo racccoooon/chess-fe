@@ -15,7 +15,7 @@
         {{ tabNames[tab] }}
       </button>
     </div>
-    <div class="flex-1 flex p-8 overflow-y-auto">
+    <div class="flex-1 flex p-8 overflow-y-auto scroll-p-8">
       <InfoPanelGameTab
         v-if="activeTab === GameInfoTab.Game"
         :is-player="isPlayer"

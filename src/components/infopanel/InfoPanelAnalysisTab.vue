@@ -1,5 +1,7 @@
 <template>
-  <div class="grow flex flex-col-reverse sm:flex-col gap-8 justify-between">
+  <div
+    class="grow flex flex-col-reverse sm:flex-col gap-8 justify-between h-min"
+  >
     <div class="flex flex-col gap-6">
       <div
         class="text-gray-400 dark:text-gray-500 font-medium text-sm"

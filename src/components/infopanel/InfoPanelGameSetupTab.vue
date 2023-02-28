@@ -1,5 +1,5 @@
 <template>
-  <div class="grow flex flex-col justify-between">
+  <div class="grow flex flex-col justify-between gap-8 h-min">
     <CompactFormWrapper>
       <CompactFormSection>
         <template #label>White Player Name</template>
