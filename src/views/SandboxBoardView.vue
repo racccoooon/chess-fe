@@ -282,6 +282,8 @@ const onPieceMoved = (e: PieceMovedEvent) => {
   set(pieces, applyMove(get(pieces), move));
   set(selectedPiece, null);
 
+  set(gameResult, GameResult.InProgress);
+
   get(moveHistory).push(move);
 };
 
