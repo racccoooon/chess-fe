@@ -571,6 +571,70 @@ export const getPiecesThatCanMoveToSquare = (
   return piecesThatCanMove;
 };
 
+export const getMoveItem = (
+  move: Move,
+  pieces: Piece[],
+  history: MoveItem[]
+): MoveItem | null => {
+  const pieceToMove = getPieceAtSquare(pieces, move.from.x, move.from.y);
+
+  if (!pieceToMove) {
+    return null;
+  }
+
+  const pieceToCapture = getPieceAtSquare(pieces, move.to.x, move.to.y);
+
+  const moveItem: MoveItem = {
+    from: move.from,
+    to: move.to,
+    color: pieceToMove.color,
+    type: pieceToMove.type,
+    kind: MoveType.NonSpecial,
+    status: KingStatus.IsNoCheck,
+    captures: false,
+    promoteToType: null,
+  };
+
+  if (pieceToCapture) {
+    moveItem.captures = true;
+  }
+
+  // check if move is promotion
+  if (pieceToMove.type === PieceType.Pawn) {
+    if (move.to.y === 0 || move.to.y === 7) {
+      moveItem.kind = MoveType.Promotion;
+    }
+  }
+
+  // check if move is castling
+  if (pieceToMove.type === PieceType.King) {
+    if (
+      move.from.x === 4 &&
+      (move.to.x === 6 || move.to.x === 2) &&
+      move.from.y === move.to.y
+    ) {
+      moveItem.kind = MoveType.Castling;
+    }
+  }
+
+  // check if move is en passant
+  if (pieceToMove.type === PieceType.Pawn) {
+    if (move.from.x !== move.to.x && !pieceToCapture) {
+      const pieceToCaptureEnPassant = getPieceAtSquare(
+        pieces,
+        move.to.x,
+        move.from.y
+      );
+
+      if (pieceToCaptureEnPassant) {
+        moveItem.kind = MoveType.EnPassant;
+      }
+    }
+  }
+
+  return moveItem;
+};
+
 export const getHistoryUntilIndex = (
   history: MoveItem[],
   index: number

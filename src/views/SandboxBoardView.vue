@@ -63,6 +63,7 @@ import {
   KingStatus,
   MoveType,
   PieceColor,
+  PieceType,
   PlayerColor,
 } from "@/lib/types";
 import {
@@ -71,6 +72,7 @@ import {
   fenToPieces,
   getBoardAtHistoryIndex,
   getHistoryUntilIndex,
+  getMoveItem,
   getPieceAtSquare,
   getPieceSquare,
   getValidSquaresForPiece,
@@ -81,10 +83,10 @@ import { get, set, watchDebounced } from "@vueuse/core";
 import { useSettingsStore } from "@/stores/settings";
 import { storeToRefs } from "pinia";
 import {
+  gameResultNotation,
   getGameNotation,
   notationToMoves,
   NotationType,
-  gameResultNotation,
   parseGameResultNotation,
 } from "@/lib/chessNotation";
 import SuperDuperModal from "@/components/modals/SuperDuperModal.vue";
@@ -268,16 +270,20 @@ const onPieceMoved = (e: PieceMovedEvent) => {
 
   if (piece.color !== get(activeColor)) return;
 
-  const move = {
-    from: getPieceSquare(piece),
-    to: to,
-    color: piece.color,
-    type: piece.type,
-    kind: MoveType.NonSpecial,
-    status: KingStatus.IsNoCheck,
-    captures: false,
-    promoteToType: null,
-  } as MoveItem;
+  const move = getMoveItem(
+    {
+      from: getPieceSquare(piece),
+      to,
+    },
+    get(pieces),
+    get(moveHistory)
+  );
+
+  if (!move) return;
+
+  if (move.kind === MoveType.Promotion) {
+    move.promoteToType = PieceType.Queen;
+  }
 
   set(pieces, applyMove(get(pieces), move));
   set(selectedPiece, null);
