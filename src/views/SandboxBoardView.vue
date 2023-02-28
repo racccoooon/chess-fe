@@ -126,6 +126,8 @@ const lastMove = computed(() => {
 });
 
 watch(lastMove, (newValue) => {
+  if (!newValue) return;
+
   if (newValue.status === KingStatus.IsCheckmate) {
     set(
       gameResult,
