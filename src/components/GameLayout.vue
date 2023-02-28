@@ -333,11 +333,17 @@ const bottomPlayerCapturedPieces = computed(() => {
 // compute allow interaction
 
 const allowInteractionWithWhite = computed(() => {
-  return comparePieceAndPlayerColor(PieceColor.White, props.playerColor);
+  return (
+    comparePieceAndPlayerColor(PieceColor.White, props.playerColor) ||
+    get(isTimeTraveling)
+  );
 });
 
 const allowInteractionWithBlack = computed(() => {
-  return comparePieceAndPlayerColor(PieceColor.Black, props.playerColor);
+  return (
+    comparePieceAndPlayerColor(PieceColor.Black, props.playerColor) ||
+    get(isTimeTraveling)
+  );
 });
 
 // compute highlights
