@@ -45,7 +45,7 @@
 
 <script setup lang="ts">
 import GameLayout from "@/components/GameLayout.vue";
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import type {
   BoardHighlightSquare,
   ImportGameEvent,
@@ -74,6 +74,7 @@ import {
   getPieceAtSquare,
   getPieceSquare,
   getValidSquaresForPiece,
+  invertColor,
   piecesToFen,
 } from "@/lib/chess";
 import { get, set, watchDebounced } from "@vueuse/core";
@@ -117,6 +118,25 @@ const blackPlayerName = ref((query.black as string) || "Black");
 
 const importError = ref(false);
 const importErrorMessage = ref("");
+
+const lastMove = computed(() => {
+  return get(moveHistory)[get(moveHistory).length - 1];
+});
+
+watch(lastMove, (newValue) => {
+  if (newValue.status === KingStatus.IsCheckmate) {
+    set(
+      gameResult,
+      invertColor(newValue.color) === PieceColor.White
+        ? GameResult.WhiteWins
+        : GameResult.BlackWins
+    );
+  }
+
+  if (newValue.status === KingStatus.IsStalemate) {
+    set(gameResult, GameResult.Draw);
+  }
+});
 
 const onImportGame = (e: ImportGameEvent) => {
   const { san, fen } = e;
