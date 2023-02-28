@@ -8,7 +8,7 @@
         <div class="flex flex-row items-center gap-1">
           <button
             :aria-selected="historyIndex === groupIndex * 2 + itemIndex + 1"
-            class="px-1 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 aria-selected:bg-yellow-300 aria-selected:dark:bg-yellow-600 font-bold rounded-lg transition-colors"
+            class="px-1 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 aria-selected:bg-gray-400 aria-selected:dark:bg-gray-500 font-bold rounded-lg transition-colors"
             v-for="(move, itemIndex) in moveGroup"
             :key="itemIndex"
             @click="emit('timeTravelAbsolute', groupIndex * 2 + itemIndex + 1)"
