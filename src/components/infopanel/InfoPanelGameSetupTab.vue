@@ -65,7 +65,7 @@
           >
             <template #label="option">
               <span class="ml-2 font-bold text-sm text-black dark:text-white">
-                {{ gameResultNotation[option.value] || "*" }}
+                {{ getGameResultNotation(option.value) || "*" }}
               </span>
               <span>
                 {{ option.label }}
@@ -92,7 +92,7 @@ import { computed, ref } from "vue";
 import {
   getGameNotation,
   NotationType,
-  gameResultNotation,
+  getGameResultNotation,
 } from "@/lib/chessNotation";
 // @ts-ignore
 import SvgIcon from "@jamescoyle/vue-icon";

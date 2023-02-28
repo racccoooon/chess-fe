@@ -57,6 +57,10 @@ export const gameResultNotation: Record<GameResult, string> = {
   [GameResult.Unknown]: "",
 };
 
+export const getGameResultNotation = (result: GameResult): string => {
+  return gameResultNotation[result];
+};
+
 export const parseGameResultNotation = (notation: string): GameResult => {
   if (notation === "1-0") {
     return GameResult.WhiteWins;
