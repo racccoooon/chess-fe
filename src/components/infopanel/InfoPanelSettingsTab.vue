@@ -160,6 +160,10 @@
                 label: 'Modern',
               },
               {
+                value: PieceSet.Flat,
+                label: 'Flat',
+              },
+              {
                 value: PieceSet.Raccoon,
                 label: 'Raccoon',
               },

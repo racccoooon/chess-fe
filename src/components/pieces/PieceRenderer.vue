@@ -5,6 +5,11 @@
       :color="color"
       :type="type"
     />
+    <AnyPieceSvgFlat
+      v-else-if="set === PieceSet.Flat"
+      :color="color"
+      :type="type"
+    />
     <AnyPieceSvgRaccoon
       v-else-if="set === PieceSet.Raccoon"
       :color="color"
@@ -45,6 +50,7 @@ import { PieceColor, PieceSet, PieceType } from "@/lib/types";
 import AnyPieceSvgModern from "@/components/pieces/modern/AnyPieceSvgModern.vue";
 import AnyPieceSvgRaccoon from "@/components/pieces/raccoon/AnyPieceSvgRaccoon.vue";
 import AnyPieceSvgClassic from "@/components/pieces/classic/AnyPieceSvgClassic.vue";
+import AnyPieceSvgFlat from "@/components/pieces/flat/AnyPieceSvgFlat.vue";
 
 defineProps<{
   color: PieceColor;

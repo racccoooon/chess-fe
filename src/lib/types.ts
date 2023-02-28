@@ -43,6 +43,7 @@ export enum HighlightShape {
 export enum PieceSet {
   Modern = "modern",
   Raccoon = "raccoon",
+  Flat = "flat",
   Classic = "classic",
   Blindfold = "blindfold",
 }
