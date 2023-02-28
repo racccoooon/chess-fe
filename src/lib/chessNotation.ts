@@ -1,5 +1,11 @@
 import type { MoveItem, Piece, Square } from "@/lib/types";
-import { KingStatus, MoveType, PieceColor, PieceType } from "@/lib/types";
+import {
+  GameResult,
+  KingStatus,
+  MoveType,
+  PieceColor,
+  PieceType,
+} from "@/lib/types";
 import {
   applyMove,
   getHistoryUntilIndex,
@@ -41,6 +47,26 @@ export const pieceName: Record<PieceType, string> = {
   [PieceType.Bishop]: "bishop",
   [PieceType.Queen]: "queen",
   [PieceType.King]: "king",
+};
+
+export const gameResultNotation: Record<GameResult, string> = {
+  [GameResult.WhiteWins]: "1-0",
+  [GameResult.BlackWins]: "0-1",
+  [GameResult.Draw]: "1/2-1/2",
+  [GameResult.InProgress]: "",
+  [GameResult.Unknown]: "",
+};
+
+export const parseGameResultNotation = (notation: string): GameResult => {
+  if (notation === "1-0") {
+    return GameResult.WhiteWins;
+  } else if (notation === "0-1") {
+    return GameResult.BlackWins;
+  } else if (notation === "1/2-1/2") {
+    return GameResult.Draw;
+  } else {
+    return GameResult.InProgress;
+  }
 };
 
 export const getPieceNotation = (type: PieceType, useUnicodeIcons: boolean) => {

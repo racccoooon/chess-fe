@@ -12,6 +12,7 @@
           :moveHistory="moveHistory"
           :history-index="historyIndex"
           :setup-fen="setupFen"
+          :game-result="gameResult"
           @time-travel-absolute="emit('timeTravelAbsolute', $event)"
         />
       </template>
@@ -63,7 +64,7 @@
 <script setup lang="ts">
 import GameHistory from "@/components/GameHistory.vue";
 import type { MoveItem } from "@/lib/types";
-import { PieceColor } from "@/lib/types";
+import { GameResult, PieceColor } from "@/lib/types";
 import { getChessOpening } from "@/lib/chessOpenings";
 import { asyncComputed } from "@vueuse/core";
 // @ts-ignore
@@ -83,6 +84,7 @@ const props = defineProps<{
   gameHasStarted: boolean;
   historyIndex: number;
   setupFen?: string;
+  gameResult?: GameResult;
 }>();
 
 const emit = defineEmits<{

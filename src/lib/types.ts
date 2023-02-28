@@ -116,6 +116,14 @@ export interface MoveItem {
   promoteToType: PieceType | null;
 }
 
+export enum GameResult {
+  Unknown = "unknown",
+  InProgress = "inProgress",
+  WhiteWins = "whiteWins",
+  BlackWins = "blackWins",
+  Draw = "draw",
+}
+
 export interface JoinGameResponse {
   moves: MoveItem[];
   board: {

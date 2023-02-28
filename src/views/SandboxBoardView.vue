@@ -6,7 +6,6 @@
     :active-color="activeColor"
     :player-color="PlayerColor.Both"
     :is-player="true"
-    :can-move="true"
     :game-has-started="true"
     v-model:white-player-name="whitePlayerName"
     v-model:black-player-name="blackPlayerName"
@@ -18,6 +17,7 @@
       GameInfoTab.Settings,
     ]"
     :setup-fen="setupFen"
+    v-model:game-result="gameResult"
     @continue-from-history-index="onContinueFromHistoryIndex"
     @piece-selected="onPieceSelected"
     @piece-deselected="onPieceDeselected"
@@ -58,6 +58,7 @@ import type {
 } from "@/lib/types";
 import {
   GameInfoTab,
+  GameResult,
   HighlightShape,
   KingStatus,
   MoveType,
@@ -82,6 +83,8 @@ import {
   getGameNotation,
   notationToMoves,
   NotationType,
+  gameResultNotation,
+  parseGameResultNotation,
 } from "@/lib/chessNotation";
 import SuperDuperModal from "@/components/modals/SuperDuperModal.vue";
 import { useRoute, useRouter } from "vue-router";
@@ -97,6 +100,10 @@ const setupFen = ref((query.fen as string) || defaultFen);
 
 const pieces = ref<Piece[]>(fenToPieces(get(setupFen)));
 const moveHistory = ref<MoveItem[]>([]);
+
+const gameResult = ref<GameResult>(
+  parseGameResultNotation(query.result as string) || GameResult.InProgress
+);
 
 const selectedPiece = ref<Piece | null>(null);
 const activeColor = computed(() => {
@@ -168,6 +175,10 @@ const updateQuery = () => {
     query.fen = get(setupFen);
   }
 
+  if (get(gameResult) !== GameResult.InProgress) {
+    query.result = gameResultNotation[get(gameResult)];
+  }
+
   if (get(moveHistory).length !== 0) {
     const notation = getGameNotation(
       get(moveHistory),
@@ -183,7 +194,7 @@ const updateQuery = () => {
 };
 
 watchDebounced(
-  [pieces, moveHistory, whitePlayerName, blackPlayerName],
+  [pieces, moveHistory, whitePlayerName, blackPlayerName, gameResult],
   () => {
     updateQuery();
   },

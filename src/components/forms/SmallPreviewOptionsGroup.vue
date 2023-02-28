@@ -9,10 +9,15 @@
       :aria-selected="modelValue === option.value"
       class="h-12 px-3 flex items-center gap-3 text-gray-500 dark:text-gray-300 aria-selected:text-gray-900 aria-selected:dark:text-gray-50 aria-selected:bg-gray-200 aria-selected:dark:bg-gray-700 text-sm font-medium rounded-[1.25rem] transition-all ease-in-out"
     >
-      <span class="w-6 h-6 rounded-lg overflow-hidden">
+      <span
+        class="w-6 h-6 rounded-lg overflow-hidden flex items-center"
+        v-if="$slots.preview"
+      >
         <slot v-bind="option" name="preview" />
       </span>
-      <span>{{ option.label }}</span>
+      <span class="flex items-center gap-3">
+        <slot v-bind="option" name="label">{{ option.label }}</slot>
+      </span>
     </button>
   </div>
 </template>

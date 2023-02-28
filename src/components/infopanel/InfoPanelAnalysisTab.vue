@@ -13,6 +13,7 @@
         :moveHistory="moveHistory"
         :history-index="historyIndex"
         :setup-fen="setupFen"
+        :game-result="gameResult"
         @time-travel-absolute="emit('timeTravelAbsolute', $event)"
       />
       <div>
@@ -132,6 +133,7 @@ const props = defineProps<{
   activeColor: PieceColor;
   historyIndex: number;
   setupFen?: string;
+  gameResult?: string;
 }>();
 
 const emit = defineEmits<{

@@ -48,6 +48,32 @@
           </div>
         </CompactFormInputElement>
       </CompactFormSection>
+      <CompactFormSection>
+        <template #label>Outcome</template>
+        <template #description> The outcome of the game. </template>
+        <CompactFormInputElement>
+          <SmallPreviewOptionsGroup
+            class="grid-cols-2"
+            :model-value="gameResult || GameResult.Unknown"
+            @update:model-value="emit('update:gameResult', $event)"
+            :options="[
+              { value: GameResult.WhiteWins, label: 'White Won' },
+              { value: GameResult.BlackWins, label: 'Black Won' },
+              { value: GameResult.Draw, label: 'Draw' },
+              { value: GameResult.InProgress, label: 'Ongoing' },
+            ]"
+          >
+            <template #label="option">
+              <span class="ml-2 font-bold text-sm text-black dark:text-white">
+                {{ gameResultNotation[option.value] || "*" }}
+              </span>
+              <span>
+                {{ option.label }}
+              </span>
+            </template>
+          </SmallPreviewOptionsGroup>
+        </CompactFormInputElement>
+      </CompactFormSection>
     </CompactFormWrapper>
     <LargePrimaryButton @click="importGame">
       <span>Import</span>
@@ -63,7 +89,11 @@ import CompactFormSection from "@/components/forms/CompactFormSection.vue";
 import CompactFormInputElement from "@/components/forms/CompactFormInputElement.vue";
 import type { ImportGameEvent, MoveItem } from "@/lib/types";
 import { computed, ref } from "vue";
-import { getGameNotation, NotationType } from "@/lib/chessNotation";
+import {
+  getGameNotation,
+  NotationType,
+  gameResultNotation,
+} from "@/lib/chessNotation";
 // @ts-ignore
 import SvgIcon from "@jamescoyle/vue-icon";
 import { mdiUndoVariant, mdiImport } from "@mdi/js";
@@ -71,18 +101,22 @@ import { get, syncRefs } from "@vueuse/core";
 import LargePrimaryButton from "@/components/forms/LargePrimaryButton.vue";
 import { defaultFen, fenToPieces } from "@/lib/chess";
 import LargeFlatSecondaryButton from "@/components/forms/LargeFlatSecondaryButton.vue";
+import SmallPreviewOptionsGroup from "@/components/forms/SmallPreviewOptionsGroup.vue";
+import { GameResult } from "@/lib/types";
 
 const props = defineProps<{
   setupFen?: string;
   moveHistory?: MoveItem[];
   whitePlayerName?: string;
   blackPlayerName?: string;
+  gameResult?: GameResult;
 }>();
 
 const emit = defineEmits<{
   (event: "importGame", payload: ImportGameEvent): void;
   (event: "update:whitePlayerName", payload: string): void;
   (event: "update:blackPlayerName", payload: string): void;
+  (event: "update:gameResult", payload: GameResult): void;
 }>();
 
 const fenInput = ref<string>("");

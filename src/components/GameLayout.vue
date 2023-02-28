@@ -65,6 +65,8 @@
         v-model:pointer-mode="pointerMode"
         v-model:paint-piece-color="paintPieceColor"
         v-model:paint-piece-type="paintPieceType"
+        :game-result="gameResult"
+        @update:game-result="emit('update:gameResult', $event)"
       />
     </div>
   </div>
@@ -85,6 +87,7 @@ import type {
 } from "@/lib/types";
 import {
   BoardPointerMode,
+  GameResult,
   GameInfoTab,
   HighlightColor,
   HighlightShape,
@@ -122,6 +125,7 @@ const props = defineProps<{
   blackPlayerName: string;
   highlightSquares: BoardHighlightSquare[];
   setupFen?: string;
+  gameResult?: GameResult;
   panelTabs: GameInfoTab[];
 }>();
 
@@ -135,6 +139,7 @@ const emit = defineEmits<{
   (event: "update:blackPlayerName", payload: string): void;
   (event: "piecePainted", payload: PiecePaintedEvent): void;
   (event: "pieceErased", payload: PieceErasedEvent): void;
+  (event: "update:gameResult", payload: GameResult): void;
 }>();
 
 const boardRenderer = ref();

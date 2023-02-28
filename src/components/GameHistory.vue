@@ -18,12 +18,22 @@
         </div>
       </div>
     </div>
+    <span
+      v-if="
+        gameResult &&
+        [GameResult.WhiteWins, GameResult.BlackWins, GameResult.Draw].includes(
+          gameResult
+        )
+      "
+      class="font-bold"
+      v-text="gameResultNotation[gameResult]"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import type { MoveItem } from "@/lib/types";
-import { getMoveNotation } from "@/lib/chessNotation";
+import { gameResultNotation, getMoveNotation } from "@/lib/chessNotation";
 import { computed } from "vue";
 import { storeToRefs } from "pinia";
 import { useSettingsStore } from "@/stores/settings";
@@ -34,11 +44,13 @@ import {
   getHistoryUntilIndex,
 } from "@/lib/chess";
 import { get } from "@vueuse/core";
+import { GameResult } from "@/lib/types";
 
 const props = defineProps<{
   moveHistory: MoveItem[];
   historyIndex?: number;
   setupFen?: string;
+  gameResult?: GameResult;
 }>();
 
 const emit = defineEmits<{

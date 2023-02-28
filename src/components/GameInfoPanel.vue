@@ -24,6 +24,7 @@
         :game-has-started="gameHasStarted"
         :history-index="historyIndex"
         :setup-fen="setupFen"
+        :game-result="gameResult"
         @time-travel-relative="emit('timeTravelRelative', $event)"
         @time-travel-absolute="emit('timeTravelAbsolute', $event)"
       />
@@ -33,6 +34,7 @@
         :active-color="activeColor"
         :history-index="historyIndex"
         :setup-fen="setupFen"
+        :game-result="gameResult"
         @time-travel-relative="emit('timeTravelRelative', $event)"
         @time-travel-absolute="emit('timeTravelAbsolute', $event)"
         @continue-from-history-index="emit('continueFromHistoryIndex', $event)"
@@ -55,6 +57,8 @@
         :black-player-name="blackPlayerName"
         @update:black-player-name="emit('update:blackPlayerName', $event)"
         :setup-fen="setupFen"
+        :game-result="gameResult"
+        @update:game-result="emit('update:gameResult', $event)"
       />
       <InfoPanelShareTab
         v-else-if="activeTab === GameInfoTab.Share"
@@ -75,7 +79,12 @@ import InfoPanelGameTab from "@/components/infopanel/InfoPanelGameTab.vue";
 import InfoPanelSettingsTab from "@/components/infopanel/InfoPanelSettingsTab.vue";
 import InfoPanelShareTab from "@/components/infopanel/InfoPanelShareTab.vue";
 import { set, watchOnce } from "@vueuse/core";
-import { BoardPointerMode, GameInfoTab, PieceType } from "@/lib/types";
+import {
+  BoardPointerMode,
+  GameInfoTab,
+  GameResult,
+  PieceType,
+} from "@/lib/types";
 import type { ImportGameEvent } from "@/lib/types";
 import InfoPanelGameSetupTab from "@/components/infopanel/InfoPanelGameSetupTab.vue";
 import InfoPanelAnalysisTab from "@/components/infopanel/InfoPanelAnalysisTab.vue";
@@ -90,6 +99,7 @@ const props = defineProps<{
   whitePlayerName: string;
   blackPlayerName: string;
   setupFen: string;
+  gameResult?: GameResult;
   pointerMode: BoardPointerMode;
   paintPieceType: PieceType;
   paintPieceColor: PieceColor;
@@ -106,6 +116,7 @@ const emit = defineEmits<{
   (event: "update:pointerMode", payload: BoardPointerMode): void;
   (event: "update:paintPieceType", payload: PieceType): void;
   (event: "update:paintPieceColor", payload: PieceColor): void;
+  (event: "update:gameResult", payload: GameResult): void;
 }>();
 
 const activeTab = ref<GameInfoTab>(GameInfoTab.Share);
