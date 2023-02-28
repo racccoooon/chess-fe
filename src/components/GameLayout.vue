@@ -94,11 +94,14 @@ import {
   PieceColor,
   PieceType,
   PlayerColor,
+  MoveType,
+  KingStatus,
 } from "@/lib/types";
 import { computed, ref, watch } from "vue";
 import { get, set, whenever } from "@vueuse/core";
 import { useClamp } from "@vueuse/math";
 import {
+  applyMove,
   comparePieceAndPlayerColor,
   defaultFen,
   fenToPieces,
@@ -106,6 +109,7 @@ import {
   getCapturedPieces,
   getMaterialValueByColor,
   getPiecesByType,
+  getPieceSquare,
   isInCheck,
 } from "@/lib/chess";
 import GameInfoPanel from "@/components/GameInfoPanel.vue";
@@ -188,12 +192,22 @@ const lastMove = computed(() => {
     return props.moveHistory[props.moveHistory.length - 1] || null;
   }
 
+  if (get(alternativePieces).length !== 0) {
+    return null;
+  }
+
   return props.moveHistory[get(historyIndex) - 1];
 });
+
+const alternativePieces = ref<Piece[]>([]);
 
 const pieces = computed(() => {
   if (!get(isTimeTraveling)) {
     return props.pieces;
+  }
+
+  if (get(alternativePieces).length !== 0) {
+    return get(alternativePieces);
   }
 
   return getBoardAtHistoryIndex(
@@ -203,6 +217,10 @@ const pieces = computed(() => {
   );
 });
 
+watch(historyIndex, () => {
+  set(alternativePieces, []);
+});
+
 const pointerMode = ref<BoardPointerMode>(BoardPointerMode.Move);
 const paintPieceType = ref<PieceType>(PieceType.Pawn);
 const paintPieceColor = ref<PieceColor>(PieceColor.White);
@@ -210,12 +228,12 @@ const paintPieceColor = ref<PieceColor>(PieceColor.White);
 // computed values for checking if the player is in check
 const isWhiteInCheck = computed(() => {
   if (!get(lastMove)) return false;
-  return isInCheck(get(lastMove), PieceColor.White);
+  return isInCheck(get(lastMove)!, PieceColor.White);
 });
 
 const isBlackInCheck = computed(() => {
   if (!get(lastMove)) return false;
-  return isInCheck(get(lastMove), PieceColor.Black);
+  return isInCheck(get(lastMove)!, PieceColor.Black);
 });
 
 const isAnyInCheck = computed(() => {
@@ -315,17 +333,11 @@ const bottomPlayerCapturedPieces = computed(() => {
 // compute allow interaction
 
 const allowInteractionWithWhite = computed(() => {
-  return (
-    comparePieceAndPlayerColor(PieceColor.White, props.playerColor) &&
-    !get(isTimeTraveling)
-  );
+  return comparePieceAndPlayerColor(PieceColor.White, props.playerColor);
 });
 
 const allowInteractionWithBlack = computed(() => {
-  return (
-    comparePieceAndPlayerColor(PieceColor.Black, props.playerColor) &&
-    !get(isTimeTraveling)
-  );
+  return comparePieceAndPlayerColor(PieceColor.Black, props.playerColor);
 });
 
 // compute highlights
@@ -347,12 +359,12 @@ const highlightSquares = computed((): BoardHighlightSquare[] => {
 
   if (get(lastMove) && get(showLastMove)) {
     list.push({
-      square: get(lastMove).from,
+      square: get(lastMove)!.from,
       color: get(lastMoveHighlightColor),
       shape: HighlightShape.SquareFill,
     });
     list.push({
-      square: get(lastMove).to,
+      square: get(lastMove)!.to,
       color: get(lastMoveHighlightColor),
       shape: HighlightShape.SquareFill,
     });
@@ -374,7 +386,33 @@ const onPieceDeselected = () => {
 };
 
 const onPieceMoved = (e: PieceMovedEvent) => {
-  if (get(isTimeTraveling)) return;
+  if (get(isTimeTraveling)) {
+    if (get(alternativePieces).length === 0) {
+      set(alternativePieces, get(pieces));
+    }
+
+    const { piece, to } = e;
+
+    if (!piece) {
+      return;
+    }
+
+    const move = {
+      from: getPieceSquare(piece),
+      to: to,
+      color: piece.color,
+      type: piece.type,
+      kind: MoveType.NonSpecial,
+      status: KingStatus.IsNoCheck,
+      captures: false,
+      promoteToType: null,
+    } as MoveItem;
+
+    applyMove(get(alternativePieces), move);
+
+    return;
+  }
+
   emit("pieceMoved", { piece: e.piece, to: e.to });
 };
 
