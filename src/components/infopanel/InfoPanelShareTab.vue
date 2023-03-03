@@ -4,19 +4,19 @@
       <h2 class="text-gray-900 dark:text-gray-50 font-medium text-xl">
         Send this link to your opponent
       </h2>
-      <div class="flex flex-col md:flex-row gap-4 md:gap-2">
+      <div class="flex flex-row gap-2">
         <LargeTextInput
           v-model="inviteOpponentLink"
           ref="opponentLinkInput"
           readonly
         />
-        <LargeSecondaryButton
+        <LargeFlatSecondaryButton
           @click="copyOpponentLinkToClipboard"
           class="grow"
           alt="copy link"
         >
           <SvgIcon type="mdi" :path="mdiContentCopy" size="18" />
-        </LargeSecondaryButton>
+        </LargeFlatSecondaryButton>
       </div>
       <div
         class="h-min p-2 flex flex-row justify-center rounded-lg overflow-hidden bg-white"
@@ -33,28 +33,28 @@
       <h2 class="text-gray-900 dark:text-gray-50 font-medium text-xl">
         Permanent link to this game
       </h2>
-      <div class="flex flex-col md:flex-row gap-4 md:gap-2">
+      <div class="flex flex-row gap-2">
         <LargeTextInput
           class="grow px-6 py-4 text-gray-900 dark:text-gray-50 bg-gray-200 dark:bg-gray-700 rounded-xl"
           v-model="permanentLink"
           ref="permanentLinkInput"
           readonly
         />
-        <LargeSecondaryButton
+        <LargeFlatSecondaryButton
           class="grow"
           alt="open in new tab"
           :href="permanentLink"
           target="_blank"
         >
           <SvgIcon type="mdi" :path="mdiOpenInNew" size="18" />
-        </LargeSecondaryButton>
-        <LargeSecondaryButton
+        </LargeFlatSecondaryButton>
+        <LargeFlatSecondaryButton
           @click="copyPermanentLinkToClipboard"
           class="grow"
           alt="copy link"
         >
           <SvgIcon type="mdi" :path="mdiContentCopy" size="18" />
-        </LargeSecondaryButton>
+        </LargeFlatSecondaryButton>
       </div>
     </div>
   </div>
@@ -70,7 +70,7 @@ import QRCode from "qrcode";
 import SvgIcon from "@jamescoyle/vue-icon";
 import { mdiContentCopy, mdiOpenInNew } from "@mdi/js";
 import LargeTextInput from "@/components/forms/LargeTextInput.vue";
-import LargeSecondaryButton from "@/components/forms/LargeSecondaryButton.vue";
+import LargeFlatSecondaryButton from "@/components/forms/LargeFlatSecondaryButton.vue";
 import type { MoveItem } from "@/lib/types";
 import { getGameNotation, NotationType } from "@/lib/chessNotation";
 
