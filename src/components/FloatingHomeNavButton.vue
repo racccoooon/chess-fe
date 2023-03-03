@@ -4,7 +4,7 @@
     class="flex justify-center sm:fixed sm:top-0 sm:left-0 mt-6 sm:m-4 sm:p-4 hover:px-6 group sm:hover:bg-gray-100 sm:hover:dark:bg-gray-800 rounded-2xl transition-all ease-in-out duration-200"
   >
     <PieceRenderer
-      class="hidden sm:block sm:absolute h-6 opacity-75 group-hover:opacity-0 transition-all ease-in-out duration-200"
+      class="hidden sm:block sm:absolute h-6 sm:-translate-x-4 sm:group-hover:translate-x-4 opacity-100 group-hover:opacity-0 transition-all ease-in-out duration-200"
       :color="PieceColor.White"
       :type="PieceType.Pawn"
     />
