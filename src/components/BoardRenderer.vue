@@ -262,7 +262,6 @@ import {
   set,
   useMouse,
   useRefHistory,
-  useWindowScroll,
 } from "@vueuse/core";
 import { getFileName, getRankName } from "@/lib/chessNotation";
 import { getPieceAtSquare, getPieceSquare } from "@/lib/chess";
@@ -351,8 +350,9 @@ const userHighlightsByBoardPosition = ref<
   Record<string, { arrows: BoardArrow[]; squares: BoardHighlightSquare[] }>
 >({});
 
-const { x: mouseX, y: mouseY } = useMouse();
-const { y: windowScrollY } = useWindowScroll();
+const { x: mouseX, y: mouseY } = useMouse({
+  type: "client",
+});
 
 watch(
   pieces,
@@ -895,10 +895,7 @@ const stopHighlighting = () => {
 };
 
 const hoveredSquare = computed(() => {
-  return displayPositionToBoardPosition(
-    get(mouseX),
-    get(mouseY) - get(windowScrollY)
-  );
+  return displayPositionToBoardPosition(get(mouseX), get(mouseY));
 });
 
 const hoveredPiece = computed(() => {
@@ -934,6 +931,8 @@ const dragMouseDelta = computed(() => {
     y: get(mouseY) - get(dragMouseStart).y,
   };
 });
+
+// TODO: scaling is not working correctly
 
 const dragMouseDeltaScaled = computed(() => {
   const outerRect = get(outerSvg)!.getBoundingClientRect();
