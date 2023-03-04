@@ -172,6 +172,10 @@
                 label: 'Classic',
               },
               {
+                value: PieceSet.Obfuscated,
+                label: 'Obfuscated',
+              },
+              {
                 value: PieceSet.Blindfold,
                 label: 'Blind',
               },

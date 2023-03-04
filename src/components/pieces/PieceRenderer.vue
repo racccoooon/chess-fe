@@ -20,6 +20,11 @@
       :color="color"
       :type="type"
     />
+    <AnyPieceSvgObfuscated
+      v-else-if="set === PieceSet.Obfuscated"
+      :color="color"
+      :type="type"
+    />
     <template v-else-if="set !== PieceSet.Blindfold">
       <text
         x="50%"
@@ -51,6 +56,7 @@ import AnyPieceSvgModern from "@/components/pieces/modern/AnyPieceSvgModern.vue"
 import AnyPieceSvgRaccoon from "@/components/pieces/raccoon/AnyPieceSvgRaccoon.vue";
 import AnyPieceSvgClassic from "@/components/pieces/classic/AnyPieceSvgClassic.vue";
 import AnyPieceSvgFlat from "@/components/pieces/flat/AnyPieceSvgFlat.vue";
+import AnyPieceSvgObfuscated from "@/components/pieces/obfuscated/AnyPieceSvgObfuscated.vue";
 
 defineProps<{
   color: PieceColor;

@@ -45,6 +45,7 @@ export enum PieceSet {
   Raccoon = "raccoon",
   Flat = "flat",
   Classic = "classic",
+  Obfuscated = "obfuscated",
   Blindfold = "blindfold",
 }
 
