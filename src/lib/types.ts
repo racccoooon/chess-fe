@@ -238,3 +238,12 @@ export enum BoardPointerMode {
   Paint = "paint",
   Erase = "erase",
 }
+
+export enum ChessVariation {
+  Standard = "standard",
+  Chess960 = "chess960",
+  Horde = "horde",
+  Atheist = "atheist",
+  FogOfWar = "fogOfWar",
+  Custom = "custom",
+}

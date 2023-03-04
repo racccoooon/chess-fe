@@ -43,6 +43,41 @@
           </template>
         </LargeOptionsGroup>
       </div>
+      <div class="flex flex-col gap-6">
+        <h2 class="text-xl font-bold">Chess Variation</h2>
+        <LargeOptionsGroup
+          v-model="variation"
+          :options="[
+            { label: 'Standard Chess', value: ChessVariation.Standard },
+            { label: 'Custom', value: ChessVariation.Custom },
+            { label: 'Chess960', value: ChessVariation.Chess960 },
+            { label: 'Horde', value: ChessVariation.Horde },
+            { label: 'Atheist Chess', value: ChessVariation.Atheist },
+            { label: 'Fog Of War', value: ChessVariation.FogOfWar },
+          ]"
+        >
+        </LargeOptionsGroup>
+      </div>
+      <div
+        class="flex flex-col gap-6"
+        v-if="variation === ChessVariation.Custom"
+      >
+        <h2 class="text-xl font-bold">Custom Game Settings</h2>
+        <div class="flex flex-col gap-3">
+          <h3 class="text-lg font-medium">Starting Fen</h3>
+          <LargeTextInput v-model="customFen" />
+        </div>
+        <div class="flex flex-col gap-3">
+          <h3 class="text-lg font-medium">Starting Color</h3>
+          <SmallOptionsGroup
+            v-model="startingColor"
+            :options="[
+              { label: 'White', value: PieceColor.White },
+              { label: 'Black', value: PieceColor.Black },
+            ]"
+          />
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -53,13 +88,22 @@ import LargePrimaryButton from "@/components/forms/LargePrimaryButton.vue";
 import SvgIcon from "@jamescoyle/vue-icon";
 import { mdiArrowRight } from "@mdi/js";
 import LargeOptionsGroup from "@/components/forms/LargeOptionsGroup.vue";
-import { GameStartColor, PieceColor, PieceType } from "@/lib/types";
+import type { Piece } from "@/lib/types";
+import {
+  ChessVariation,
+  GameStartColor,
+  PieceColor,
+  PieceType,
+} from "@/lib/types";
 import PieceRenderer from "@/components/pieces/PieceRenderer.vue";
 import { ref } from "vue";
 import { createGame as createGameApi } from "@/lib/api";
 import { get } from "@vueuse/core";
 import { useUserStore } from "@/stores/user";
 import { useRouter } from "vue-router";
+import { fenToPieces } from "@/lib/chess";
+import LargeTextInput from "@/components/forms/LargeTextInput.vue";
+import SmallOptionsGroup from "@/components/forms/SmallOptionsGroup.vue";
 
 const store = useUserStore();
 
@@ -69,8 +113,51 @@ const router = useRouter();
 
 const startColor = ref(GameStartColor.White);
 
+const variation = ref(ChessVariation.Standard);
+
+const customFen = ref("");
+const startingColor = ref(PieceColor.White);
+
+const randomizedRow = (row: string) => {
+  return row
+    .split("")
+    .sort(() => 0.5 - Math.random())
+    .join("");
+};
+
 const createGame = async () => {
-  let game = await createGameApi(get(startColor));
+  let startingPieces: Piece[] = [];
+
+  switch (get(variation)) {
+    case ChessVariation.Chess960:
+      startingPieces = fenToPieces(
+        `${randomizedRow("rnbqkbnr")}/pppppppp/8/8/8/8/PPPPPPPP/${randomizedRow(
+          "RNBQKBNR"
+        )}`
+      );
+      break;
+    case ChessVariation.Horde:
+      startingPieces = fenToPieces(
+        "rnbqkbnr/pppppppp/8/1PP2PP1/PPPPPPPP/PPPPPPPP/PPPPPPPP/PPPPPPPP"
+      );
+      break;
+    case ChessVariation.Atheist:
+      startingPieces = fenToPieces(
+        "rnpqkpnr/pppppppp/8/8/8/8/PPPPPPPP/RNPQKPNR"
+      );
+      break;
+    case ChessVariation.Custom:
+      startingPieces = fenToPieces(get(customFen));
+      break;
+  }
+
+  let game = await createGameApi(
+    get(startColor),
+    startingPieces,
+    get(variation) === ChessVariation.Custom
+      ? get(startingColor)
+      : PieceColor.White
+  );
 
   store.$patch({
     name: get(playerName),

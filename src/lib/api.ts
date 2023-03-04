@@ -1,17 +1,21 @@
 import axios from "axios";
-import type { GameStartColor, Square } from "@/lib/types";
+import type { GameStartColor, Piece, Square, PieceColor } from "@/lib/types";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
 });
 
 export const createGame = async (
-  color: GameStartColor
+  color: GameStartColor,
+  startingPieces: Piece[],
+  startingColor: PieceColor
 ): Promise<{
   gameId: string;
 }> => {
   const response = await api.post("/games/", {
     color,
+    startingPieces,
+    startingColor,
   });
   return response.data;
 };
