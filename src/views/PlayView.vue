@@ -22,6 +22,13 @@
           @select-type="onPromotionSelected"
         />
         <div
+          v-if="showModal === ModalType.Loading"
+          class="flex flex-row gap-6 items-center"
+        >
+          <SvgIcon type="mdi" :path="mdiLoading" class="animate-spin w-6 h-6" />
+          <h2 class="font-medium text-lg">Loading...</h2>
+        </div>
+        <div
           class="flex flex-col gap-4"
           v-if="showModal === ModalType.IllegalMove"
         >
@@ -88,6 +95,9 @@ import PromoteModalContent from "@/components/modals/PromoteModalContent.vue";
 import { useSettingsStore } from "@/stores/settings";
 import { storeToRefs } from "pinia";
 import { getValidMoves } from "@/lib/api";
+// @ts-ignore
+import SvgIcon from "@jamescoyle/vue-icon";
+import { mdiLoading } from "@mdi/js";
 
 const router = useRouter();
 const hubConnection = new SignalrConnection();
@@ -221,7 +231,7 @@ const highlightSquares = computed((): BoardHighlightSquare[] => {
   return list;
 });
 
-const showModal = ref(ModalType.None);
+const showModal = ref(ModalType.Loading);
 const promotionSelectedType = ref<PieceType | null>(null);
 
 const initialize = async () => {
@@ -285,6 +295,9 @@ const initialize = async () => {
 
     // set active color
     set(activeColor, e.activeColor as PieceColor);
+
+    // disable loading modal
+    set(showModal, ModalType.None);
   });
 
   hubConnection.onGameStarted((e: GameStartedResponse) => {

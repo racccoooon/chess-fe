@@ -216,6 +216,7 @@ export enum ModalType {
   None = "none",
   Promotion = "promotion",
   IllegalMove = "illegalMove",
+  Loading = "loading",
 }
 
 export interface Vector2 {
