@@ -31,6 +31,25 @@
     </div>
     <div class="flex flex-col gap-6">
       <h2 class="text-gray-900 dark:text-gray-50 font-medium text-xl">
+        Send this link to spectators
+      </h2>
+      <div class="flex flex-row gap-2">
+        <LargeTextInput
+          v-model="inviteSpectatorsLink"
+          ref="opponentLinkInput"
+          readonly
+        />
+        <LargeFlatSecondaryButton
+          @click="copySpectatorsLinkToClipboard"
+          class="grow"
+          alt="copy link"
+        >
+          <SvgIcon type="mdi" :path="mdiContentCopy" size="18" />
+        </LargeFlatSecondaryButton>
+      </div>
+    </div>
+    <div class="flex flex-col gap-6">
+      <h2 class="text-gray-900 dark:text-gray-50 font-medium text-xl">
         Permanent link to this game
       </h2>
       <div class="flex flex-row gap-2">
@@ -90,6 +109,10 @@ const inviteOpponentLink = computed(() => {
   return `${window.location.origin}/play/${get(gameId)}`;
 });
 
+const inviteSpectatorsLink = computed(() => {
+  return `${window.location.origin}/spectate/${get(gameId)}`;
+});
+
 const permanentLink = ref("");
 
 const getPermanentLink = () => {
@@ -132,6 +155,10 @@ watchDebounced(() => props.moveHistory, getPermanentLink, {
 
 const copyOpponentLinkToClipboard = () => {
   navigator.clipboard.writeText(get(inviteOpponentLink));
+};
+
+const copySpectatorsLinkToClipboard = () => {
+  navigator.clipboard.writeText(get(inviteSpectatorsLink));
 };
 
 const copyPermanentLinkToClipboard = () => {

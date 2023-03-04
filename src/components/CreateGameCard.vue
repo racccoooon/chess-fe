@@ -156,7 +156,8 @@ const createGame = async () => {
     startingPieces,
     get(variation) === ChessVariation.Custom
       ? get(startingColor)
-      : PieceColor.White
+      : PieceColor.White,
+    true
   );
 
   store.$patch({

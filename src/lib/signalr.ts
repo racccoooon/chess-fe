@@ -40,6 +40,18 @@ export class SignalrConnection {
     });
   }
 
+  async joinSpectator(gameId: string) {
+    await this.connection.invoke("JoinSpectator", {
+      gameId,
+    });
+  }
+
+  async leaveSpectator(gameId: string) {
+    await this.connection.invoke("LeaveSpectator", {
+      gameId,
+    });
+  }
+
   async makeMove(gameId: string, move: Move, promoteToType: PieceType | null) {
     await this.connection.invoke("Move", {
       gameId,

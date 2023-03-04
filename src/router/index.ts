@@ -18,6 +18,11 @@ const router = createRouter({
       name: "sandbox-board",
       component: () => import("../views/SandboxBoardView.vue"),
     },
+    {
+      path: "/spectate/:gameId",
+      name: "spectate",
+      component: () => import("../views/SpectateView.vue"),
+    },
   ],
 });
 

@@ -8,7 +8,8 @@ const api = axios.create({
 export const createGame = async (
   color: GameStartColor,
   startingPieces: Piece[],
-  startingColor: PieceColor
+  startingColor: PieceColor,
+  isPublic: boolean
 ): Promise<{
   gameId: string;
 }> => {
@@ -16,8 +17,15 @@ export const createGame = async (
     color,
     startingPieces,
     startingColor,
+    isPublic,
   });
   return response.data;
+};
+
+export const getGames = async (): Promise<{ id: string; name: string }[]> => {
+  const response = await api.get(`/games/`);
+
+  return response.data.games;
 };
 
 export const getValidMoves = async (

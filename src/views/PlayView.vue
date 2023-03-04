@@ -21,13 +21,7 @@
           v-if="showModal === ModalType.Promotion"
           @select-type="onPromotionSelected"
         />
-        <div
-          v-if="showModal === ModalType.Loading"
-          class="flex flex-row gap-6 items-center"
-        >
-          <SvgIcon type="mdi" :path="mdiLoading" class="animate-spin w-6 h-6" />
-          <h2 class="font-medium text-lg">Loading...</h2>
-        </div>
+        <LoadingModalContent v-if="showModal === ModalType.Loading" />
         <div
           class="flex flex-col gap-4"
           v-if="showModal === ModalType.IllegalMove"
@@ -95,9 +89,7 @@ import PromoteModalContent from "@/components/modals/PromoteModalContent.vue";
 import { useSettingsStore } from "@/stores/settings";
 import { storeToRefs } from "pinia";
 import { getValidMoves } from "@/lib/api";
-// @ts-ignore
-import SvgIcon from "@jamescoyle/vue-icon";
-import { mdiLoading } from "@mdi/js";
+import LoadingModalContent from "@/components/modals/LoadingModalContent.vue";
 
 const router = useRouter();
 const hubConnection = new SignalrConnection();
@@ -241,18 +233,17 @@ const initialize = async () => {
   await hubConnection.start();
 
   hubConnection.onGameFull(() => {
-    alert("Game is full!");
-    router.push({ name: "start-playing" });
+    router.push({ name: "spectate", params: { gameId: get(gameId) } });
   });
 
   hubConnection.onGameNotFound(() => {
     alert("Game not found!");
-    router.push({ name: "start-playing" });
+    router.push({ name: "home" });
   });
 
   hubConnection.onPlayerNotFound(() => {
     alert("Player not found!");
-    router.push({ name: "start-playing" });
+    router.push({ name: "home" });
   });
 
   hubConnection.onInvalidMove(() => {
@@ -284,11 +275,8 @@ const initialize = async () => {
     }
 
     // set opponent if they already joined before us
-    if (e.playerColor === PlayerColor.White) {
-      set(blackPlayerName, e.opponentName || "Opponent");
-    } else {
-      set(whitePlayerName, e.opponentName || "Opponent");
-    }
+    set(whitePlayerName, e.whitePlayerName || "Opponent");
+    set(blackPlayerName, e.blackPlayerName || "Opponent");
 
     // set move history
     set(moveHistory, e.moves);

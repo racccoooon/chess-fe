@@ -658,6 +658,10 @@ export const comparePieceAndPlayerColor = (
     return true;
   }
 
+  if (playerColor === PlayerColor.None) {
+    return false;
+  }
+
   if (pieceColor === PieceColor.Black && playerColor === PlayerColor.Black) {
     return true;
   }

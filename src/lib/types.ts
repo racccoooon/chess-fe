@@ -16,6 +16,7 @@ export enum PlayerColor {
   White = "white",
   Black = "black",
   Both = "both",
+  None = "none",
 }
 
 export enum GameStartColor {
@@ -137,7 +138,8 @@ export interface JoinGameResponse {
   }[];
   activeColor: PieceColor;
   playerColor: PlayerColor;
-  opponentName: string;
+  whitePlayerName: string;
+  blackPlayerName: string;
 }
 
 export interface GameStartedResponse {
