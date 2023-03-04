@@ -16,7 +16,7 @@
 </template>
 
 <script setup lang="ts">
-import { PieceColor, PieceType } from "@/lib/types";
+import type { PieceColor, PieceType } from "@/lib/types";
 
 defineProps<{
   color: PieceColor;
