@@ -5,6 +5,7 @@ import type {
   JoinGameResponse,
   Move,
   MoveItem,
+  PlayerNameChangedResponse,
 } from "@/lib/types";
 import type { PieceType } from "@/lib/types";
 
@@ -48,6 +49,17 @@ export class SignalrConnection {
     });
   }
 
+  async changeName(token: string, name: string) {
+    await this.connection.invoke("ChangeName", {
+      token,
+      name,
+    });
+  }
+
+  onPlayerNameChanged(callback: (e: PlayerNameChangedResponse) => void) {
+    this.connection.on("playerNameChanged", callback);
+  }
+
   onGameFull(callback: () => void) {
     this.connection.on("gameFull", callback);
   }
@@ -74,13 +86,5 @@ export class SignalrConnection {
 
   onMove(callback: (e: MoveItem) => Promise<void>) {
     this.connection.on("move", callback);
-  }
-
-  onCheck(callback: (e: MoveItem) => Promise<void>) {
-    this.connection.on("check", callback);
-  }
-
-  onCheckmate(callback: (e: MoveItem) => Promise<void>) {
-    this.connection.on("checkmate", callback);
   }
 }

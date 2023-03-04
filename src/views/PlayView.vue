@@ -50,6 +50,7 @@ import type {
   Piece,
   PieceMovedEvent,
   PieceSelectedEvent,
+  PlayerNameChangedResponse,
   PromotionSelectedEvent,
   Square,
 } from "@/lib/types";
@@ -62,7 +63,14 @@ import {
   PlayerColor,
 } from "@/lib/types";
 import { computed, onMounted, ref, watch } from "vue";
-import { get, set, syncRef, useMemoize, whenever } from "@vueuse/core";
+import {
+  get,
+  set,
+  syncRef,
+  useMemoize,
+  watchDebounced,
+  whenever,
+} from "@vueuse/core";
 import { SignalrConnection } from "@/lib/signalr";
 import { useUserStore } from "@/stores/user";
 import { getSquareName } from "@/lib/chessNotation";
@@ -109,6 +117,14 @@ const moveHistory = ref<MoveItem[]>([]);
 const gameHasStarted = ref(false);
 
 const activeColor = ref<PieceColor>(PieceColor.White);
+
+watchDebounced(
+  userName,
+  () => {
+    hubConnection.changeName(get(userToken), get(userName));
+  },
+  { debounce: 500, maxWait: 1000 }
+);
 
 const playerCanMove = computed(() => {
   return (
@@ -283,6 +299,14 @@ const initialize = async () => {
 
   hubConnection.onMove(async (e: MoveItem) => {
     resolveMove(e);
+  });
+
+  hubConnection.onPlayerNameChanged((e: PlayerNameChangedResponse) => {
+    if (e.color === PieceColor.White) {
+      set(whitePlayerName, e.name);
+    } else {
+      set(blackPlayerName, e.name);
+    }
   });
 
   // join the game

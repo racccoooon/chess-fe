@@ -142,6 +142,11 @@ export interface GameStartedResponse {
   blackPlayerName: string;
 }
 
+export interface PlayerNameChangedResponse {
+  name: string;
+  color: PieceColor;
+}
+
 export interface PieceSelectedEvent {
   piece: Piece;
 }
