@@ -192,6 +192,10 @@
             v-model="piecesDisplaySize"
             :options="[
               {
+                value: PiecesDisplaySize.VerySmall,
+                label: 'Ant',
+              },
+              {
                 value: PiecesDisplaySize.Small,
                 label: 'Tiny',
               },
@@ -206,6 +210,10 @@
               {
                 value: PiecesDisplaySize.ExtraLarge,
                 label: 'Huge',
+              },
+              {
+                value: PiecesDisplaySize.TooLarge,
+                label: 'Enourmous',
               },
             ]"
           />

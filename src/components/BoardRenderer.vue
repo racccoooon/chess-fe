@@ -257,12 +257,7 @@ import {
 import { storeToRefs } from "pinia";
 import { useSettingsStore } from "@/stores/settings";
 import { computed, nextTick, ref, toRef, watch } from "vue";
-import {
-  get,
-  set,
-  useMouse,
-  useRefHistory,
-} from "@vueuse/core";
+import { get, set, useMouse, useRefHistory } from "@vueuse/core";
 import { getFileName, getRankName } from "@/lib/chessNotation";
 import { getPieceAtSquare, getPieceSquare } from "@/lib/chess";
 import objectHash from "object-hash";
@@ -542,6 +537,8 @@ const fillClass = computed(() => {
 
 const pieceAbsoluteSize = computed(() => {
   switch (get(piecesDisplaySize)) {
+    case PiecesDisplaySize.VerySmall:
+      return 10;
     case PiecesDisplaySize.Small:
       return 50;
     case PiecesDisplaySize.Medium:
@@ -550,6 +547,8 @@ const pieceAbsoluteSize = computed(() => {
       return 90;
     case PiecesDisplaySize.ExtraLarge:
       return 100;
+    case PiecesDisplaySize.TooLarge:
+      return 150;
     default:
       return 80;
   }

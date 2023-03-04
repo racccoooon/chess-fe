@@ -49,10 +49,12 @@ export enum PieceSet {
 }
 
 export enum PiecesDisplaySize {
+  VerySmall = "verySmall",
   Small = "small",
   Medium = "medium",
   Large = "large",
   ExtraLarge = "extraLarge",
+  TooLarge = "tooLarge",
 }
 export interface Piece {
   type: PieceType;
