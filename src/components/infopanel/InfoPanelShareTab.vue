@@ -82,7 +82,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { get, set, watchDebounced } from "@vueuse/core";
+import { get, set, useEventBus, watchDebounced } from "@vueuse/core";
 // @ts-ignore
 import QRCode from "qrcode";
 // @ts-ignore
@@ -92,6 +92,7 @@ import LargeTextInput from "@/components/forms/LargeTextInput.vue";
 import LargeFlatSecondaryButton from "@/components/forms/LargeFlatSecondaryButton.vue";
 import type { MoveItem } from "@/lib/types";
 import { getGameNotation, NotationType } from "@/lib/chessNotation";
+import { toastBusKey } from "@/lib/eventBus";
 
 const props = defineProps<{
   moveHistory?: MoveItem[];
@@ -100,6 +101,8 @@ const props = defineProps<{
 }>();
 
 const router = useRouter();
+
+const toastHub = useEventBus(toastBusKey);
 
 const gameId = ref(useRoute().params.gameId as string);
 
@@ -155,14 +158,23 @@ watchDebounced(() => props.moveHistory, getPermanentLink, {
 
 const copyOpponentLinkToClipboard = () => {
   navigator.clipboard.writeText(get(inviteOpponentLink));
+  toastHub.emit({
+    message: "Copied link to clipboard!",
+  });
 };
 
 const copySpectatorsLinkToClipboard = () => {
   navigator.clipboard.writeText(get(inviteSpectatorsLink));
+  toastHub.emit({
+    message: "Copied link to clipboard!",
+  });
 };
 
 const copyPermanentLinkToClipboard = () => {
   navigator.clipboard.writeText(get(permanentLink));
+  toastHub.emit({
+    message: "Copied link to clipboard!",
+  });
 };
 
 const generateOpponentQrCode = () => {

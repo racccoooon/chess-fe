@@ -253,3 +253,12 @@ export enum ChessVariation {
   FogOfWar = "fogOfWar",
   Custom = "custom",
 }
+
+export interface Toast {
+  title?: string;
+  message: string;
+}
+
+export interface ToastKeyed extends Toast {
+  id: string;
+}
