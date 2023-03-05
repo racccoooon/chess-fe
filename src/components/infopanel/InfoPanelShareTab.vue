@@ -98,7 +98,7 @@ const toastHub = useEventBus(toastBusKey);
 const gameId = ref(useRoute().params.gameId as string);
 
 const inviteOpponentLink = computed(() => {
-  return `${window.location.origin}/play/${get(gameId)}`;
+  return `${window.location.origin}/${get(gameId)}`;
 });
 
 const inviteSpectatorsLink = computed(() => {

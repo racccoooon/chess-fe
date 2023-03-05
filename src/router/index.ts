@@ -9,6 +9,12 @@ const router = createRouter({
       component: () => import("../views/HomeView.vue"),
     },
     {
+      path: "/:gameId",
+      redirect: (to) => {
+        return { name: "play", params: to.params };
+      },
+    },
+    {
       path: "/play/:gameId",
       name: "play",
       component: () => import("../views/PlayView.vue"),
