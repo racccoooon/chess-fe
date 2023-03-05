@@ -89,6 +89,7 @@ const props = defineProps<{
   moveHistory?: MoveItem[];
   whitePlayerName?: string;
   blackPlayerName?: string;
+  setupFen?: string;
 }>();
 
 const router = useRouter();
@@ -131,6 +132,7 @@ const getPermanentLink = () => {
       query: {
         white: props.whitePlayerName,
         black: props.blackPlayerName,
+        fen: props.setupFen,
         moves: san,
       },
     }).href;

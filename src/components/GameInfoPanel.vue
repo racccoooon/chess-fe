@@ -65,6 +65,7 @@
         :move-history="moveHistory"
         :white-player-name="whitePlayerName"
         :black-player-name="blackPlayerName"
+        :setup-fen="setupFen"
       />
       <InfoPanelSettingsTab v-else-if="activeTab === GameInfoTab.Settings" />
     </div>
