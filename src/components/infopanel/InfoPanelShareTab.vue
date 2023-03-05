@@ -18,16 +18,7 @@
           <SvgIcon type="mdi" :path="mdiContentCopy" size="18" />
         </LargeFlatSecondaryButton>
       </div>
-      <div
-        class="h-min p-2 flex flex-row justify-center rounded-lg overflow-hidden bg-white"
-      >
-        <img
-          ref="opponentQrCodeImg"
-          class="w-full md:w-1/3 xl:w-2/5"
-          src=""
-          alt="Opponent Link QrCode"
-        />
-      </div>
+      <QRCodeDisplay :text="inviteOpponentLink" alt="QRCode for opponent" />
     </div>
     <div class="flex flex-col gap-6">
       <h2 class="text-gray-900 dark:text-gray-50 font-medium text-xl">
@@ -47,6 +38,7 @@
           <SvgIcon type="mdi" :path="mdiContentCopy" size="18" />
         </LargeFlatSecondaryButton>
       </div>
+      <QRCodeDisplay :text="inviteSpectatorsLink" alt="QRCode for spectators" />
     </div>
     <div class="flex flex-col gap-6">
       <h2 class="text-gray-900 dark:text-gray-50 font-medium text-xl">
@@ -80,11 +72,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { get, set, useEventBus, watchDebounced } from "@vueuse/core";
-// @ts-ignore
-import QRCode from "qrcode";
 // @ts-ignore
 import SvgIcon from "@jamescoyle/vue-icon";
 import { mdiContentCopy, mdiOpenInNew } from "@mdi/js";
@@ -93,6 +83,7 @@ import LargeFlatSecondaryButton from "@/components/forms/LargeFlatSecondaryButto
 import type { MoveItem } from "@/lib/types";
 import { getGameNotation, NotationType } from "@/lib/chessNotation";
 import { toastBusKey } from "@/lib/eventBus";
+import QRCodeDisplay from "@/components/forms/QRCodeDisplay.vue";
 
 const props = defineProps<{
   moveHistory?: MoveItem[];
@@ -105,8 +96,6 @@ const router = useRouter();
 const toastHub = useEventBus(toastBusKey);
 
 const gameId = ref(useRoute().params.gameId as string);
-
-const opponentQrCodeImg = ref<HTMLImageElement>();
 
 const inviteOpponentLink = computed(() => {
   return `${window.location.origin}/play/${get(gameId)}`;
@@ -177,22 +166,7 @@ const copyPermanentLinkToClipboard = () => {
   });
 };
 
-const generateOpponentQrCode = () => {
-  if (!get(opponentQrCodeImg)) return;
-
-  QRCode.toDataURL(get(inviteOpponentLink), {}, (err: any, url: any) => {
-    if (err) throw err;
-
-    get(opponentQrCodeImg)!.src = url;
-  });
-};
-
-watch([inviteOpponentLink, opponentQrCodeImg], () => {
-  generateOpponentQrCode();
-});
-
 onMounted(() => {
-  generateOpponentQrCode();
   getPermanentLink();
 });
 </script>
