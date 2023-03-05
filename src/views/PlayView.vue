@@ -291,8 +291,10 @@ const initialize = async () => {
     }
 
     // set opponent if they already joined before us
-    set(whitePlayerName, e.whitePlayerName || "Opponent");
-    set(blackPlayerName, e.blackPlayerName || "Opponent");
+    if (get(playerColor) !== PlayerColor.White)
+      set(whitePlayerName, e.whitePlayerName || "Opponent");
+    if (get(playerColor) !== PlayerColor.Black)
+      set(blackPlayerName, e.blackPlayerName || "Opponent");
 
     // set move history
     set(moveHistory, e.moves);
@@ -308,8 +310,10 @@ const initialize = async () => {
     // the game started event means the opponent joined
 
     // set names
-    set(whitePlayerName, e.whitePlayerName);
-    set(blackPlayerName, e.blackPlayerName);
+    if (get(playerColor) !== PlayerColor.White)
+      set(whitePlayerName, e.whitePlayerName);
+    if (get(playerColor) !== PlayerColor.Black)
+      set(blackPlayerName, e.blackPlayerName);
 
     set(gameHasStarted, true);
   });
@@ -319,6 +323,10 @@ const initialize = async () => {
   });
 
   hubConnection.onPlayerNameChanged((e: PlayerNameChangedResponse) => {
+    if (comparePieceAndPlayerColor(e.color, get(playerColor))) {
+      return;
+    }
+
     if (e.color === PieceColor.White) {
       set(whitePlayerName, e.name);
     } else {
