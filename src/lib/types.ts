@@ -136,6 +136,11 @@ export interface JoinGameResponse {
     type: PieceType;
     position: Square;
   }[];
+  initialBoard: {
+    color: PieceColor;
+    type: PieceType;
+    position: Square;
+  }[];
   activeColor: PieceColor;
   playerColor: PlayerColor;
   whitePlayerName: string;

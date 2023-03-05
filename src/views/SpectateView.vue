@@ -11,6 +11,7 @@
     :black-player-name="blackPlayerName"
     :panel-tabs="[GameInfoTab.Game, GameInfoTab.Share, GameInfoTab.Settings]"
     :highlight-squares="[]"
+    :setup-fen="setupFen"
   >
     <template #board-overlay>
       <SuperDuperModal v-if="loading">
@@ -32,7 +33,7 @@ import { onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { SignalrConnection } from "@/lib/signalr";
 import { get, set } from "@vueuse/core";
-import { applyMove, invertColor } from "@/lib/chess";
+import { applyMove, defaultFen, invertColor, piecesToFen } from "@/lib/chess";
 import GameLayout from "@/components/GameLayout.vue";
 import SuperDuperModal from "@/components/modals/SuperDuperModal.vue";
 import LoadingModalContent from "@/components/modals/LoadingModalContent.vue";
@@ -43,6 +44,7 @@ const hubConnection = new SignalrConnection();
 const gameId = ref(useRoute().params.gameId as string);
 
 const pieces = ref<Piece[]>([]);
+const setupFen = ref(defaultFen);
 
 const whitePlayerName = ref("");
 const blackPlayerName = ref("");
@@ -77,6 +79,17 @@ const initialize = async () => {
         y: piece.position.y,
       });
     });
+
+    // set setup fen
+    const initialPieces = e.initialBoard.map((piece) => {
+      return {
+        type: piece.type as PieceType,
+        color: piece.color as PieceColor,
+        x: piece.position.x,
+        y: piece.position.y,
+      };
+    });
+    set(setupFen, piecesToFen(initialPieces));
 
     // set player names
     set(whitePlayerName, e.whitePlayerName || "White");

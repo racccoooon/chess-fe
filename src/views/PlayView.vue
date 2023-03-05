@@ -11,6 +11,7 @@
     :black-player-name="blackPlayerName"
     :highlight-squares="highlightSquares"
     :panel-tabs="[GameInfoTab.Game, GameInfoTab.Share, GameInfoTab.Settings]"
+    :setup-fen="setupFen"
     @piece-selected="onPieceSelected"
     @piece-deselected="onPieceDeselected"
     @piece-moved="onPieceMoved"
@@ -78,10 +79,12 @@ import { getSquareName } from "@/lib/chessNotation";
 import {
   applyMove,
   comparePieceAndPlayerColor,
+  defaultFen,
   getPieceAtSquare,
   getPieceSquare,
   getValidSquaresForPiece,
   invertColor,
+  piecesToFen,
 } from "@/lib/chess";
 import GameLayout from "@/components/GameLayout.vue";
 import SuperDuperModal from "@/components/modals/SuperDuperModal.vue";
@@ -104,6 +107,8 @@ const { name: userName, token: userToken } = storeToRefs(userStore);
 const gameId = ref(useRoute().params.gameId as string);
 
 const pieces = ref<Piece[]>([]);
+
+const setupFen = ref(defaultFen);
 
 const whitePlayerName = ref("");
 const blackPlayerName = ref("");
@@ -264,6 +269,17 @@ const initialize = async () => {
         y: piece.position.y,
       });
     });
+
+    // set setup fen
+    const initialPieces = e.initialBoard.map((piece) => {
+      return {
+        type: piece.type as PieceType,
+        color: piece.color as PieceColor,
+        x: piece.position.x,
+        y: piece.position.y,
+      };
+    });
+    set(setupFen, piecesToFen(initialPieces));
 
     // set player color
     set(playerColor, e.playerColor as PlayerColor);
