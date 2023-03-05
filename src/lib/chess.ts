@@ -183,13 +183,21 @@ export const piecesToFen = (pieces: Piece[]): string => {
   const rows: string[] = [];
   for (let y = 7; y >= 0; y--) {
     let row = "";
+    let empty = 0;
     for (let x = 0; x < 8; x++) {
       const piece = getPieceAtSquare(pieces, x, y);
       if (piece) {
+        if (empty > 0) {
+          row += empty;
+          empty = 0;
+        }
         row += pieceToChar(piece);
       } else {
-        row += "1";
+        empty++;
       }
+    }
+    if (empty > 0) {
+      row += empty;
     }
     rows.push(row);
   }
