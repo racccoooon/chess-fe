@@ -23,6 +23,10 @@
           @select-type="onPromotionSelected"
         />
         <LoadingModalContent v-if="showModal === ModalType.Loading" />
+        <SetNameModalContent
+          v-if="showModal === ModalType.SetName"
+          @dismissed="showModal = ModalType.None"
+        />
         <div
           class="flex flex-col gap-4"
           v-if="showModal === ModalType.IllegalMove"
@@ -93,16 +97,20 @@ import { useSettingsStore } from "@/stores/settings";
 import { storeToRefs } from "pinia";
 import { getValidMoves } from "@/lib/api";
 import LoadingModalContent from "@/components/modals/LoadingModalContent.vue";
+import SetNameModalContent from "@/components/modals/SetNameModalContent.vue";
 
 const router = useRouter();
 const hubConnection = new SignalrConnection();
 
-const userStore = useUserStore();
-const settingsStore = useSettingsStore();
+const { showLegalMoves, legalMoveHighlightColor } = storeToRefs(
+  useSettingsStore()
+);
 
-const { showLegalMoves, legalMoveHighlightColor } = storeToRefs(settingsStore);
-
-const { name: userName, token: userToken } = storeToRefs(userStore);
+const {
+  name: userName,
+  token: userToken,
+  hasSetName: hasSetUserName,
+} = storeToRefs(useUserStore());
 
 const gameId = ref(useRoute().params.gameId as string);
 
@@ -423,5 +431,9 @@ const onPieceMoved = async (e: PieceMovedEvent) => {
 
 onMounted(async () => {
   await initialize();
+
+  if (!get(hasSetUserName)) {
+    set(showModal, ModalType.SetName);
+  }
 });
 </script>
