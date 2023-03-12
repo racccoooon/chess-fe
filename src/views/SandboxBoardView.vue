@@ -76,7 +76,6 @@ import {
   getPieceAtSquare,
   getPieceSquare,
   getValidSquaresForPiece,
-  invertColor,
   piecesToFen,
 } from "@/lib/chess";
 import { get, set, watchDebounced } from "@vueuse/core";
@@ -131,7 +130,7 @@ watch(lastMove, (newValue) => {
   if (newValue.status === KingStatus.IsCheckmate) {
     set(
       gameResult,
-      invertColor(newValue.color) === PieceColor.White
+      newValue.color === PieceColor.White
         ? GameResult.WhiteWins
         : GameResult.BlackWins
     );
