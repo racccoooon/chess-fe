@@ -199,7 +199,20 @@ const updateQuery = () => {
   }
 
   if (get(gameResult) !== GameResult.InProgress) {
-    query.result = gameResultNotation[get(gameResult)];
+    // don't add result if last move is checkmate by the player that won according to the result
+    if (
+      !(
+        get(lastMove) &&
+        get(lastMove)!.status === KingStatus.IsCheckmate &&
+        get(lastMove)!.color ===
+          (get(gameResult) === GameResult.WhiteWins
+            ? PieceColor.White
+            : PieceColor.Black)
+      ) ||
+      get(gameResult) === GameResult.Draw
+    ) {
+      query.result = gameResultNotation[get(gameResult)];
+    }
   }
 
   if (get(moveHistory).length !== 0) {
