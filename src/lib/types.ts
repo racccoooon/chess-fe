@@ -203,6 +203,13 @@ export enum ChessBoardColor {
   HighContrast = "highContrast",
 }
 
+export enum ChessBoardOrientation {
+  WhiteBottom = "whiteBottom",
+  BlackBottom = "blackBottom",
+  PlayerBottom = "playerBottom",
+  OpponentBottom = "opponentBottom",
+}
+
 export enum MoveStyle {
   DragAndDropOnly = "dragAndDropOnly",
   ClickOnly = "clickOnly",

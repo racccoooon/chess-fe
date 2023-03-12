@@ -148,6 +148,34 @@
             ]"
           />
         </CompactFormInputElement>
+        <CompactFormInputElement>
+          <template #label>Board Orientation</template>
+          <template #description>
+            What side of the board is facing you. (is on the bottom of the
+            screen)
+          </template>
+          <SmallOptionsGroup
+            v-model="boardOrientation"
+            :options="[
+              {
+                value: ChessBoardOrientation.PlayerBottom,
+                label: 'Your side',
+              },
+              {
+                value: ChessBoardOrientation.OpponentBottom,
+                label: 'Opponent\'s side',
+              },
+              {
+                value: ChessBoardOrientation.WhiteBottom,
+                label: 'White',
+              },
+              {
+                value: ChessBoardOrientation.BlackBottom,
+                label: 'Black',
+              },
+            ]"
+          />
+        </CompactFormInputElement>
       </CompactFormSection>
       <CompactFormSection>
         <template #label>Chess Pieces</template>
@@ -675,6 +703,7 @@ import {
   PieceColor,
   PieceType,
   HighlightColor,
+  ChessBoardOrientation,
 } from "@/lib/types";
 import { storeToRefs } from "pinia";
 import SmallOptionsGroup from "@/components/forms/SmallOptionsGroup.vue";
@@ -700,6 +729,7 @@ const {
   showCheck,
   boardColor,
   boardBorder,
+  boardOrientation,
   pieceSet,
   piecesDisplaySize,
   animationDuration,

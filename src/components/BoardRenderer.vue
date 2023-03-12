@@ -247,6 +247,7 @@ import {
   BoardPointerMode,
   ChessBoardBorder,
   ChessBoardColor,
+  ChessBoardOrientation,
   HighlightColor,
   HighlightShape,
   MoveStyle,
@@ -290,6 +291,7 @@ const {
   clickDuration,
   boardColor,
   boardBorder,
+  boardOrientation,
   showCoordinates,
   pieceSet,
   piecesDisplaySize,
@@ -344,6 +346,18 @@ const userHighlights = ref<BoardHighlightSquare[]>([]);
 const userHighlightsByBoardPosition = ref<
   Record<string, { arrows: BoardArrow[]; squares: BoardHighlightSquare[] }>
 >({});
+
+const reverse = computed(() => {
+  if (get(boardOrientation) === ChessBoardOrientation.WhiteBottom) {
+    return false;
+  } else if (get(boardOrientation) === ChessBoardOrientation.BlackBottom) {
+    return true;
+  } else if (get(boardOrientation) === ChessBoardOrientation.OpponentBottom) {
+    return !props.reverse;
+  }
+
+  return props.reverse;
+});
 
 const { x: mouseX, y: mouseY } = useMouse({
   type: "client",
@@ -476,7 +490,7 @@ const animatePiece = (from: Piece, to: Piece) => {
   let absoluteOriginX = -diffX * squareAbsoluteWidth;
   let absoluteOriginY = diffY * squareAbsoluteHeight;
 
-  if (props.reverse) {
+  if (get(reverse)) {
     absoluteOriginX *= -1;
     absoluteOriginY *= -1;
   }
@@ -604,7 +618,7 @@ const arrows = computed(() => {
 });
 
 const displayXToBoardX = (x: number) => {
-  if (props.reverse) {
+  if (get(reverse)) {
     return 7 - x;
   } else {
     return x;
@@ -612,7 +626,7 @@ const displayXToBoardX = (x: number) => {
 };
 
 const displayYToBoardY = (y: number) => {
-  if (props.reverse) {
+  if (get(reverse)) {
     return y;
   } else {
     return 7 - y;
@@ -620,7 +634,7 @@ const displayYToBoardY = (y: number) => {
 };
 
 const boardXToDisplayX = (x: number) => {
-  if (props.reverse) {
+  if (get(reverse)) {
     return 7 - x;
   } else {
     return x;
@@ -628,7 +642,7 @@ const boardXToDisplayX = (x: number) => {
 };
 
 const boardYToDisplayY = (y: number) => {
-  if (props.reverse) {
+  if (get(reverse)) {
     return y;
   } else {
     return 7 - y;

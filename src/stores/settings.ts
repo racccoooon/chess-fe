@@ -5,6 +5,7 @@ import {
   AnimationDuration,
   ChessBoardBorder,
   ChessBoardColor,
+  ChessBoardOrientation,
   ClickDuration,
   HighlightColor,
   MoveStyle,
@@ -26,6 +27,7 @@ export const useSettingsStore = defineStore("settings", () => {
         showCheck: true,
         boardColor: ChessBoardColor.Green,
         boardBorder: ChessBoardBorder.None,
+        boardOrientation: ChessBoardOrientation.PlayerBottom,
         pieceSet: PieceSet.Modern,
         piecesDisplaySize: PiecesDisplaySize.Medium,
         animationDuration: AnimationDuration.Medium as

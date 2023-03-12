@@ -1,9 +1,9 @@
 <template>
-  <div class="flex flex-col gap-2">
-    <div v-if="$slots.label || $slots.description" class="flex flex-col gap-2">
+  <div class="flex flex-col gap-3">
+    <div v-if="$slots.label || $slots.description" class="flex flex-col gap-1">
       <h2
         v-if="$slots.label"
-        class="text-gray-900 dark:text-gray-50 font-medium"
+        class="text-gray-800 dark:text-gray-200 font-medium text-sm"
       >
         <slot name="label" />
       </h2>
