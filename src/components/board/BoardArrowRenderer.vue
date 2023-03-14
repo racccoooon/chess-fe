@@ -3,19 +3,7 @@
     <polygon
       class="arrow"
       :points="arrowPointsString"
-      :class="{
-        'fill-gray-50/50 data-[dark=true]:fill-white/75':
-          arrow.color === HighlightColor.Highlight,
-        'fill-yellow-300/75': arrow.color === HighlightColor.Yellow,
-        'fill-red-400/75 data-[dark=true]:fill-red-300/90':
-          arrow.color === HighlightColor.Red,
-        'fill-lime-400/75 data-[dark=true]:fill-lime-500/90':
-          arrow.color === HighlightColor.Green,
-        'fill-blue-400/75 data-[dark=true]:fill-blue-500/90':
-          arrow.color === HighlightColor.Blue,
-        'fill-purple-400/75 data-[dark=true]:fill-purple-500/90':
-          arrow.color === HighlightColor.Purple,
-      }"
+      :class="getHighlightFillClass(arrow.color)"
     />
   </g>
 </template>
@@ -23,8 +11,8 @@
 <script setup lang="ts">
 import type { BoardArrow, Vector2 } from "@/lib/types";
 import { computed } from "vue";
-import { HighlightColor } from "@/lib/types";
 import { get } from "@vueuse/core";
+import { getHighlightFillClass } from "@/lib/chessBoard";
 
 const props = defineProps<{
   arrow: BoardArrow;

@@ -77,7 +77,7 @@
           </template>
         </template>
       </g>
-      <g id="highlightSquares">
+      <g id="highlightSquares" opacity="0.7">
         <template v-for="(highlight, index) in highlightSquares" :key="index">
           <g
             :transform="`
@@ -85,19 +85,7 @@
                 ${boardXToDisplayX(highlight.square.x) * squareAbsoluteWidth},
                 ${boardYToDisplayY(highlight.square.y) * squareAbsoluteHeight}
             )`"
-            :class="{
-              'fill-gray-50/50 data-[dark=true]:fill-white/75':
-                highlight.color === HighlightColor.Highlight,
-              'fill-yellow-300/75': highlight.color === HighlightColor.Yellow,
-              'fill-red-400/75 data-[dark=true]:fill-red-300/90':
-                highlight.color === HighlightColor.Red,
-              'fill-lime-400/75 data-[dark=true]:fill-lime-500/90':
-                highlight.color === HighlightColor.Green,
-              'fill-blue-400/75 data-[dark=true]:fill-blue-500/90':
-                highlight.color === HighlightColor.Blue,
-              'fill-purple-400/75 data-[dark=true]:fill-purple-500/90':
-                highlight.color === HighlightColor.Purple,
-            }"
+            :class="getHighlightFillClass(highlight.color)"
           >
             <rect
               v-if="highlight.shape === HighlightShape.SquareFill"
@@ -108,19 +96,16 @@
             <path
               v-else-if="highlight.shape === HighlightShape.SquareOutline"
               d="M100,0L100,100L0,100L0,0L100,0ZM90,10L10,10L10,90L90,90L90,10Z"
-              :data-dark="!((highlight.square.x + highlight.square.y) % 2)"
             />
             <circle
               v-if="highlight.shape === HighlightShape.Dot"
               cx="50"
               cy="50"
               r="18"
-              :data-dark="!((highlight.square.x + highlight.square.y) % 2)"
             />
             <path
               v-else-if="highlight.shape === HighlightShape.CircleOutline"
               d="M50,0C77.596,0 100,22.404 100,50C100,77.596 77.596,100 50,100C22.404,100 0,77.596 0,50C0,22.404 22.404,0 50,0ZM50,10C72.077,10 90,27.923 90,50C90,72.077 72.077,90 50,90C27.923,90 10,72.077 10,50C10,27.923 27.923,10 50,10Z"
-              :data-dark="!((highlight.square.x + highlight.square.y) % 2)"
             />
           </g>
         </template>
@@ -216,7 +201,7 @@
       <g>
         <use href="#selected-piece" v-if="selectedPiece" />
       </g>
-      <g id="arrows">
+      <g id="arrows" opacity="0.8">
         <template v-for="(arrow, index) in arrows" :key="index">
           <BoardArrowRenderer
             :arrow="arrow"
@@ -264,6 +249,7 @@ import { getPieceAtSquare, getPieceSquare } from "@/lib/chess";
 import objectHash from "object-hash";
 import { gsap } from "gsap";
 import BoardArrowRenderer from "@/components/board/BoardArrowRenderer.vue";
+import { getHighlightFillClass } from "@/lib/chessBoard";
 
 const props = defineProps<{
   pieces: Piece[];
@@ -586,7 +572,7 @@ const highlightSquares = computed((): BoardHighlightSquare[] => {
   if (get(hoveredSquare) && get(selectedPiece)) {
     arr.push({
       square: get(hoveredSquare)!,
-      color: HighlightColor.Highlight,
+      color: HighlightColor.White,
       shape: HighlightShape.SquareOutline,
     });
   }

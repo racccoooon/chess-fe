@@ -26,12 +26,18 @@ export enum GameStartColor {
 }
 
 export enum HighlightColor {
-  Green = "green",
-  Yellow = "yellow",
+  White = "white",
+  Gray = "gray",
+  Black = "black",
   Red = "red",
+  Orange = "orange",
+  Yellow = "yellow",
+  Green = "green",
+  Teal = "teal",
+  LightBlue = "lightBlue",
   Blue = "blue",
   Purple = "purple",
-  Highlight = "highlight",
+  Pink = "pink",
 }
 
 export enum HighlightShape {

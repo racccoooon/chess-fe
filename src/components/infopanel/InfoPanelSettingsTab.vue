@@ -253,6 +253,9 @@
       </CompactFormSection>
       <CompactFormSection>
         <template #label>Highlight Squares</template>
+        <template #description
+          >What the computer should highlight for you</template
+        >
         <CompactFormInputElement>
           <SmallOptionsGroup
             v-model="showLegalMoves"
@@ -409,54 +412,15 @@
       </CompactFormSection>
       <CompactFormSection>
         <template #label>Highlight Colors</template>
+        <template #description>The color of highlights on the board</template>
         <CompactFormInputElement>
           <template #label>User Arrows</template>
+          <template #description
+            >The color of arrow you draw (hold and drag right click)</template
+          >
           <SmallPreviewOptionsGroup
-            :options="[
-              {
-                value: HighlightColor.Green,
-                label: 'Green',
-                userOptions: {
-                  class: 'bg-green-300',
-                },
-              },
-              {
-                value: HighlightColor.Yellow,
-                label: 'Yellow',
-                userOptions: {
-                  class: 'bg-yellow-300',
-                },
-              },
-              {
-                value: HighlightColor.Red,
-                label: 'Red',
-                userOptions: {
-                  class: 'bg-red-400',
-                },
-              },
-              {
-                value: HighlightColor.Purple,
-                label: 'Purple',
-                userOptions: {
-                  class: 'bg-purple-300',
-                },
-              },
-              {
-                value: HighlightColor.Blue,
-                label: 'Blue',
-                userOptions: {
-                  class: 'bg-blue-300',
-                },
-              },
-              {
-                value: HighlightColor.Highlight,
-                label: 'White',
-                userOptions: {
-                  class: 'bg-gray-200',
-                },
-              },
-            ]"
-            class="grid-cols-2"
+            :options="highlightOptions"
+            class="grid-cols-2 md:grid-cols-3"
             v-model="userArrowColor"
           >
             <template #preview="option">
@@ -466,52 +430,12 @@
         </CompactFormInputElement>
         <CompactFormInputElement>
           <template #label>User highlighted squares</template>
+          <template #description
+            >The color of squares you highlight (right click)</template
+          >
           <SmallPreviewOptionsGroup
-            :options="[
-              {
-                value: HighlightColor.Green,
-                label: 'Green',
-                userOptions: {
-                  class: 'bg-green-300',
-                },
-              },
-              {
-                value: HighlightColor.Yellow,
-                label: 'Yellow',
-                userOptions: {
-                  class: 'bg-yellow-300',
-                },
-              },
-              {
-                value: HighlightColor.Red,
-                label: 'Red',
-                userOptions: {
-                  class: 'bg-red-400',
-                },
-              },
-              {
-                value: HighlightColor.Purple,
-                label: 'Purple',
-                userOptions: {
-                  class: 'bg-purple-300',
-                },
-              },
-              {
-                value: HighlightColor.Blue,
-                label: 'Blue',
-                userOptions: {
-                  class: 'bg-blue-300',
-                },
-              },
-              {
-                value: HighlightColor.Highlight,
-                label: 'White',
-                userOptions: {
-                  class: 'bg-gray-200',
-                },
-              },
-            ]"
-            class="grid-cols-2"
+            :options="highlightOptions"
+            class="grid-cols-2 md:grid-cols-3"
             v-model="userHighlightColor"
           >
             <template #preview="option">
@@ -521,52 +445,12 @@
         </CompactFormInputElement>
         <CompactFormInputElement>
           <template #label>Last Move</template>
+          <template #description
+            >The color in which the last move gets highlighted</template
+          >
           <SmallPreviewOptionsGroup
-            :options="[
-              {
-                value: HighlightColor.Green,
-                label: 'Green',
-                userOptions: {
-                  class: 'bg-green-300',
-                },
-              },
-              {
-                value: HighlightColor.Yellow,
-                label: 'Yellow',
-                userOptions: {
-                  class: 'bg-yellow-300',
-                },
-              },
-              {
-                value: HighlightColor.Red,
-                label: 'Red',
-                userOptions: {
-                  class: 'bg-red-400',
-                },
-              },
-              {
-                value: HighlightColor.Purple,
-                label: 'Purple',
-                userOptions: {
-                  class: 'bg-purple-300',
-                },
-              },
-              {
-                value: HighlightColor.Blue,
-                label: 'Blue',
-                userOptions: {
-                  class: 'bg-blue-300',
-                },
-              },
-              {
-                value: HighlightColor.Highlight,
-                label: 'White',
-                userOptions: {
-                  class: 'bg-gray-200',
-                },
-              },
-            ]"
-            class="grid-cols-2"
+            :options="highlightOptions"
+            class="grid-cols-2 md:grid-cols-3"
             v-model="lastMoveHighlightColor"
           >
             <template #preview="option">
@@ -576,52 +460,13 @@
         </CompactFormInputElement>
         <CompactFormInputElement>
           <template #label>Selected Square</template>
+          <template #description
+            >The color in which the piece you are about to move gets
+            highlighted</template
+          >
           <SmallPreviewOptionsGroup
-            :options="[
-              {
-                value: HighlightColor.Green,
-                label: 'Green',
-                userOptions: {
-                  class: 'bg-green-300',
-                },
-              },
-              {
-                value: HighlightColor.Yellow,
-                label: 'Yellow',
-                userOptions: {
-                  class: 'bg-yellow-300',
-                },
-              },
-              {
-                value: HighlightColor.Red,
-                label: 'Red',
-                userOptions: {
-                  class: 'bg-red-400',
-                },
-              },
-              {
-                value: HighlightColor.Purple,
-                label: 'Purple',
-                userOptions: {
-                  class: 'bg-purple-300',
-                },
-              },
-              {
-                value: HighlightColor.Blue,
-                label: 'Blue',
-                userOptions: {
-                  class: 'bg-blue-300',
-                },
-              },
-              {
-                value: HighlightColor.Highlight,
-                label: 'White',
-                userOptions: {
-                  class: 'bg-gray-200',
-                },
-              },
-            ]"
-            class="grid-cols-2"
+            :options="highlightOptions"
+            class="grid-cols-2 md:grid-cols-3"
             v-model="selectedSquareHighlightColor"
           >
             <template #preview="option">
@@ -631,52 +476,13 @@
         </CompactFormInputElement>
         <CompactFormInputElement>
           <template #label>Legal Moves</template>
+          <template #description
+            >The color in which legal moves of the selected piece get
+            highlighted</template
+          >
           <SmallPreviewOptionsGroup
-            :options="[
-              {
-                value: HighlightColor.Green,
-                label: 'Green',
-                userOptions: {
-                  class: 'bg-green-300',
-                },
-              },
-              {
-                value: HighlightColor.Yellow,
-                label: 'Yellow',
-                userOptions: {
-                  class: 'bg-yellow-300',
-                },
-              },
-              {
-                value: HighlightColor.Red,
-                label: 'Red',
-                userOptions: {
-                  class: 'bg-red-400',
-                },
-              },
-              {
-                value: HighlightColor.Purple,
-                label: 'Purple',
-                userOptions: {
-                  class: 'bg-purple-300',
-                },
-              },
-              {
-                value: HighlightColor.Blue,
-                label: 'Blue',
-                userOptions: {
-                  class: 'bg-blue-300',
-                },
-              },
-              {
-                value: HighlightColor.Highlight,
-                label: 'White',
-                userOptions: {
-                  class: 'bg-gray-200',
-                },
-              },
-            ]"
-            class="grid-cols-2"
+            :options="highlightOptions"
+            class="grid-cols-2 md:grid-cols-3"
             v-model="legalMoveHighlightColor"
           >
             <template #preview="option">
@@ -742,4 +548,91 @@ const {
 } = storeToRefs(settingsStore);
 
 const { name: userName } = storeToRefs(userStore);
+
+const highlightOptions = [
+  {
+    value: HighlightColor.White,
+    label: "White",
+    userOptions: {
+      class: "bg-gray-200",
+    },
+  },
+  {
+    value: HighlightColor.Gray,
+    label: "Gray",
+    userOptions: {
+      class: "bg-gray-500",
+    },
+  },
+  {
+    value: HighlightColor.Black,
+    label: "Black",
+    userOptions: {
+      class: "bg-gray-700",
+    },
+  },
+  {
+    value: HighlightColor.Red,
+    label: "Red",
+    userOptions: {
+      class: "bg-red-400",
+    },
+  },
+  {
+    value: HighlightColor.Orange,
+    label: "Orange",
+    userOptions: {
+      class: "bg-orange-400",
+    },
+  },
+  {
+    value: HighlightColor.Yellow,
+    label: "Yellow",
+    userOptions: {
+      class: "bg-amber-300",
+    },
+  },
+  {
+    value: HighlightColor.Green,
+    label: "Green",
+    userOptions: {
+      class: "bg-green-300",
+    },
+  },
+  {
+    value: HighlightColor.Teal,
+    label: "Teal",
+    userOptions: {
+      class: "bg-teal-300",
+    },
+  },
+  {
+    value: HighlightColor.LightBlue,
+    label: "Sky Blue",
+    userOptions: {
+      class: "bg-sky-300",
+    },
+  },
+  {
+    value: HighlightColor.Blue,
+    label: "Blue",
+    userOptions: {
+      class: "bg-blue-400",
+    },
+  },
+  {
+    value: HighlightColor.Purple,
+    label: "Purple",
+    userOptions: {
+      class: "bg-purple-400",
+    },
+  },
+  {
+    value: HighlightColor.Pink,
+    label: "Pink",
+    userOptions: {
+      class: "bg-pink-300",
+    },
+  },
+];
 </script>

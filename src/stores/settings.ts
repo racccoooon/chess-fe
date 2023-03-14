@@ -36,7 +36,7 @@ export const useSettingsStore = defineStore("settings", () => {
         showCoordinates: true,
         lastMoveHighlightColor: HighlightColor.Yellow,
         selectedSquareHighlightColor: HighlightColor.Green,
-        legalMoveHighlightColor: HighlightColor.Highlight,
+        legalMoveHighlightColor: HighlightColor.White,
         userHighlightColor: HighlightColor.Red,
         userArrowColor: HighlightColor.Green,
       },
