@@ -3,7 +3,7 @@ import { HighlightColor } from "@/lib/types";
 export const getHighlightFillClass = (color: HighlightColor): string => {
   switch (color) {
     case HighlightColor.White:
-      return "fill-gray-100";
+      return "fill-gray-200 data-[dark=true]:fill-gray-50";
     case HighlightColor.Gray:
       return "fill-gray-300";
     case HighlightColor.Black:
