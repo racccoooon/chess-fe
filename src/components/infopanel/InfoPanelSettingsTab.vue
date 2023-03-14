@@ -1,15 +1,21 @@
 <template>
   <div class="grow h-min">
     <CompactFormWrapper>
-      <CompactFormSection>
+      <CompactFormSection open>
         <template #label>Your Name</template>
+        <template #description
+          >Your name gets displayed to your opponent and spectators</template
+        >
         <CompactFormInputElement>
           <LargeTextInput v-model="userName" />
         </CompactFormInputElement>
       </CompactFormSection>
-      <CompactFormSection>
+      <CompactFormSection open>
         <template #label>Chess Board</template>
+        <template #description>Configure the chess board</template>
         <CompactFormInputElement>
+          <template #label>Board Style</template>
+          <template #description>Choose a board style that you like</template>
           <SmallPreviewOptionsGroup
             :options="[
               {
@@ -177,8 +183,11 @@
           />
         </CompactFormInputElement>
       </CompactFormSection>
-      <CompactFormSection>
+      <CompactFormSection open>
         <template #label>Chess Pieces</template>
+        <template #description
+          >How chess pieces look like on the board</template
+        >
         <CompactFormInputElement>
           <SmallPreviewOptionsGroup
             v-model="pieceSet"
@@ -303,114 +312,6 @@
         </CompactFormInputElement>
       </CompactFormSection>
       <CompactFormSection>
-        <template #label>Notation</template>
-        <CompactFormInputElement>
-          <SmallOptionsGroup
-            v-model="notationType"
-            :options="[
-              {
-                value: NotationType.Algebraic,
-                label: 'Algebraic',
-              },
-              {
-                value: NotationType.LongAlgebraic,
-                label: 'Long algebraic',
-              },
-              {
-                value: NotationType.Spoken,
-                label: 'Spoken',
-              },
-            ]"
-          />
-        </CompactFormInputElement>
-        <CompactFormInputElement>
-          <SmallOptionsGroup
-            v-model="useUnicodeIconsInNotation"
-            :options="[
-              {
-                value: true,
-                label: 'Use unicode icons',
-              },
-              {
-                value: false,
-                label: 'Use Letters',
-              },
-            ]"
-          />
-        </CompactFormInputElement>
-      </CompactFormSection>
-      <CompactFormSection>
-        <template #label>Animations</template>
-        <CompactFormInputElement>
-          <SmallOptionsGroup
-            v-model="animationDuration"
-            :options="[
-              {
-                value: AnimationDuration.None,
-                label: 'None',
-              },
-              {
-                value: AnimationDuration.Slow,
-                label: 'Slow',
-              },
-              {
-                value: AnimationDuration.Medium,
-                label: 'Medium',
-              },
-              {
-                value: AnimationDuration.Fast,
-                label: 'Fast',
-              },
-            ]"
-          />
-        </CompactFormInputElement>
-      </CompactFormSection>
-      <CompactFormSection>
-        <template #label>Move style</template>
-        <template #description>
-          If moving pieces doesn't work with a touch screen try setting this to
-          click only.
-        </template>
-        <CompactFormInputElement>
-          <SmallOptionsGroup
-            v-model="preferredMoveStyle"
-            :options="[
-              {
-                value: MoveStyle.Both,
-                label: 'Both',
-              },
-              {
-                value: MoveStyle.DragAndDropOnly,
-                label: 'Drag and Drop',
-              },
-              {
-                value: MoveStyle.ClickOnly,
-                label: 'Click only',
-              },
-            ]"
-          />
-        </CompactFormInputElement>
-        <CompactFormInputElement>
-          <SmallOptionsGroup
-            v-model="clickDuration"
-            :options="[
-              {
-                value: ClickDuration.Short,
-                label: 'Short click',
-              },
-              {
-                value: ClickDuration.Medium,
-                label: 'Medium click',
-              },
-              {
-                value: ClickDuration.Long,
-                label: 'Long click',
-              },
-            ]"
-          />
-        </CompactFormInputElement>
-      </CompactFormSection>
-      <CompactFormSection>
         <template #label>Highlight Colors</template>
         <template #description>The color of highlights on the board</template>
         <CompactFormInputElement>
@@ -489,6 +390,119 @@
               <div class="w-full h-full" :class="option.userOptions.class" />
             </template>
           </SmallPreviewOptionsGroup>
+        </CompactFormInputElement>
+      </CompactFormSection>
+      <CompactFormSection>
+        <template #label>Notation</template>
+        <template #description
+          >How to notate the moves in the game history</template
+        >
+        <CompactFormInputElement>
+          <SmallOptionsGroup
+            v-model="notationType"
+            :options="[
+              {
+                value: NotationType.Algebraic,
+                label: 'Algebraic',
+              },
+              {
+                value: NotationType.LongAlgebraic,
+                label: 'Long algebraic',
+              },
+              {
+                value: NotationType.Spoken,
+                label: 'Spoken',
+              },
+            ]"
+          />
+        </CompactFormInputElement>
+        <CompactFormInputElement>
+          <SmallOptionsGroup
+            v-model="useUnicodeIconsInNotation"
+            :options="[
+              {
+                value: true,
+                label: 'Use unicode icons',
+              },
+              {
+                value: false,
+                label: 'Use Letters',
+              },
+            ]"
+          />
+        </CompactFormInputElement>
+      </CompactFormSection>
+      <CompactFormSection>
+        <template #label>Animations</template>
+        <template #description>How fast pieces move across the board</template>
+        <CompactFormInputElement>
+          <SmallOptionsGroup
+            v-model="animationDuration"
+            :options="[
+              {
+                value: AnimationDuration.None,
+                label: 'None',
+              },
+              {
+                value: AnimationDuration.Slow,
+                label: 'Slow',
+              },
+              {
+                value: AnimationDuration.Medium,
+                label: 'Medium',
+              },
+              {
+                value: AnimationDuration.Fast,
+                label: 'Fast',
+              },
+            ]"
+          />
+        </CompactFormInputElement>
+      </CompactFormSection>
+      <CompactFormSection>
+        <template #label>Move style</template>
+        <template #description> The way you make moves on the board </template>
+        <CompactFormInputElement>
+          <template #description>
+            If moving pieces doesn't work with a touch screen try setting this
+            to click only.
+          </template>
+          <SmallOptionsGroup
+            v-model="preferredMoveStyle"
+            :options="[
+              {
+                value: MoveStyle.Both,
+                label: 'Both',
+              },
+              {
+                value: MoveStyle.DragAndDropOnly,
+                label: 'Drag and Drop',
+              },
+              {
+                value: MoveStyle.ClickOnly,
+                label: 'Click only',
+              },
+            ]"
+          />
+        </CompactFormInputElement>
+        <CompactFormInputElement>
+          <SmallOptionsGroup
+            v-model="clickDuration"
+            :options="[
+              {
+                value: ClickDuration.Short,
+                label: 'Short click',
+              },
+              {
+                value: ClickDuration.Medium,
+                label: 'Medium click',
+              },
+              {
+                value: ClickDuration.Long,
+                label: 'Long click',
+              },
+            ]"
+          />
         </CompactFormInputElement>
       </CompactFormSection>
     </CompactFormWrapper>
