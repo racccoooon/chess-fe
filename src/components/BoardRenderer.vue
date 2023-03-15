@@ -232,7 +232,6 @@ import {
   AnimationDuration,
   BoardPointerMode,
   ChessBoardBorder,
-  ChessBoardColor,
   ChessBoardOrientation,
   HighlightColor,
   HighlightShape,
@@ -250,7 +249,7 @@ import { getPieceAtSquare, getPieceSquare } from "@/lib/chess";
 import objectHash from "object-hash";
 import { gsap } from "gsap";
 import BoardArrowRenderer from "@/components/board/BoardArrowRenderer.vue";
-import { getHighlightFillClass } from "@/lib/chessBoard";
+import { getHighlightFillClass, getSquareColorClass } from "@/lib/chessBoard";
 
 const props = defineProps<{
   pieces: Piece[];
@@ -512,28 +511,7 @@ const allowMoveByClicking = computed(() => {
 });
 
 const fillClass = computed(() => {
-  switch (get(boardColor)) {
-    case ChessBoardColor.Neutral:
-      return "fill-gray-100 data-[dark=true]:fill-gray-500";
-    case ChessBoardColor.Wood:
-      return "fill-brown-200 data-[dark=true]:fill-brown-500";
-    case ChessBoardColor.Green:
-      return "fill-green-100 data-[dark=true]:fill-green-500";
-    case ChessBoardColor.Blue:
-      return "fill-blue-200 data-[dark=true]:fill-blue-500";
-    case ChessBoardColor.Red:
-      return "fill-red-200 data-[dark=true]:fill-red-500";
-    case ChessBoardColor.Orange:
-      return "fill-orange-100 data-[dark=true]:fill-orange-400";
-    case ChessBoardColor.Purple:
-      return "fill-purple-100 data-[dark=true]:fill-purple-500";
-    case ChessBoardColor.Pink:
-      return "fill-pink-200 data-[dark=true]:fill-pink-400";
-    case ChessBoardColor.HighContrast:
-      return "fill-white data-[dark=true]:fill-gray-800";
-    default:
-      return "";
-  }
+  return getSquareColorClass(get(boardColor));
 });
 
 const pieceAbsoluteSize = computed(() => {

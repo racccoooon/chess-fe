@@ -21,69 +21,41 @@
               {
                 value: ChessBoardColor.Neutral,
                 label: 'Neutral',
-                userOptions: {
-                  lightClass: 'fill-gray-100',
-                  darkClass: 'fill-gray-500',
-                },
+              },
+              {
+                value: ChessBoardColor.HighContrast,
+                label: 'Darker',
               },
               {
                 value: ChessBoardColor.Wood,
                 label: 'Wood',
-                userOptions: {
-                  lightClass: 'fill-brown-200',
-                  darkClass: 'fill-brown-500',
-                },
               },
               {
                 value: ChessBoardColor.Green,
                 label: 'Green',
-                userOptions: {
-                  lightClass: 'fill-green-100',
-                  darkClass: 'fill-green-500',
-                },
               },
               {
                 value: ChessBoardColor.Blue,
                 label: 'Blue',
-                userOptions: {
-                  lightClass: 'fill-blue-200',
-                  darkClass: 'fill-blue-500',
-                },
               },
               {
                 value: ChessBoardColor.Red,
                 label: 'Red',
-                userOptions: {
-                  lightClass: 'fill-red-200',
-                  darkClass: 'fill-red-500',
-                },
               },
               {
                 value: ChessBoardColor.Orange,
                 label: 'Orange',
-                userOptions: {
-                  lightClass: 'fill-orange-100',
-                  darkClass: 'fill-orange-400',
-                },
               },
               {
                 value: ChessBoardColor.Purple,
                 label: 'Purple',
-                userOptions: {
-                  lightClass: 'fill-purple-100',
-                  darkClass: 'fill-purple-500',
-                },
               },
               {
                 value: ChessBoardColor.Pink,
                 label: 'Pink',
-                userOptions: {
-                  lightClass: 'fill-pink-200',
-                  darkClass: 'fill-pink-400',
-                },
               },
             ]"
-            class="grid-cols-2"
+            class="grid-cols-2 md:grid-cols-3"
             v-model="boardColor"
           >
             <template #preview="option">
@@ -93,28 +65,32 @@
                   height="10"
                   x="0"
                   y="0"
-                  :class="option.userOptions.lightClass"
+                  data-dark="false"
+                  :class="getSquareColorClass(option.value)"
                 />
                 <rect
                   width="10"
                   height="10"
                   x="10"
                   y="0"
-                  :class="option.userOptions.darkClass"
+                  data-dark="true"
+                  :class="getSquareColorClass(option.value)"
                 />
                 <rect
                   width="10"
                   height="10"
                   x="00"
                   y="10"
-                  :class="option.userOptions.darkClass"
+                  data-dark="true"
+                  :class="getSquareColorClass(option.value)"
                 />
                 <rect
                   width="10"
                   height="10"
                   x="10"
                   y="10"
-                  :class="option.userOptions.lightClass"
+                  data-dark="false"
+                  :class="getSquareColorClass(option.value)"
                 />
               </svg>
             </template>
@@ -534,6 +510,7 @@ import LargeTextInput from "@/components/forms/LargeTextInput.vue";
 import CompactFormWrapper from "@/components/forms/CompactFormWrapper.vue";
 import CompactFormSection from "@/components/forms/CompactFormSection.vue";
 import CompactFormInputElement from "@/components/forms/CompactFormInputElement.vue";
+import { getSquareColorClass } from "@/lib/chessBoard";
 
 const settingsStore = useSettingsStore();
 
