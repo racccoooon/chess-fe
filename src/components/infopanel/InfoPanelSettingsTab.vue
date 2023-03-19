@@ -205,34 +205,21 @@
           </SmallPreviewOptionsGroup>
         </CompactFormInputElement>
         <CompactFormInputElement>
-          <SmallOptionsGroup
+          <template #label>Piece Size</template>
+          <template #description>How big do you like your chess?</template>
+          <RangeInput
             v-model="piecesDisplaySize"
-            :options="[
-              {
-                value: PiecesDisplaySize.VerySmall,
-                label: 'Ant',
-              },
-              {
-                value: PiecesDisplaySize.Small,
-                label: 'Tiny',
-              },
-              {
-                value: PiecesDisplaySize.Medium,
-                label: 'Normal',
-              },
-              {
-                value: PiecesDisplaySize.Large,
-                label: 'Bigger',
-              },
-              {
-                value: PiecesDisplaySize.ExtraLarge,
-                label: 'Huge',
-              },
-              {
-                value: PiecesDisplaySize.TooLarge,
-                label: 'Enourmous',
-              },
+            :labels="[
+              { value: 10, label: 'Ant' },
+              { value: 50, label: 'Tiny' },
+              { value: 80, label: 'Normal' },
+              { value: 90, label: 'Bigger' },
+              { value: 100, label: 'Huge' },
+              { value: 150, label: 'Enormous' },
             ]"
+            :min="10"
+            :max="200"
+            :step="10"
           />
         </CompactFormInputElement>
       </CompactFormSection>
@@ -492,7 +479,6 @@ import {
   ChessBoardColor,
   ChessBoardBorder,
   PieceSet,
-  PiecesDisplaySize,
   MoveStyle,
   ClickDuration,
   AnimationDuration,
@@ -511,6 +497,7 @@ import CompactFormWrapper from "@/components/forms/CompactFormWrapper.vue";
 import CompactFormSection from "@/components/forms/CompactFormSection.vue";
 import CompactFormInputElement from "@/components/forms/CompactFormInputElement.vue";
 import { getSquareColorClass } from "@/lib/chessBoard";
+import RangeInput from "@/components/forms/RangeInput.vue";
 
 const settingsStore = useSettingsStore();
 
