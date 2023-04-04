@@ -49,11 +49,10 @@
           v-model="variation"
           :options="[
             { label: 'Standard Chess', value: ChessVariation.Standard },
-            { label: 'Custom', value: ChessVariation.Custom },
             { label: 'Chess960', value: ChessVariation.Chess960 },
             { label: 'Horde', value: ChessVariation.Horde },
             { label: 'Atheist Chess', value: ChessVariation.Atheist },
-            { label: 'Fog Of War', value: ChessVariation.FogOfWar },
+            { label: 'Custom', value: ChessVariation.Custom },
           ]"
         >
         </LargeOptionsGroup>
