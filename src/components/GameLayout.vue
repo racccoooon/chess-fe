@@ -96,6 +96,7 @@ import {
   PlayerColor,
   MoveType,
   KingStatus,
+  ChessBoardOrientation,
 } from "@/lib/types";
 import { computed, ref, watch } from "vue";
 import { get, set, whenever } from "@vueuse/core";
@@ -159,10 +160,8 @@ const historyIndex = computed({
   },
 });
 
-const settingsStore = useSettingsStore();
-
-const { showLastMove, showCheck, lastMoveHighlightColor } =
-  storeToRefs(settingsStore);
+const { showLastMove, showCheck, lastMoveHighlightColor, boardOrientation } =
+  storeToRefs(useSettingsStore());
 
 watch(
   () => props.moveHistory.length,
@@ -225,6 +224,18 @@ const pointerMode = ref<BoardPointerMode>(BoardPointerMode.Move);
 const paintPieceType = ref<PieceType>(PieceType.Pawn);
 const paintPieceColor = ref<PieceColor>(PieceColor.White);
 
+const reverseBoard = computed(() => {
+  if (get(boardOrientation) === ChessBoardOrientation.WhiteBottom) {
+    return false;
+  } else if (get(boardOrientation) === ChessBoardOrientation.BlackBottom) {
+    return true;
+  } else if (get(boardOrientation) === ChessBoardOrientation.OpponentBottom) {
+    return !props.reverseBoard;
+  }
+
+  return props.reverseBoard;
+});
+
 // computed values for checking if the player is in check
 const isWhiteInCheck = computed(() => {
   if (!get(lastMove)) return false;
@@ -267,7 +278,7 @@ const blackCapturedPieces = computed(() => {
 
 // computed values to display
 const topPlayerColor = computed(() => {
-  if (props.reverseBoard) {
+  if (get(reverseBoard)) {
     return PieceColor.White;
   } else {
     return PieceColor.Black;
@@ -275,7 +286,7 @@ const topPlayerColor = computed(() => {
 });
 
 const bottomPlayerColor = computed(() => {
-  if (props.reverseBoard) {
+  if (get(reverseBoard)) {
     return PieceColor.Black;
   } else {
     return PieceColor.White;
@@ -283,7 +294,7 @@ const bottomPlayerColor = computed(() => {
 });
 
 const topPlayerName = computed(() => {
-  if (props.reverseBoard) {
+  if (get(reverseBoard)) {
     return props.whitePlayerName;
   } else {
     return props.blackPlayerName;
@@ -291,7 +302,7 @@ const topPlayerName = computed(() => {
 });
 
 const bottomPlayerName = computed(() => {
-  if (props.reverseBoard) {
+  if (get(reverseBoard)) {
     return props.blackPlayerName;
   } else {
     return props.whitePlayerName;
@@ -299,7 +310,7 @@ const bottomPlayerName = computed(() => {
 });
 
 const topPlayerMaterialAdvantage = computed(() => {
-  if (props.reverseBoard) {
+  if (get(reverseBoard)) {
     return get(whiteMaterialAdvantage);
   } else {
     return get(blackMaterialAdvantage);
@@ -307,7 +318,7 @@ const topPlayerMaterialAdvantage = computed(() => {
 });
 
 const bottomPlayerMaterialAdvantage = computed(() => {
-  if (props.reverseBoard) {
+  if (get(reverseBoard)) {
     return get(blackMaterialAdvantage);
   } else {
     return get(whiteMaterialAdvantage);
@@ -315,7 +326,7 @@ const bottomPlayerMaterialAdvantage = computed(() => {
 });
 
 const topPlayerCapturedPieces = computed(() => {
-  if (props.reverseBoard) {
+  if (get(reverseBoard)) {
     return get(whiteCapturedPieces);
   } else {
     return get(blackCapturedPieces);
@@ -323,7 +334,7 @@ const topPlayerCapturedPieces = computed(() => {
 });
 
 const bottomPlayerCapturedPieces = computed(() => {
-  if (props.reverseBoard) {
+  if (get(reverseBoard)) {
     return get(blackCapturedPieces);
   } else {
     return get(whiteCapturedPieces);

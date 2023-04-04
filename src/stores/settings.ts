@@ -29,14 +29,14 @@ export const useSettingsStore = defineStore("settings", () => {
         boardBorder: ChessBoardBorder.None,
         boardOrientation: ChessBoardOrientation.PlayerBottom,
         pieceSet: PieceSet.Modern,
-        piecesDisplaySize: PiecesDisplaySize.Medium,
+        piecesDisplaySize: PiecesDisplaySize.Medium as number, // TODO: For some reason, this gets turned into a string somewhere and i can't figure out where
         animationDuration: AnimationDuration.Medium as
           | AnimationDuration
           | number,
         showCoordinates: true,
         lastMoveHighlightColor: HighlightColor.Yellow,
         selectedSquareHighlightColor: HighlightColor.Green,
-        legalMoveHighlightColor: HighlightColor.Highlight,
+        legalMoveHighlightColor: HighlightColor.White,
         userHighlightColor: HighlightColor.Red,
         userArrowColor: HighlightColor.Green,
       },

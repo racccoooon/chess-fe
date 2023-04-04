@@ -1,83 +1,61 @@
 <template>
   <div class="grow h-min">
     <CompactFormWrapper>
-      <CompactFormSection>
+      <CompactFormSection open>
         <template #label>Your Name</template>
+        <template #description
+          >Your name gets displayed to your opponent and spectators</template
+        >
         <CompactFormInputElement>
           <LargeTextInput v-model="userName" />
         </CompactFormInputElement>
       </CompactFormSection>
-      <CompactFormSection>
+      <CompactFormSection open>
         <template #label>Chess Board</template>
+        <template #description>Configure the chess board</template>
         <CompactFormInputElement>
+          <template #label>Board Style</template>
+          <template #description>Choose a board style that you like</template>
           <SmallPreviewOptionsGroup
             :options="[
               {
                 value: ChessBoardColor.Neutral,
                 label: 'Neutral',
-                userOptions: {
-                  lightClass: 'fill-gray-100',
-                  darkClass: 'fill-gray-500',
-                },
+              },
+              {
+                value: ChessBoardColor.HighContrast,
+                label: 'Darker',
               },
               {
                 value: ChessBoardColor.Wood,
                 label: 'Wood',
-                userOptions: {
-                  lightClass: 'fill-brown-200',
-                  darkClass: 'fill-brown-500',
-                },
               },
               {
                 value: ChessBoardColor.Green,
                 label: 'Green',
-                userOptions: {
-                  lightClass: 'fill-green-100',
-                  darkClass: 'fill-green-500',
-                },
               },
               {
                 value: ChessBoardColor.Blue,
                 label: 'Blue',
-                userOptions: {
-                  lightClass: 'fill-blue-200',
-                  darkClass: 'fill-blue-500',
-                },
               },
               {
                 value: ChessBoardColor.Red,
                 label: 'Red',
-                userOptions: {
-                  lightClass: 'fill-red-200',
-                  darkClass: 'fill-red-500',
-                },
               },
               {
                 value: ChessBoardColor.Orange,
                 label: 'Orange',
-                userOptions: {
-                  lightClass: 'fill-orange-100',
-                  darkClass: 'fill-orange-400',
-                },
               },
               {
                 value: ChessBoardColor.Purple,
                 label: 'Purple',
-                userOptions: {
-                  lightClass: 'fill-purple-100',
-                  darkClass: 'fill-purple-500',
-                },
               },
               {
                 value: ChessBoardColor.Pink,
                 label: 'Pink',
-                userOptions: {
-                  lightClass: 'fill-pink-200',
-                  darkClass: 'fill-pink-400',
-                },
               },
             ]"
-            class="grid-cols-2"
+            class="grid-cols-2 md:grid-cols-3"
             v-model="boardColor"
           >
             <template #preview="option">
@@ -87,28 +65,32 @@
                   height="10"
                   x="0"
                   y="0"
-                  :class="option.userOptions.lightClass"
+                  data-dark="false"
+                  :class="getSquareColorClass(option.value)"
                 />
                 <rect
                   width="10"
                   height="10"
                   x="10"
                   y="0"
-                  :class="option.userOptions.darkClass"
+                  data-dark="true"
+                  :class="getSquareColorClass(option.value)"
                 />
                 <rect
                   width="10"
                   height="10"
                   x="00"
                   y="10"
-                  :class="option.userOptions.darkClass"
+                  data-dark="true"
+                  :class="getSquareColorClass(option.value)"
                 />
                 <rect
                   width="10"
                   height="10"
                   x="10"
                   y="10"
-                  :class="option.userOptions.lightClass"
+                  data-dark="false"
+                  :class="getSquareColorClass(option.value)"
                 />
               </svg>
             </template>
@@ -177,8 +159,11 @@
           />
         </CompactFormInputElement>
       </CompactFormSection>
-      <CompactFormSection>
+      <CompactFormSection open>
         <template #label>Chess Pieces</template>
+        <template #description
+          >How chess pieces look like on the board</template
+        >
         <CompactFormInputElement>
           <SmallPreviewOptionsGroup
             v-model="pieceSet"
@@ -220,39 +205,29 @@
           </SmallPreviewOptionsGroup>
         </CompactFormInputElement>
         <CompactFormInputElement>
-          <SmallOptionsGroup
+          <template #label>Piece Size</template>
+          <template #description>How big do you like your chess?</template>
+          <RangeInput
             v-model="piecesDisplaySize"
-            :options="[
-              {
-                value: PiecesDisplaySize.VerySmall,
-                label: 'Ant',
-              },
-              {
-                value: PiecesDisplaySize.Small,
-                label: 'Tiny',
-              },
-              {
-                value: PiecesDisplaySize.Medium,
-                label: 'Normal',
-              },
-              {
-                value: PiecesDisplaySize.Large,
-                label: 'Bigger',
-              },
-              {
-                value: PiecesDisplaySize.ExtraLarge,
-                label: 'Huge',
-              },
-              {
-                value: PiecesDisplaySize.TooLarge,
-                label: 'Enourmous',
-              },
+            :labels="[
+              { value: 10, label: 'Ant' },
+              { value: 50, label: 'Tiny' },
+              { value: 80, label: 'Normal' },
+              { value: 90, label: 'Bigger' },
+              { value: 100, label: 'Huge' },
+              { value: 150, label: 'Enormous' },
             ]"
+            :min="10"
+            :max="200"
+            :step="10"
           />
         </CompactFormInputElement>
       </CompactFormSection>
       <CompactFormSection>
         <template #label>Highlight Squares</template>
+        <template #description
+          >What the computer should highlight for you</template
+        >
         <CompactFormInputElement>
           <SmallOptionsGroup
             v-model="showLegalMoves"
@@ -300,7 +275,91 @@
         </CompactFormInputElement>
       </CompactFormSection>
       <CompactFormSection>
+        <template #label>Highlight Colors</template>
+        <template #description>The color of highlights on the board</template>
+        <CompactFormInputElement>
+          <template #label>User Arrows</template>
+          <template #description
+            >The color of arrow you draw (hold and drag right click)</template
+          >
+          <SmallPreviewOptionsGroup
+            :options="highlightOptions"
+            class="grid-cols-2 md:grid-cols-3"
+            v-model="userArrowColor"
+          >
+            <template #preview="option">
+              <div class="w-full h-full" :class="option.userOptions.class" />
+            </template>
+          </SmallPreviewOptionsGroup>
+        </CompactFormInputElement>
+        <CompactFormInputElement>
+          <template #label>User highlighted squares</template>
+          <template #description
+            >The color of squares you highlight (right click)</template
+          >
+          <SmallPreviewOptionsGroup
+            :options="highlightOptions"
+            class="grid-cols-2 md:grid-cols-3"
+            v-model="userHighlightColor"
+          >
+            <template #preview="option">
+              <div class="w-full h-full" :class="option.userOptions.class" />
+            </template>
+          </SmallPreviewOptionsGroup>
+        </CompactFormInputElement>
+        <CompactFormInputElement>
+          <template #label>Last Move</template>
+          <template #description
+            >The color in which the last move gets highlighted</template
+          >
+          <SmallPreviewOptionsGroup
+            :options="highlightOptions"
+            class="grid-cols-2 md:grid-cols-3"
+            v-model="lastMoveHighlightColor"
+          >
+            <template #preview="option">
+              <div class="w-full h-full" :class="option.userOptions.class" />
+            </template>
+          </SmallPreviewOptionsGroup>
+        </CompactFormInputElement>
+        <CompactFormInputElement>
+          <template #label>Selected Square</template>
+          <template #description
+            >The color in which the piece you are about to move gets
+            highlighted</template
+          >
+          <SmallPreviewOptionsGroup
+            :options="highlightOptions"
+            class="grid-cols-2 md:grid-cols-3"
+            v-model="selectedSquareHighlightColor"
+          >
+            <template #preview="option">
+              <div class="w-full h-full" :class="option.userOptions.class" />
+            </template>
+          </SmallPreviewOptionsGroup>
+        </CompactFormInputElement>
+        <CompactFormInputElement>
+          <template #label>Legal Moves</template>
+          <template #description
+            >The color in which legal moves of the selected piece get
+            highlighted</template
+          >
+          <SmallPreviewOptionsGroup
+            :options="highlightOptions"
+            class="grid-cols-2 md:grid-cols-3"
+            v-model="legalMoveHighlightColor"
+          >
+            <template #preview="option">
+              <div class="w-full h-full" :class="option.userOptions.class" />
+            </template>
+          </SmallPreviewOptionsGroup>
+        </CompactFormInputElement>
+      </CompactFormSection>
+      <CompactFormSection>
         <template #label>Notation</template>
+        <template #description
+          >How to notate the moves in the game history</template
+        >
         <CompactFormInputElement>
           <SmallOptionsGroup
             v-model="notationType"
@@ -338,6 +397,7 @@
       </CompactFormSection>
       <CompactFormSection>
         <template #label>Animations</template>
+        <template #description>How fast pieces move across the board</template>
         <CompactFormInputElement>
           <SmallOptionsGroup
             v-model="animationDuration"
@@ -364,11 +424,12 @@
       </CompactFormSection>
       <CompactFormSection>
         <template #label>Move style</template>
-        <template #description>
-          If moving pieces doesn't work with a touch screen try setting this to
-          click only.
-        </template>
+        <template #description> The way you make moves on the board </template>
         <CompactFormInputElement>
+          <template #description>
+            If moving pieces doesn't work with a touch screen try setting this
+            to click only.
+          </template>
           <SmallOptionsGroup
             v-model="preferredMoveStyle"
             :options="[
@@ -407,284 +468,6 @@
           />
         </CompactFormInputElement>
       </CompactFormSection>
-      <CompactFormSection>
-        <template #label>Highlight Colors</template>
-        <CompactFormInputElement>
-          <template #label>User Arrows</template>
-          <SmallPreviewOptionsGroup
-            :options="[
-              {
-                value: HighlightColor.Green,
-                label: 'Green',
-                userOptions: {
-                  class: 'bg-green-300',
-                },
-              },
-              {
-                value: HighlightColor.Yellow,
-                label: 'Yellow',
-                userOptions: {
-                  class: 'bg-yellow-300',
-                },
-              },
-              {
-                value: HighlightColor.Red,
-                label: 'Red',
-                userOptions: {
-                  class: 'bg-red-400',
-                },
-              },
-              {
-                value: HighlightColor.Purple,
-                label: 'Purple',
-                userOptions: {
-                  class: 'bg-purple-300',
-                },
-              },
-              {
-                value: HighlightColor.Blue,
-                label: 'Blue',
-                userOptions: {
-                  class: 'bg-blue-300',
-                },
-              },
-              {
-                value: HighlightColor.Highlight,
-                label: 'White',
-                userOptions: {
-                  class: 'bg-gray-200',
-                },
-              },
-            ]"
-            class="grid-cols-2"
-            v-model="userArrowColor"
-          >
-            <template #preview="option">
-              <div class="w-full h-full" :class="option.userOptions.class" />
-            </template>
-          </SmallPreviewOptionsGroup>
-        </CompactFormInputElement>
-        <CompactFormInputElement>
-          <template #label>User highlighted squares</template>
-          <SmallPreviewOptionsGroup
-            :options="[
-              {
-                value: HighlightColor.Green,
-                label: 'Green',
-                userOptions: {
-                  class: 'bg-green-300',
-                },
-              },
-              {
-                value: HighlightColor.Yellow,
-                label: 'Yellow',
-                userOptions: {
-                  class: 'bg-yellow-300',
-                },
-              },
-              {
-                value: HighlightColor.Red,
-                label: 'Red',
-                userOptions: {
-                  class: 'bg-red-400',
-                },
-              },
-              {
-                value: HighlightColor.Purple,
-                label: 'Purple',
-                userOptions: {
-                  class: 'bg-purple-300',
-                },
-              },
-              {
-                value: HighlightColor.Blue,
-                label: 'Blue',
-                userOptions: {
-                  class: 'bg-blue-300',
-                },
-              },
-              {
-                value: HighlightColor.Highlight,
-                label: 'White',
-                userOptions: {
-                  class: 'bg-gray-200',
-                },
-              },
-            ]"
-            class="grid-cols-2"
-            v-model="userHighlightColor"
-          >
-            <template #preview="option">
-              <div class="w-full h-full" :class="option.userOptions.class" />
-            </template>
-          </SmallPreviewOptionsGroup>
-        </CompactFormInputElement>
-        <CompactFormInputElement>
-          <template #label>Last Move</template>
-          <SmallPreviewOptionsGroup
-            :options="[
-              {
-                value: HighlightColor.Green,
-                label: 'Green',
-                userOptions: {
-                  class: 'bg-green-300',
-                },
-              },
-              {
-                value: HighlightColor.Yellow,
-                label: 'Yellow',
-                userOptions: {
-                  class: 'bg-yellow-300',
-                },
-              },
-              {
-                value: HighlightColor.Red,
-                label: 'Red',
-                userOptions: {
-                  class: 'bg-red-400',
-                },
-              },
-              {
-                value: HighlightColor.Purple,
-                label: 'Purple',
-                userOptions: {
-                  class: 'bg-purple-300',
-                },
-              },
-              {
-                value: HighlightColor.Blue,
-                label: 'Blue',
-                userOptions: {
-                  class: 'bg-blue-300',
-                },
-              },
-              {
-                value: HighlightColor.Highlight,
-                label: 'White',
-                userOptions: {
-                  class: 'bg-gray-200',
-                },
-              },
-            ]"
-            class="grid-cols-2"
-            v-model="lastMoveHighlightColor"
-          >
-            <template #preview="option">
-              <div class="w-full h-full" :class="option.userOptions.class" />
-            </template>
-          </SmallPreviewOptionsGroup>
-        </CompactFormInputElement>
-        <CompactFormInputElement>
-          <template #label>Selected Square</template>
-          <SmallPreviewOptionsGroup
-            :options="[
-              {
-                value: HighlightColor.Green,
-                label: 'Green',
-                userOptions: {
-                  class: 'bg-green-300',
-                },
-              },
-              {
-                value: HighlightColor.Yellow,
-                label: 'Yellow',
-                userOptions: {
-                  class: 'bg-yellow-300',
-                },
-              },
-              {
-                value: HighlightColor.Red,
-                label: 'Red',
-                userOptions: {
-                  class: 'bg-red-400',
-                },
-              },
-              {
-                value: HighlightColor.Purple,
-                label: 'Purple',
-                userOptions: {
-                  class: 'bg-purple-300',
-                },
-              },
-              {
-                value: HighlightColor.Blue,
-                label: 'Blue',
-                userOptions: {
-                  class: 'bg-blue-300',
-                },
-              },
-              {
-                value: HighlightColor.Highlight,
-                label: 'White',
-                userOptions: {
-                  class: 'bg-gray-200',
-                },
-              },
-            ]"
-            class="grid-cols-2"
-            v-model="selectedSquareHighlightColor"
-          >
-            <template #preview="option">
-              <div class="w-full h-full" :class="option.userOptions.class" />
-            </template>
-          </SmallPreviewOptionsGroup>
-        </CompactFormInputElement>
-        <CompactFormInputElement>
-          <template #label>Legal Moves</template>
-          <SmallPreviewOptionsGroup
-            :options="[
-              {
-                value: HighlightColor.Green,
-                label: 'Green',
-                userOptions: {
-                  class: 'bg-green-300',
-                },
-              },
-              {
-                value: HighlightColor.Yellow,
-                label: 'Yellow',
-                userOptions: {
-                  class: 'bg-yellow-300',
-                },
-              },
-              {
-                value: HighlightColor.Red,
-                label: 'Red',
-                userOptions: {
-                  class: 'bg-red-400',
-                },
-              },
-              {
-                value: HighlightColor.Purple,
-                label: 'Purple',
-                userOptions: {
-                  class: 'bg-purple-300',
-                },
-              },
-              {
-                value: HighlightColor.Blue,
-                label: 'Blue',
-                userOptions: {
-                  class: 'bg-blue-300',
-                },
-              },
-              {
-                value: HighlightColor.Highlight,
-                label: 'White',
-                userOptions: {
-                  class: 'bg-gray-200',
-                },
-              },
-            ]"
-            class="grid-cols-2"
-            v-model="legalMoveHighlightColor"
-          >
-            <template #preview="option">
-              <div class="w-full h-full" :class="option.userOptions.class" />
-            </template>
-          </SmallPreviewOptionsGroup>
-        </CompactFormInputElement>
-      </CompactFormSection>
     </CompactFormWrapper>
   </div>
 </template>
@@ -696,7 +479,6 @@ import {
   ChessBoardColor,
   ChessBoardBorder,
   PieceSet,
-  PiecesDisplaySize,
   MoveStyle,
   ClickDuration,
   AnimationDuration,
@@ -714,6 +496,8 @@ import LargeTextInput from "@/components/forms/LargeTextInput.vue";
 import CompactFormWrapper from "@/components/forms/CompactFormWrapper.vue";
 import CompactFormSection from "@/components/forms/CompactFormSection.vue";
 import CompactFormInputElement from "@/components/forms/CompactFormInputElement.vue";
+import { getSquareColorClass } from "@/lib/chessBoard";
+import RangeInput from "@/components/forms/RangeInput.vue";
 
 const settingsStore = useSettingsStore();
 
@@ -742,4 +526,91 @@ const {
 } = storeToRefs(settingsStore);
 
 const { name: userName } = storeToRefs(userStore);
+
+const highlightOptions = [
+  {
+    value: HighlightColor.White,
+    label: "White",
+    userOptions: {
+      class: "bg-gray-200",
+    },
+  },
+  {
+    value: HighlightColor.Gray,
+    label: "Gray",
+    userOptions: {
+      class: "bg-gray-500",
+    },
+  },
+  {
+    value: HighlightColor.Black,
+    label: "Black",
+    userOptions: {
+      class: "bg-gray-700",
+    },
+  },
+  {
+    value: HighlightColor.Red,
+    label: "Red",
+    userOptions: {
+      class: "bg-red-400",
+    },
+  },
+  {
+    value: HighlightColor.Orange,
+    label: "Orange",
+    userOptions: {
+      class: "bg-orange-400",
+    },
+  },
+  {
+    value: HighlightColor.Yellow,
+    label: "Yellow",
+    userOptions: {
+      class: "bg-amber-300",
+    },
+  },
+  {
+    value: HighlightColor.Green,
+    label: "Green",
+    userOptions: {
+      class: "bg-green-300",
+    },
+  },
+  {
+    value: HighlightColor.Teal,
+    label: "Teal",
+    userOptions: {
+      class: "bg-teal-300",
+    },
+  },
+  {
+    value: HighlightColor.LightBlue,
+    label: "Sky Blue",
+    userOptions: {
+      class: "bg-sky-300",
+    },
+  },
+  {
+    value: HighlightColor.Blue,
+    label: "Blue",
+    userOptions: {
+      class: "bg-blue-400",
+    },
+  },
+  {
+    value: HighlightColor.Purple,
+    label: "Purple",
+    userOptions: {
+      class: "bg-purple-400",
+    },
+  },
+  {
+    value: HighlightColor.Pink,
+    label: "Pink",
+    userOptions: {
+      class: "bg-pink-300",
+    },
+  },
+];
 </script>

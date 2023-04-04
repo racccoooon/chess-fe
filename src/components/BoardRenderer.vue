@@ -85,42 +85,28 @@
                 ${boardXToDisplayX(highlight.square.x) * squareAbsoluteWidth},
                 ${boardYToDisplayY(highlight.square.y) * squareAbsoluteHeight}
             )`"
-            :class="{
-              'fill-gray-50/50 data-[dark=true]:fill-white/75':
-                highlight.color === HighlightColor.Highlight,
-              'fill-yellow-300/75': highlight.color === HighlightColor.Yellow,
-              'fill-red-400/75 data-[dark=true]:fill-red-300/90':
-                highlight.color === HighlightColor.Red,
-              'fill-lime-400/75 data-[dark=true]:fill-lime-500/90':
-                highlight.color === HighlightColor.Green,
-              'fill-blue-400/75 data-[dark=true]:fill-blue-500/90':
-                highlight.color === HighlightColor.Blue,
-              'fill-purple-400/75 data-[dark=true]:fill-purple-500/90':
-                highlight.color === HighlightColor.Purple,
-            }"
+            :class="getHighlightFillClass(highlight.color)"
+            :data-dark="!((highlight.square.x + highlight.square.y) % 2)"
+            opacity="0.8"
           >
             <rect
               v-if="highlight.shape === HighlightShape.SquareFill"
               :width="squareAbsoluteWidth"
               :height="squareAbsoluteHeight"
-              :data-dark="!((highlight.square.x + highlight.square.y) % 2)"
             />
             <path
               v-else-if="highlight.shape === HighlightShape.SquareOutline"
-              d="M100,0L100,100L0,100L0,0L100,0ZM90,10L10,10L10,90L90,90L90,10Z"
-              :data-dark="!((highlight.square.x + highlight.square.y) % 2)"
+              d="M89,5C90.591,5 92.117,5.632 93.243,6.757C94.368,7.883 95,9.409 95,11L95,89C95,90.591 94.368,92.117 93.243,93.243C92.117,94.368 90.591,95 89,95L11,95C9.409,95 7.883,94.368 6.757,93.243C5.632,92.117 5,90.591 5,89L5,11C5,9.409 5.632,7.883 6.757,6.757C7.883,5.632 9.409,5 11,5L89,5ZM87.5,15.5C87.5,14.704 87.184,13.941 86.621,13.379C86.059,12.816 85.296,12.5 84.5,12.5L15.5,12.5C14.704,12.5 13.941,12.816 13.379,13.379C12.816,13.941 12.5,14.704 12.5,15.5L12.5,84.5C12.5,85.296 12.816,86.059 13.379,86.621C13.941,87.184 14.704,87.5 15.5,87.5L84.5,87.5C85.296,87.5 86.059,87.184 86.621,86.621C87.184,86.059 87.5,85.296 87.5,84.5L87.5,15.5Z"
             />
             <circle
               v-if="highlight.shape === HighlightShape.Dot"
               cx="50"
               cy="50"
               r="18"
-              :data-dark="!((highlight.square.x + highlight.square.y) % 2)"
             />
             <path
               v-else-if="highlight.shape === HighlightShape.CircleOutline"
-              d="M50,0C77.596,0 100,22.404 100,50C100,77.596 77.596,100 50,100C22.404,100 0,77.596 0,50C0,22.404 22.404,0 50,0ZM50,10C72.077,10 90,27.923 90,50C90,72.077 72.077,90 50,90C27.923,90 10,72.077 10,50C10,27.923 27.923,10 50,10Z"
-              :data-dark="!((highlight.square.x + highlight.square.y) % 2)"
+              d="M50,5C74.853,5 95,25.147 95,50C95,50 95,50 95,50C95,74.853 74.853,95 50,95C50,95 50,95 50,95C25.147,95 5,74.853 5,50C5,50 5,50 5,50C5,25.147 25.147,5 50,5L50,5ZM87.5,49.998C87.5,40.053 83.549,30.515 76.517,23.483C69.485,16.451 59.947,12.5 50.002,12.5L49.998,12.5C40.053,12.5 30.515,16.451 23.483,23.483C16.451,30.515 12.5,40.053 12.5,49.998L12.5,50.002C12.5,59.947 16.451,69.485 23.483,76.517C30.515,83.549 40.053,87.5 49.998,87.5L50.002,87.5C59.947,87.5 69.485,83.549 76.517,76.517C83.549,69.485 87.5,59.947 87.5,50.002L87.5,49.998Z"
             />
           </g>
         </template>
@@ -216,7 +202,7 @@
       <g>
         <use href="#selected-piece" v-if="selectedPiece" />
       </g>
-      <g id="arrows">
+      <g id="arrows" opacity="0.8">
         <template v-for="(arrow, index) in arrows" :key="index">
           <BoardArrowRenderer
             :arrow="arrow"
@@ -246,24 +232,22 @@ import {
   AnimationDuration,
   BoardPointerMode,
   ChessBoardBorder,
-  ChessBoardColor,
-  ChessBoardOrientation,
   HighlightColor,
   HighlightShape,
   MoveStyle,
   PieceColor,
-  PiecesDisplaySize,
   PieceType,
 } from "@/lib/types";
 import { storeToRefs } from "pinia";
 import { useSettingsStore } from "@/stores/settings";
 import { computed, nextTick, ref, toRef, watch } from "vue";
-import { get, set, useMouse, useRefHistory } from "@vueuse/core";
+import { clamp, get, set, useMouse, useRefHistory } from "@vueuse/core";
 import { getFileName, getRankName } from "@/lib/chessNotation";
 import { getPieceAtSquare, getPieceSquare } from "@/lib/chess";
 import objectHash from "object-hash";
 import { gsap } from "gsap";
 import BoardArrowRenderer from "@/components/board/BoardArrowRenderer.vue";
+import { getHighlightFillClass, getSquareColorClass } from "@/lib/chessBoard";
 
 const props = defineProps<{
   pieces: Piece[];
@@ -291,7 +275,6 @@ const {
   clickDuration,
   boardColor,
   boardBorder,
-  boardOrientation,
   showCoordinates,
   pieceSet,
   piecesDisplaySize,
@@ -346,18 +329,6 @@ const userHighlights = ref<BoardHighlightSquare[]>([]);
 const userHighlightsByBoardPosition = ref<
   Record<string, { arrows: BoardArrow[]; squares: BoardHighlightSquare[] }>
 >({});
-
-const reverse = computed(() => {
-  if (get(boardOrientation) === ChessBoardOrientation.WhiteBottom) {
-    return false;
-  } else if (get(boardOrientation) === ChessBoardOrientation.BlackBottom) {
-    return true;
-  } else if (get(boardOrientation) === ChessBoardOrientation.OpponentBottom) {
-    return !props.reverse;
-  }
-
-  return props.reverse;
-});
 
 const { x: mouseX, y: mouseY } = useMouse({
   type: "client",
@@ -490,7 +461,7 @@ const animatePiece = (from: Piece, to: Piece) => {
   let absoluteOriginX = -diffX * squareAbsoluteWidth;
   let absoluteOriginY = diffY * squareAbsoluteHeight;
 
-  if (get(reverse)) {
+  if (props.reverse) {
     absoluteOriginX *= -1;
     absoluteOriginY *= -1;
   }
@@ -525,47 +496,11 @@ const allowMoveByClicking = computed(() => {
 });
 
 const fillClass = computed(() => {
-  switch (get(boardColor)) {
-    case ChessBoardColor.Neutral:
-      return "fill-gray-100 data-[dark=true]:fill-gray-500";
-    case ChessBoardColor.Wood:
-      return "fill-brown-200 data-[dark=true]:fill-brown-500";
-    case ChessBoardColor.Green:
-      return "fill-green-100 data-[dark=true]:fill-green-500";
-    case ChessBoardColor.Blue:
-      return "fill-blue-200 data-[dark=true]:fill-blue-500";
-    case ChessBoardColor.Red:
-      return "fill-red-200 data-[dark=true]:fill-red-500";
-    case ChessBoardColor.Orange:
-      return "fill-orange-100 data-[dark=true]:fill-orange-400";
-    case ChessBoardColor.Purple:
-      return "fill-purple-100 data-[dark=true]:fill-purple-500";
-    case ChessBoardColor.Pink:
-      return "fill-pink-200 data-[dark=true]:fill-pink-400";
-    case ChessBoardColor.HighContrast:
-      return "fill-white data-[dark=true]:fill-gray-800";
-    default:
-      return "";
-  }
+  return getSquareColorClass(get(boardColor));
 });
 
 const pieceAbsoluteSize = computed(() => {
-  switch (get(piecesDisplaySize)) {
-    case PiecesDisplaySize.VerySmall:
-      return 10;
-    case PiecesDisplaySize.Small:
-      return 50;
-    case PiecesDisplaySize.Medium:
-      return 80;
-    case PiecesDisplaySize.Large:
-      return 90;
-    case PiecesDisplaySize.ExtraLarge:
-      return 100;
-    case PiecesDisplaySize.TooLarge:
-      return 150;
-    default:
-      return 80;
-  }
+  return clamp(get(piecesDisplaySize) as number, 10, 200) || 80;
 });
 
 const pieceAbsoluteOffset = computed(() => {
@@ -586,7 +521,7 @@ const highlightSquares = computed((): BoardHighlightSquare[] => {
   if (get(hoveredSquare) && get(selectedPiece)) {
     arr.push({
       square: get(hoveredSquare)!,
-      color: HighlightColor.Highlight,
+      color: HighlightColor.White,
       shape: HighlightShape.SquareOutline,
     });
   }
@@ -618,7 +553,7 @@ const arrows = computed(() => {
 });
 
 const displayXToBoardX = (x: number) => {
-  if (get(reverse)) {
+  if (props.reverse) {
     return 7 - x;
   } else {
     return x;
@@ -626,7 +561,7 @@ const displayXToBoardX = (x: number) => {
 };
 
 const displayYToBoardY = (y: number) => {
-  if (get(reverse)) {
+  if (props.reverse) {
     return y;
   } else {
     return 7 - y;
@@ -634,7 +569,7 @@ const displayYToBoardY = (y: number) => {
 };
 
 const boardXToDisplayX = (x: number) => {
-  if (get(reverse)) {
+  if (props.reverse) {
     return 7 - x;
   } else {
     return x;
@@ -642,7 +577,7 @@ const boardXToDisplayX = (x: number) => {
 };
 
 const boardYToDisplayY = (y: number) => {
-  if (get(reverse)) {
+  if (props.reverse) {
     return y;
   } else {
     return 7 - y;

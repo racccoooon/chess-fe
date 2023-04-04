@@ -26,12 +26,18 @@ export enum GameStartColor {
 }
 
 export enum HighlightColor {
-  Green = "green",
-  Yellow = "yellow",
+  White = "white",
+  Gray = "gray",
+  Black = "black",
   Red = "red",
+  Orange = "orange",
+  Yellow = "yellow",
+  Green = "green",
+  Teal = "teal",
+  LightBlue = "lightBlue",
   Blue = "blue",
   Purple = "purple",
-  Highlight = "highlight",
+  Pink = "pink",
 }
 
 export enum HighlightShape {
@@ -51,13 +57,14 @@ export enum PieceSet {
 }
 
 export enum PiecesDisplaySize {
-  VerySmall = "verySmall",
-  Small = "small",
-  Medium = "medium",
-  Large = "large",
-  ExtraLarge = "extraLarge",
-  TooLarge = "tooLarge",
+  VerySmall = 10,
+  Small = 50,
+  Medium = 80,
+  Large = 90,
+  ExtraLarge = 100,
+  TooLarge = 150,
 }
+
 export interface Piece {
   type: PieceType;
   color: PieceColor;
