@@ -1,7 +1,7 @@
 <template>
   <div class="grow h-min">
     <CompactFormWrapper>
-      <CompactFormSection open>
+      <CompactFormSection details open>
         <template #label>Your Name</template>
         <template #description
           >Your name gets displayed to your opponent and spectators</template
@@ -10,7 +10,7 @@
           <LargeTextInput v-model="userName" />
         </CompactFormInputElement>
       </CompactFormSection>
-      <CompactFormSection open>
+      <CompactFormSection details open>
         <template #label>Chess Board</template>
         <template #description>Configure the chess board</template>
         <CompactFormInputElement>
@@ -159,7 +159,7 @@
           />
         </CompactFormInputElement>
       </CompactFormSection>
-      <CompactFormSection open>
+      <CompactFormSection details open>
         <template #label>Chess Pieces</template>
         <template #description
           >How chess pieces look like on the board</template
@@ -223,7 +223,7 @@
           />
         </CompactFormInputElement>
       </CompactFormSection>
-      <CompactFormSection>
+      <CompactFormSection details>
         <template #label>Highlight Squares</template>
         <template #description
           >What the computer should highlight for you</template
@@ -274,7 +274,7 @@
           />
         </CompactFormInputElement>
       </CompactFormSection>
-      <CompactFormSection>
+      <CompactFormSection details>
         <template #label>Highlight Colors</template>
         <template #description>The color of highlights on the board</template>
         <CompactFormInputElement>
@@ -355,7 +355,7 @@
           </SmallPreviewOptionsGroup>
         </CompactFormInputElement>
       </CompactFormSection>
-      <CompactFormSection>
+      <CompactFormSection details>
         <template #label>Notation</template>
         <template #description
           >How to notate the moves in the game history</template
@@ -395,7 +395,7 @@
           />
         </CompactFormInputElement>
       </CompactFormSection>
-      <CompactFormSection>
+      <CompactFormSection details>
         <template #label>Animations</template>
         <template #description>How fast pieces move across the board</template>
         <CompactFormInputElement>
@@ -422,7 +422,7 @@
           />
         </CompactFormInputElement>
       </CompactFormSection>
-      <CompactFormSection>
+      <CompactFormSection details>
         <template #label>Move style</template>
         <template #description> The way you make moves on the board </template>
         <CompactFormInputElement>
