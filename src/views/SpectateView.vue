@@ -14,22 +14,41 @@
     :setup-fen="setupFen"
   >
     <template #board-overlay>
-      <SuperDuperModal v-if="loading">
-        <LoadingModalContent />
+      <SuperDuperModal v-if="loading || gameHasEnded">
+        <LoadingModalContent v-if="loading" />
+        <GameOverModalContent
+          v-if="gameHasEnded"
+          :is-player="false"
+          :player-color="playerColor"
+          :game-result="gameResult"
+          :white-player-name="whitePlayerName"
+          :black-player-name="blackPlayerName"
+          :setup-fen="setupFen"
+          :move-history="moveHistory"
+          @dismissed="showModal = ModalType.None"
+        />
       </SuperDuperModal>
     </template>
   </GameLayout>
 </template>
 
 <script setup lang="ts">
-import { GameInfoTab, PieceColor, PieceType, PlayerColor } from "@/lib/types";
+import {
+  GameInfoTab,
+  GameResult,
+  KingStatus,
+  ModalType,
+  PieceColor,
+  PieceType,
+  PlayerColor,
+} from "@/lib/types";
 import type {
   JoinGameResponse,
   MoveItem,
   Piece,
   PlayerNameChangedResponse,
 } from "@/lib/types";
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { SignalrConnection } from "@/lib/signalr";
 import { get, set } from "@vueuse/core";
@@ -37,6 +56,7 @@ import { applyMove, defaultFen, invertColor, piecesToFen } from "@/lib/chess";
 import GameLayout from "@/components/GameLayout.vue";
 import SuperDuperModal from "@/components/modals/SuperDuperModal.vue";
 import LoadingModalContent from "@/components/modals/LoadingModalContent.vue";
+import GameOverModalContent from "@/components/modals/GameOverModalContent.vue";
 
 const router = useRouter();
 const hubConnection = new SignalrConnection();
@@ -53,9 +73,21 @@ const moveHistory = ref<MoveItem[]>([]);
 
 const gameHasStarted = ref(false);
 
+const gameHasEnded = ref(false);
+
 const activeColor = ref<PieceColor>(PieceColor.White);
 
 const loading = ref(true);
+
+const gameResult = ref<GameResult>(GameResult.InProgress);
+
+const lastMove = computed(() => {
+  if (get(moveHistory).length === 0) {
+    return null;
+  }
+
+  return get(moveHistory)[get(moveHistory).length - 1];
+});
 
 const initialize = async () => {
   await hubConnection.start();
@@ -105,6 +137,11 @@ const initialize = async () => {
     set(gameHasStarted, e.whitePlayerName !== "" && e.blackPlayerName !== "");
 
     set(loading, false);
+
+    // check if the game has ended
+    if (get(lastMove)) {
+      checkIfGameHasEnded(get(lastMove)!);
+    }
   });
 
   hubConnection.onGameStarted((e) => {
@@ -116,6 +153,8 @@ const initialize = async () => {
 
   hubConnection.onMove(async (e: MoveItem) => {
     resolveMove(e);
+
+    checkIfGameHasEnded(e);
   });
 
   hubConnection.onPlayerNameChanged((e: PlayerNameChangedResponse) => {
@@ -146,4 +185,18 @@ const resolveMove = (move: MoveItem) => {
 onMounted(async () => {
   await initialize();
 });
+
+const checkIfGameHasEnded = (move: MoveItem) => {
+  // check if game has ended
+  if (move.status === KingStatus.IsCheckmate) {
+    set(
+      gameResult,
+      move.color === PieceColor.White
+        ? GameResult.WhiteWins
+        : GameResult.BlackWins
+    );
+
+    set(gameHasEnded, true);
+  }
+};
 </script>

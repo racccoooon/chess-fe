@@ -84,7 +84,6 @@ import {
 import { computed, onMounted, ref, watch } from "vue";
 import {
   get,
-  isDefined,
   set,
   syncRef,
   useMemoize,
@@ -339,7 +338,7 @@ const initialize = async () => {
     set(showModal, ModalType.None);
 
     // check if the game has ended
-    if (isDefined(get(lastMove))) {
+    if (get(lastMove)) {
       checkIfGameHasEnded(get(lastMove)!);
     }
   });
