@@ -27,6 +27,12 @@
           v-if="showModal === ModalType.SetName"
           @dismissed="showModal = ModalType.None"
         />
+        <GameOverModalContent
+          v-if="showModal === ModalType.GameOver"
+          :winner="winner"
+          :is-player="true"
+          @dismissed="showModal = ModalType.None"
+        />
         <div
           class="flex flex-col gap-4"
           v-if="showModal === ModalType.IllegalMove"
@@ -98,6 +104,7 @@ import { storeToRefs } from "pinia";
 import { getValidMoves } from "@/lib/api";
 import LoadingModalContent from "@/components/modals/LoadingModalContent.vue";
 import SetNameModalContent from "@/components/modals/SetNameModalContent.vue";
+import GameOverModalContent from "@/components/modals/GameOverModalContent.vue";
 
 const router = useRouter();
 const hubConnection = new SignalrConnection();
@@ -328,6 +335,8 @@ const initialize = async () => {
 
   hubConnection.onMove(async (e: MoveItem) => {
     resolveMove(e);
+
+    // TODO: check for end of game
   });
 
   hubConnection.onPlayerNameChanged((e: PlayerNameChangedResponse) => {

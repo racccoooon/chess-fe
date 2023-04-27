@@ -242,6 +242,7 @@ export enum ModalType {
   IllegalMove = "illegalMove",
   Loading = "loading",
   SetName = "setName",
+  GameOver = "gameOver",
 }
 
 export interface Vector2 {
