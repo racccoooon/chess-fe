@@ -9,8 +9,11 @@
     <component
       :is="details ? 'summary' : 'div'"
       v-if="$slots.label || $slots.description"
-      class="cursor-pointer flex flex-row gap-2 justify-between"
-      :class="{ 'group-open/form-section:mb-8': details, 'mb-4': !details }"
+      class="flex flex-row gap-2 justify-between"
+      :class="{
+        'cursor-pointer group-open/form-section:mb-8': details,
+        'mb-4': !details,
+      }"
     >
       <span class="flex flex-col gap-2">
         <span
