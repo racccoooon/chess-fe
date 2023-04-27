@@ -29,8 +29,13 @@
         />
         <GameOverModalContent
           v-if="showModal === ModalType.GameOver"
-          :winner="winner"
           :is-player="true"
+          :player-color="playerColor"
+          :game-result="gameResult"
+          :white-player-name="whitePlayerName"
+          :black-player-name="blackPlayerName"
+          :setup-fen="setupFen"
+          :move-history="moveHistory"
           @dismissed="showModal = ModalType.None"
         />
         <div
@@ -68,7 +73,9 @@ import type {
 } from "@/lib/types";
 import {
   GameInfoTab,
+  GameResult,
   HighlightShape,
+  KingStatus,
   ModalType,
   PieceColor,
   PieceType,
@@ -77,6 +84,7 @@ import {
 import { computed, onMounted, ref, watch } from "vue";
 import {
   get,
+  isDefined,
   set,
   syncRef,
   useMemoize,
@@ -139,6 +147,8 @@ const moveHistory = ref<MoveItem[]>([]);
 const gameHasStarted = ref(false);
 
 const activeColor = ref<PieceColor>(PieceColor.White);
+
+const gameResult = ref<GameResult>(GameResult.InProgress);
 
 watchDebounced(
   userName,
@@ -246,6 +256,14 @@ const highlightSquares = computed((): BoardHighlightSquare[] => {
 const showModal = ref(ModalType.Loading);
 const promotionSelectedType = ref<PieceType | null>(null);
 
+const lastMove = computed(() => {
+  if (get(moveHistory).length === 0) {
+    return null;
+  }
+
+  return get(moveHistory)[get(moveHistory).length - 1];
+});
+
 const initialize = async () => {
   set(gameHasStarted, false);
 
@@ -319,6 +337,11 @@ const initialize = async () => {
 
     // disable loading modal
     set(showModal, ModalType.None);
+
+    // check if the game has ended
+    if (isDefined(get(lastMove))) {
+      checkIfGameHasEnded(get(lastMove)!);
+    }
   });
 
   hubConnection.onGameStarted((e: GameStartedResponse) => {
@@ -335,8 +358,7 @@ const initialize = async () => {
 
   hubConnection.onMove(async (e: MoveItem) => {
     resolveMove(e);
-
-    // TODO: check for end of game
+    checkIfGameHasEnded(e);
   });
 
   hubConnection.onPlayerNameChanged((e: PlayerNameChangedResponse) => {
@@ -366,6 +388,20 @@ const resolveMove = (move: MoveItem) => {
 
   // change the active color
   set(activeColor, invertColor(move.color));
+};
+
+const checkIfGameHasEnded = (move: MoveItem) => {
+  // check if game has ended
+  if (move.status === KingStatus.IsCheckmate) {
+    set(
+      gameResult,
+      move.color === PieceColor.White
+        ? GameResult.WhiteWins
+        : GameResult.BlackWins
+    );
+
+    set(showModal, ModalType.GameOver);
+  }
 };
 
 const askForPromotion = (): Promise<PieceType> => {
@@ -446,3 +482,4 @@ onMounted(async () => {
   }
 });
 </script>
+import { isDefined } from '@vueuse/core';
