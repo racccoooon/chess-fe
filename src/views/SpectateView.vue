@@ -14,18 +14,17 @@
     :setup-fen="setupFen"
   >
     <template #board-overlay>
-      <SuperDuperModal v-if="loading || gameHasEnded">
+      <SuperDuperModal v-if="loading || showGameOverModal">
         <LoadingModalContent v-if="loading" />
         <GameOverModalContent
-          v-if="gameHasEnded"
+          v-if="showGameOverModal"
           :is-player="false"
-          :player-color="playerColor"
           :game-result="gameResult"
           :white-player-name="whitePlayerName"
           :black-player-name="blackPlayerName"
           :setup-fen="setupFen"
           :move-history="moveHistory"
-          @dismissed="showModal = ModalType.None"
+          @dismissed="showGameOverModal = false"
         />
       </SuperDuperModal>
     </template>
@@ -37,7 +36,6 @@ import {
   GameInfoTab,
   GameResult,
   KingStatus,
-  ModalType,
   PieceColor,
   PieceType,
   PlayerColor,
@@ -74,6 +72,8 @@ const moveHistory = ref<MoveItem[]>([]);
 const gameHasStarted = ref(false);
 
 const gameHasEnded = ref(false);
+
+const showGameOverModal = ref(false);
 
 const activeColor = ref<PieceColor>(PieceColor.White);
 
@@ -197,6 +197,7 @@ const checkIfGameHasEnded = (move: MoveItem) => {
     );
 
     set(gameHasEnded, true);
+    set(showGameOverModal, true);
   }
 };
 </script>

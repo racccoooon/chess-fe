@@ -39,7 +39,7 @@
 import LargePrimaryButton from "@/components/forms/LargePrimaryButton.vue";
 import LargeFlatSecondaryButton from "@/components/forms/LargeFlatSecondaryButton.vue";
 import PieceRenderer from "@/components/pieces/PieceRenderer.vue";
-import { GameResult, PieceColor, PieceType } from "@/lib/types";
+import { GameResult, PieceColor, PlayerColor, PieceType } from "@/lib/types";
 import type { MoveItem } from "@/lib/types";
 import { computed } from "vue";
 import { get } from "@vueuse/core";
@@ -47,7 +47,7 @@ import { getGameNotation, NotationType } from "@/lib/chessNotation";
 
 const props = defineProps<{
   isPlayer: boolean;
-  playerColor?: PieceColor;
+  playerColor?: PlayerColor;
   gameResult: GameResult;
   whitePlayerName: string;
   blackPlayerName: string;
@@ -66,7 +66,7 @@ const dismiss = () => {
 const hasWon = computed(() => {
   if (!props.isPlayer) return true;
 
-  if (props.playerColor === PieceColor.White) {
+  if (props.playerColor === PlayerColor.White) {
     return props.gameResult === GameResult.WhiteWins;
   } else {
     return props.gameResult === GameResult.BlackWins;
