@@ -23,7 +23,7 @@
         :to="permanentLinkTo"
         v-if="moveHistory"
       >
-        Analise game
+        Analyse game
       </LargePrimaryButton>
       <button
         class="text-gray-400 dark:text-gray-600 text-sm underline"
