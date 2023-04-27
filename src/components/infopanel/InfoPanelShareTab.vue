@@ -1,73 +1,88 @@
 <template>
-  <div class="grow flex flex-col gap-12 h-min">
-    <div class="flex flex-col gap-6">
-      <h2 class="text-gray-900 dark:text-gray-50 font-medium text-xl">
-        Send this link to your opponent
-      </h2>
-      <div class="flex flex-row gap-2">
-        <LargeTextInput
-          v-model="inviteOpponentLink"
-          ref="opponentLinkInput"
-          readonly
-        />
-        <LargeFlatSecondaryButton
-          @click="copyOpponentLinkToClipboard"
-          class="grow"
-          alt="copy link"
-        >
-          <SvgIcon type="mdi" :path="mdiContentCopy" size="18" />
-        </LargeFlatSecondaryButton>
-      </div>
-      <QRCodeDisplay :text="inviteOpponentLink" alt="QRCode for opponent" />
-    </div>
-    <div class="flex flex-col gap-6">
-      <h2 class="text-gray-900 dark:text-gray-50 font-medium text-xl">
-        Send this link to spectators
-      </h2>
-      <div class="flex flex-row gap-2">
-        <LargeTextInput
-          v-model="inviteSpectatorsLink"
-          ref="opponentLinkInput"
-          readonly
-        />
-        <LargeFlatSecondaryButton
-          @click="copySpectatorsLinkToClipboard"
-          class="grow"
-          alt="copy link"
-        >
-          <SvgIcon type="mdi" :path="mdiContentCopy" size="18" />
-        </LargeFlatSecondaryButton>
-      </div>
-      <QRCodeDisplay :text="inviteSpectatorsLink" alt="QRCode for spectators" />
-    </div>
-    <div class="flex flex-col gap-6">
-      <h2 class="text-gray-900 dark:text-gray-50 font-medium text-xl">
-        Permanent link to this game
-      </h2>
-      <div class="flex flex-row gap-2">
-        <LargeTextInput
-          class="grow px-6 py-4 text-gray-900 dark:text-gray-50 bg-gray-200 dark:bg-gray-700 rounded-xl"
-          v-model="permanentLink"
-          ref="permanentLinkInput"
-          readonly
-        />
-        <LargeFlatSecondaryButton
-          class="grow"
-          alt="open in new tab"
-          :href="permanentLink"
-          target="_blank"
-        >
-          <SvgIcon type="mdi" :path="mdiOpenInNew" size="18" />
-        </LargeFlatSecondaryButton>
-        <LargeFlatSecondaryButton
-          @click="copyPermanentLinkToClipboard"
-          class="grow"
-          alt="copy link"
-        >
-          <SvgIcon type="mdi" :path="mdiContentCopy" size="18" />
-        </LargeFlatSecondaryButton>
-      </div>
-    </div>
+  <div class="grow h-min">
+    <CompactFormWrapper>
+      <CompactFormSection>
+        <template #label> Send this link to your opponent</template>
+        <template #description>
+          The first person to click this link will be your opponent.
+        </template>
+        <CompactFormInputElement>
+          <HorizontalInputGroup>
+            <LargeTextInput
+              v-model="inviteOpponentLink"
+              ref="opponentLinkInput"
+              readonly
+            />
+            <LargeFlatSecondaryButton
+              @click="copyOpponentLinkToClipboard"
+              class="grow"
+              alt="copy link"
+            >
+              <SvgIcon type="mdi" :path="mdiContentCopy" size="18" />
+            </LargeFlatSecondaryButton>
+          </HorizontalInputGroup>
+          <QRCodeDisplay :text="inviteOpponentLink" alt="QRCode for opponent" />
+        </CompactFormInputElement>
+      </CompactFormSection>
+      <CompactFormSection>
+        <template #label>Send this link to spectators</template>
+        <template #description>
+          Anyone with this link can watch your game.
+        </template>
+        <CompactFormInputElement>
+          <HorizontalInputGroup>
+            <LargeTextInput
+              v-model="inviteSpectatorsLink"
+              ref="opponentLinkInput"
+              readonly
+            />
+            <LargeFlatSecondaryButton
+              @click="copySpectatorsLinkToClipboard"
+              class="grow"
+              alt="copy link"
+            >
+              <SvgIcon type="mdi" :path="mdiContentCopy" size="18" />
+            </LargeFlatSecondaryButton>
+          </HorizontalInputGroup>
+          <QRCodeDisplay
+            :text="inviteSpectatorsLink"
+            alt="QRCode for spectators"
+          />
+        </CompactFormInputElement>
+      </CompactFormSection>
+      <CompactFormSection>
+        <template #label>Permanent link to this game</template>
+        <template #description v-if="permanentLink">
+          This link will always point to this game, even after it is finished.
+          forever.
+        </template>
+        <template #description v-else> Go play the game first.</template>
+        <CompactFormInputElement>
+          <HorizontalInputGroup>
+            <LargeTextInput
+              v-model="permanentLink"
+              ref="permanentLinkInput"
+              readonly
+            />
+            <LargeFlatSecondaryButton
+              class="grow"
+              alt="open in new tab"
+              :href="permanentLink"
+              target="_blank"
+            >
+              <SvgIcon type="mdi" :path="mdiOpenInNew" size="18" />
+            </LargeFlatSecondaryButton>
+            <LargeFlatSecondaryButton
+              @click="copyPermanentLinkToClipboard"
+              class="grow"
+              alt="copy link"
+            >
+              <SvgIcon type="mdi" :path="mdiContentCopy" size="18" />
+            </LargeFlatSecondaryButton>
+          </HorizontalInputGroup>
+        </CompactFormInputElement>
+      </CompactFormSection>
+    </CompactFormWrapper>
   </div>
 </template>
 
@@ -84,6 +99,10 @@ import type { MoveItem } from "@/lib/types";
 import { getGameNotation, NotationType } from "@/lib/chessNotation";
 import { toastBusKey } from "@/lib/eventBus";
 import QRCodeDisplay from "@/components/forms/QRCodeDisplay.vue";
+import CompactFormWrapper from "@/components/forms/CompactFormWrapper.vue";
+import CompactFormSection from "@/components/forms/CompactFormSection.vue";
+import HorizontalInputGroup from "@/components/forms/HorizontalInputGroup.vue";
+import CompactFormInputElement from "@/components/forms/CompactFormInputElement.vue";
 
 const props = defineProps<{
   moveHistory?: MoveItem[];
