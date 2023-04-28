@@ -468,6 +468,17 @@
           />
         </CompactFormInputElement>
       </CompactFormSection>
+      <CompactFormSection details>
+        <template #label>Danger Zone</template>
+        <template #description
+          >Reset all settings to their default values</template
+        >
+        <CompactFormInputElement>
+          <LargeDangerButton @click="reset" class="w-full">
+            Reset settings
+          </LargeDangerButton>
+        </CompactFormInputElement>
+      </CompactFormSection>
     </CompactFormWrapper>
   </div>
 </template>
@@ -498,6 +509,7 @@ import CompactFormSection from "@/components/forms/CompactFormSection.vue";
 import CompactFormInputElement from "@/components/forms/CompactFormInputElement.vue";
 import { getSquareColorClass } from "@/lib/chessBoard";
 import RangeInput from "@/components/forms/RangeInput.vue";
+import LargeDangerButton from "@/components/forms/LargeDangerButton.vue";
 
 const settingsStore = useSettingsStore();
 
@@ -524,6 +536,8 @@ const {
   selectedSquareHighlightColor,
   legalMoveHighlightColor,
 } = storeToRefs(settingsStore);
+
+const { reset } = settingsStore;
 
 const { name: userName } = storeToRefs(userStore);
 
