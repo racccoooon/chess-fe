@@ -47,6 +47,7 @@
         <h2 class="text-xl font-bold">Chess Variation</h2>
         <LargeOptionsGroup
           v-model="variation"
+          first-big
           :options="[
             {
               label: 'Standard Chess',
