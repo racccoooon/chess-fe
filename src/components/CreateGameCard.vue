@@ -48,11 +48,31 @@
         <LargeOptionsGroup
           v-model="variation"
           :options="[
-            { label: 'Standard Chess', value: ChessVariation.Standard },
-            { label: 'Chess960', value: ChessVariation.Chess960 },
-            { label: 'Horde', value: ChessVariation.Horde },
-            { label: 'Atheist Chess', value: ChessVariation.Atheist },
-            { label: 'Custom', value: ChessVariation.Custom },
+            {
+              label: 'Standard Chess',
+              description: 'The classic chess experience',
+              value: ChessVariation.Standard,
+            },
+            {
+              label: 'Chess960',
+              description: 'Pieces are shuffled each game',
+              value: ChessVariation.Chess960,
+            },
+            {
+              label: 'Horde',
+              description: 'White plays with 36 pawns',
+              value: ChessVariation.Horde,
+            },
+            {
+              label: 'Atheist Chess',
+              description: 'Bishops are pawns',
+              value: ChessVariation.Atheist,
+            },
+            {
+              label: 'Custom',
+              description: 'Choose the starting position',
+              value: ChessVariation.Custom,
+            },
           ]"
         >
         </LargeOptionsGroup>
