@@ -20,9 +20,9 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, watch } from "vue";
-import { set, useToggle } from "@vueuse/core";
-import QRCode from "qrcode";
+import { ref } from "vue";
+import { useToggle } from "@vueuse/core";
+import { useQRCode } from "@vueuse/integrations/useQRCode";
 // @ts-ignore
 import SvgIcon from "@jamescoyle/vue-icon";
 import { mdiQrcode } from "@mdi/js";
@@ -35,24 +35,5 @@ const props = defineProps<{
 const show = ref(false);
 const toggleShow = useToggle(show);
 
-const dataUrl = ref("");
-
-const generateQrCode = () => {
-  QRCode.toDataURL(props.text, {}, (err: any, url: any) => {
-    if (err) throw err;
-
-    set(dataUrl, url);
-  });
-};
-
-watch(
-  () => props.text,
-  () => {
-    generateQrCode();
-  }
-);
-
-onMounted(() => {
-  generateQrCode();
-});
+const dataUrl = useQRCode(props.text);
 </script>
