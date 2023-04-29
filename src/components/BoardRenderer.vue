@@ -146,17 +146,17 @@
       <g id="pieces">
         <g
           v-for="piece in pieces"
-          :key="objectHash(piece)"
+          :key="idPiece(piece)"
           :transform="`
             translate(
               ${
-                objectHash(piece) === objectHash(selectedPiece)
+                idPiece(piece) === idPiece(selectedPiece)
                   ? boardXToDisplayX(piece.x) * squareAbsoluteWidth +
                     dragMouseDeltaScaled.x
                   : boardXToDisplayX(piece.x) * squareAbsoluteWidth
               },
               ${
-                objectHash(piece) === objectHash(selectedPiece)
+                idPiece(piece) === idPiece(selectedPiece)
                   ? boardYToDisplayY(piece.y) * squareAbsoluteHeight +
                     dragMouseDeltaScaled.y
                   : boardYToDisplayY(piece.y) * squareAbsoluteHeight
@@ -168,9 +168,7 @@
           :data-type="piece.type"
           :data-color="piece.color"
           :id="
-            objectHash(piece) === objectHash(selectedPiece)
-              ? 'selected-piece'
-              : ''
+            idPiece(piece) === idPiece(selectedPiece) ? 'selected-piece' : ''
           "
           ref="pieceElements"
         >
@@ -481,6 +479,13 @@ const animatePiece = (from: Piece, to: Piece) => {
       ease: "power2.inOut",
     }
   );
+};
+
+const idPiece = (piece: Piece | null | undefined) => {
+  if (!piece) {
+    return "";
+  }
+  return `${piece.type}-${piece.color}-${piece.x}-${piece.y}`;
 };
 
 const allowMoveByDragging = computed(() => {
