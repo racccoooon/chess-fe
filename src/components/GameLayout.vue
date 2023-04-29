@@ -6,12 +6,14 @@
     <div
       class="flex flex-col justify-center xl:basis-5/12 xl:basis-1 w-full sm:w-5/6 md:w-3/4 lg:w-2/3 xl:w-auto xl:h-screen"
     >
-      <PlayerInfo
-        :color="topPlayerColor"
-        :name="topPlayerName"
-        :material-advantage="topPlayerMaterialAdvantage"
-        :captured-pieces="topPlayerCapturedPieces"
-      />
+      <div>
+        <PlayerInfo
+          :color="topPlayerColor"
+          :name="topPlayerName"
+          :material-advantage="topPlayerMaterialAdvantage"
+          :captured-pieces="topPlayerCapturedPieces"
+        />
+      </div>
       <div class="w-full xl:h-3/4 relative sm:rounded-2xl overflow-hidden">
         <div>
           <slot name="board-overlay" />
@@ -36,12 +38,19 @@
           class="h-full"
         />
       </div>
-      <PlayerInfo
-        :color="bottomPlayerColor"
-        :name="bottomPlayerName"
-        :material-advantage="bottomPlayerMaterialAdvantage"
-        :captured-pieces="bottomPlayerCapturedPieces"
-      />
+      <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center">
+        <PlayerInfo
+          :color="bottomPlayerColor"
+          :name="bottomPlayerName"
+          :material-advantage="bottomPlayerMaterialAdvantage"
+          :captured-pieces="bottomPlayerCapturedPieces"
+        />
+        <div class="self-end sm:self-center">
+          <button @click="rotate" aria-label="flip board">
+            <SvgIcon type="mdi" :path="mdiFlipVertical" class="w-12" />
+          </button>
+        </div>
+      </div>
     </div>
     <div
       class="h-full flex flex-col basis-2/6 w-full sm:w-5/6 md:w-3/4 lg:w-2/3 xl:w-auto"
@@ -117,6 +126,9 @@ import GameInfoPanel from "@/components/GameInfoPanel.vue";
 import { useSettingsStore } from "@/stores/settings";
 import { storeToRefs } from "pinia";
 import FloatingHomeNavButton from "@/components/FloatingHomeNavButton.vue";
+// @ts-ignore
+import SvgIcon from "@jamescoyle/vue-icon";
+import { mdiFlipVertical } from "@mdi/js";
 
 const props = defineProps<{
   pieces: Piece[];
@@ -162,6 +174,23 @@ const historyIndex = computed({
 
 const { showLastMove, showCheck, lastMoveHighlightColor, boardOrientation } =
   storeToRefs(useSettingsStore());
+
+const rotate = () => {
+  switch (get(boardOrientation)) {
+    case ChessBoardOrientation.WhiteBottom:
+      set(boardOrientation, ChessBoardOrientation.BlackBottom);
+      break;
+    case ChessBoardOrientation.BlackBottom:
+      set(boardOrientation, ChessBoardOrientation.WhiteBottom);
+      break;
+    case ChessBoardOrientation.PlayerBottom:
+      set(boardOrientation, ChessBoardOrientation.OpponentBottom);
+      break;
+    case ChessBoardOrientation.OpponentBottom:
+      set(boardOrientation, ChessBoardOrientation.PlayerBottom);
+      break;
+  }
+};
 
 watch(
   () => props.moveHistory.length,
