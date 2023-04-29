@@ -151,14 +151,12 @@
             translate(
               ${
                 idPiece(piece) === idPiece(selectedPiece)
-                  ? boardXToDisplayX(piece.x) * squareAbsoluteWidth +
-                    dragMouseDeltaScaled.x
+                  ? mouseDragAbsolutePosition.x
                   : boardXToDisplayX(piece.x) * squareAbsoluteWidth
               },
               ${
                 idPiece(piece) === idPiece(selectedPiece)
-                  ? boardYToDisplayY(piece.y) * squareAbsoluteHeight +
-                    dragMouseDeltaScaled.y
+                  ? mouseDragAbsolutePosition.y
                   : boardYToDisplayY(piece.y) * squareAbsoluteHeight
               }
             )
@@ -876,27 +874,35 @@ const isAllowedToInteractWithHoveredPiece = computed(() => {
   );
 });
 
-const dragMouseDelta = computed(() => {
-  if (!get(isDragging)) return { x: 0, y: 0 };
+/***
+ * position of piece being dragged, does not produce a value when no piece is being dragged
+ */
+const mouseDragAbsolutePosition = computed(() => {
+  if (get(selectedPiece) && !get(innerSvg)) {
+    return { x: -1, y: -1 };
+  }
 
-  return {
-    x: get(mouseX) - get(dragMouseStart).x,
-    y: get(mouseY) - get(dragMouseStart).y,
-  };
-});
+  const rect = get(innerSvg)!.getBoundingClientRect();
 
-// TODO: scaling is not working correctly
+  const realX = get(mouseX) - rect.left;
+  const realY = get(mouseY) - rect.top;
 
-const dragMouseDeltaScaled = computed(() => {
-  const outerRect = get(outerSvg)!.getBoundingClientRect();
-  const innerRect = get(innerSvg)!.getBoundingClientRect();
+  const boardX = displayXToBoardX((realX / rect.width) * 8);
+  const boardY = displayYToBoardY((realY / rect.height) * 8);
 
-  const scale = (8 / 7) * (outerRect.width / innerRect.width);
+  // mirror depending on orientation
+  const displayX = boardXToDisplayX(boardX);
+  const displayY = boardYToDisplayY(boardY);
 
-  return {
-    x: get(dragMouseDelta).x * scale,
-    y: get(dragMouseDelta).y * scale,
-  };
+  // scale to display size
+  const scaledX = displayX * get(squareAbsoluteWidth);
+  const scaledY = displayY * get(squareAbsoluteHeight);
+
+  // move to center of mouse
+  const offsetX = scaledX - get(squareAbsoluteWidth) / 2;
+  const offsetY = scaledY - get(squareAbsoluteHeight) / 2;
+
+  return { x: offsetX, y: offsetY };
 });
 
 defineExpose({
