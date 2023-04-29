@@ -6,7 +6,7 @@
       @click="$emit('update:modelValue', option.value)"
       :aria-selected="modelValue === option.value"
       class="grow flex flex-row justify-between p-6 md:h-32 w-64 flex bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 border-4 border-transparent aria-selected:border-current rounded-xl transition-all ease-in-out"
-      :class="{ 'w-3/5': index === 0 && firstBig }"
+      :class="{ 'lg:w-6/12': index === 0 && firstBig }"
     >
       <span class="flex flex-row gap-2 items-start">
         <SvgIcon
