@@ -378,6 +378,8 @@ export const notationToMove = (
     move.to = getSquareFromName(toSquare[0]);
   }
 
+  const pieceToCapture = getPieceAtSquare(pieces, move.to.x, move.to.y);
+
   // find from square
   let possiblePieces = getPiecesThatCanMoveToSquare(pieces, move.to, history);
 
@@ -461,7 +463,8 @@ export const notationToMove = (
     move.captures &&
     pieceToCaptureEnPassant !== undefined &&
     pieceToCaptureEnPassant.type === PieceType.Pawn &&
-    pieceToCaptureEnPassant.color !== activeColor
+    pieceToCaptureEnPassant.color !== activeColor &&
+    !pieceToCapture // we need to check if the pawn is not capturing a piece that is on the square it is moving to otherwise we might mistake a normal capture for an en passant capture
   ) {
     move.kind = MoveType.EnPassant;
   }
