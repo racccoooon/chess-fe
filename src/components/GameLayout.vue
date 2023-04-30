@@ -14,7 +14,10 @@
           :captured-pieces="topPlayerCapturedPieces"
         />
       </div>
-      <div class="w-full xl:h-3/4 relative sm:rounded-2xl overflow-hidden">
+      <div
+        :data-roundness="boardRoundness"
+        class="w-full xl:h-3/4 relative data-[roundness=small]:sm:rounded-md data-[roundness=normal]:sm:rounded-2xl overflow-hidden"
+      >
         <div>
           <slot name="board-overlay" />
         </div>
@@ -172,8 +175,13 @@ const historyIndex = computed({
   },
 });
 
-const { showLastMove, showCheck, lastMoveHighlightColor, boardOrientation } =
-  storeToRefs(useSettingsStore());
+const {
+  showLastMove,
+  showCheck,
+  lastMoveHighlightColor,
+  boardOrientation,
+  boardRoundness,
+} = storeToRefs(useSettingsStore());
 
 const rotate = () => {
   switch (get(boardOrientation)) {

@@ -6,6 +6,7 @@ import {
   ChessBoardBorder,
   ChessBoardColor,
   ChessBoardOrientation,
+  ChessBoardRoundness,
   ClickDuration,
   HighlightColor,
   MoveStyle,
@@ -24,6 +25,7 @@ export const useSettingsStore = defineStore("settings", () => {
     showCheck: true,
     boardColor: ChessBoardColor.Green,
     boardBorder: ChessBoardBorder.None,
+    boardRoundness: ChessBoardRoundness.Normal,
     boardOrientation: ChessBoardOrientation.PlayerBottom,
     pieceSet: PieceSet.Modern,
     piecesDisplaySize: PiecesDisplaySize.Medium as number, // TODO: For some reason, this gets turned into a string somewhere and i can't figure out where

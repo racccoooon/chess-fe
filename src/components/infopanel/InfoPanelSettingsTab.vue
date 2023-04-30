@@ -131,6 +131,25 @@
           />
         </CompactFormInputElement>
         <CompactFormInputElement>
+          <SmallOptionsGroup
+            v-model="boardRoundness"
+            :options="[
+              {
+                value: ChessBoardRoundness.None,
+                label: 'Not rounded',
+              },
+              {
+                value: ChessBoardRoundness.Small,
+                label: 'Slightly rounded',
+              },
+              {
+                value: ChessBoardRoundness.Normal,
+                label: 'Normal roundness',
+              },
+            ]"
+          />
+        </CompactFormInputElement>
+        <CompactFormInputElement>
           <template #label>Board Orientation</template>
           <template #description>
             What side of the board is facing you. (is on the bottom of the
@@ -497,6 +516,7 @@ import {
   PieceType,
   HighlightColor,
   ChessBoardOrientation,
+  ChessBoardRoundness,
 } from "@/lib/types";
 import { storeToRefs } from "pinia";
 import SmallOptionsGroup from "@/components/forms/SmallOptionsGroup.vue";
@@ -525,6 +545,7 @@ const {
   showCheck,
   boardColor,
   boardBorder,
+  boardRoundness,
   boardOrientation,
   pieceSet,
   piecesDisplaySize,

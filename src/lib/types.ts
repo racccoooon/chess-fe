@@ -198,6 +198,12 @@ export enum ChessBoardBorder {
   Thick = "thick",
 }
 
+export enum ChessBoardRoundness {
+  None = "none",
+  Small = "small",
+  Normal = "normal",
+}
+
 export enum ChessBoardColor {
   Neutral = "neutral",
   Wood = "wood",
