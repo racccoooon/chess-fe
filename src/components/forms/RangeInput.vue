@@ -19,7 +19,7 @@
     </div>
     <input
       type="range"
-      v-model="value"
+      v-model.number="value"
       v-bind="$attrs"
       :min="min"
       :max="max"
