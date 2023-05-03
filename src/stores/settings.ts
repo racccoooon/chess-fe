@@ -19,7 +19,7 @@ export const useSettingsStore = defineStore("settings", () => {
     preferredMoveStyle: MoveStyle.Both,
     clickDuration: ClickDuration.Medium as ClickDuration | number,
     notationType: NotationType.Algebraic,
-    useUnicodeIconsInNotation: true,
+    useUnicodeIconsInNotation: false,
     showLegalMoves: true,
     showLastMove: true,
     showCheck: true,
